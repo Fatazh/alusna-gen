@@ -1,0 +1,73 @@
+# ALUSNA Refactor Roadmap
+
+Status values: `planned`, `in-progress`, `blocked`, `completed`, `verified`.
+
+## Phase 0: Baseline and safety
+
+Status: **verified**
+
+- [x] Initialize Git on `main`.
+- [x] Capture the pre-refactor application in commit `10a9f8e`.
+- [x] Record source size, routes, persistence key, large files, and missing tooling.
+- [x] Verify unit tests and production build.
+- [x] Record final dependency audit result for Phase 0-1.
+
+## Phase 1: Architecture blueprint
+
+Status: **verified**
+
+- [x] Define target folders and dependency direction.
+- [x] Map feature ownership and public API rules.
+- [x] Document current and target data flow.
+- [x] Decide state-management strategy.
+- [x] Decide legacy storage migration strategy.
+- [x] Define completion criteria and progress reporting.
+- [x] Validate documentation consistency.
+- [x] Commit the blueprint.
+
+## Phase 2: Safety net
+
+Status: **planned**
+
+- [ ] Add ESLint and formatting with minimal churn.
+- [ ] Add a browser E2E runner and critical navigation smoke tests.
+- [ ] Add storage migration contract tests before changing the key.
+- [ ] Add automated module-boundary checks.
+- [ ] Add CI for test, build, lint, and dependency audit.
+
+## Phase 3: Shared foundation and ALUSNA identity
+
+Status: **planned**
+
+- [ ] Add centralized ALUSNA brand configuration.
+- [ ] Implement tested CIKP-to-ALUSNA storage migration.
+- [ ] Update visible identity, slogan, favicon, metadata, structured data, and exports.
+- [ ] Move generic UI primitives and helpers into `shared`.
+
+## Phase 4: Incremental feature migration
+
+Status: **planned**
+
+- [ ] Migrate color feature and public API.
+- [ ] Migrate typography feature and public API.
+- [ ] Split design-system generation from serializers and migrate it.
+- [ ] Migrate Brand Kit last as an integration feature.
+
+## Phase 5: App shell, routing, SEO, and monetization
+
+Status: **planned**
+
+- [ ] Extract app providers and layout.
+- [ ] Extract browser routing/history.
+- [ ] Extract SEO lifecycle and retain all public paths.
+- [ ] Add required trust/legal pages before third-party ad scripts.
+- [ ] Validate transparent advertising placement.
+
+## Phase 6: Final hardening
+
+Status: **planned**
+
+- [ ] Run unit, E2E, build, audit, accessibility, responsive, and SEO checks.
+- [ ] Compare bundle and behavior against baseline.
+- [ ] Remove temporary adapters only after their consumers are migrated.
+- [ ] Finalize maintenance documentation.
