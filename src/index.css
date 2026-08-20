@@ -1,0 +1,315 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Default = Light mode ── */
+:root {
+  color-scheme: light;
+  --app-bg: linear-gradient(to bottom, #fafafa 0%, #e5e7eb 100%);
+  --chrome-bg: rgba(255, 255, 255, 0.85);
+  --chrome-text: #18181b;
+  --chrome-sub: #52525b;
+  --border: rgba(0, 0, 0, 0.08);
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --surface: #ffffff;
+  --surface-hover: rgba(0, 0, 0, 0.03);
+  --input-bg: #ffffff;
+  --input-border: rgba(0, 0, 0, 0.15);
+  --input-text: #18181b;
+  --chip-bg: rgba(0, 0, 0, 0.04);
+  --chip-active-bg: rgba(0, 0, 0, 0.08);
+  --scrollbar-thumb: #d4d4d8;
+  --scrollbar-hover: #a1a1aa;
+  --tab-indicator: #18181b;
+}
+
+/* ── Dark mode ── */
+.dark {
+  color-scheme: dark;
+  --app-bg: linear-gradient(to bottom, #09090b 0%, #09090b 0%, #000 100%);
+  --chrome-bg: rgba(9, 9, 11, 0.8);
+  --chrome-text: #f4f4f5;
+  --chrome-sub: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(24, 24, 27, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #8b8b95;
+  --surface: #18181b;
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #fafafa;
+  --chip-bg: rgba(255, 255, 255, 0.05);
+  --chip-active-bg: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: #27272a;
+  --scrollbar-hover: #3f3f46;
+  --tab-indicator: #ffffff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+/* ── Utility classes using CSS variables ── */
+@layer utilities {
+  .theme-border { border-color: var(--border); }
+  .theme-card { background-color: var(--card-bg); border-color: var(--card-border); }
+  .theme-text { color: var(--text-primary); }
+  .theme-text-sub { color: var(--text-secondary); }
+  .theme-text-muted { color: var(--text-muted); }
+  .theme-surface { background-color: var(--surface); }
+  .theme-input { background-color: var(--input-bg); border-color: var(--input-border); color: var(--input-text); }
+  .theme-chip { background-color: var(--chip-bg); }
+  .theme-chip-active { background-color: var(--chip-active-bg); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+}
+
+/* Range slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--scrollbar-thumb);
+  height: 6px;
+  border-radius: 9999px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px;
+  background-color: var(--surface);
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  border: 2px solid var(--border);
+}
+input[type="range"]::-moz-range-track {
+  background: var(--scrollbar-thumb);
+  height: 6px;
+  border-radius: 9999px;
+}
+input[type="range"]::-moz-range-thumb {
+  background-color: var(--surface);
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  border: 2px solid var(--border);
+}
+
+/* Color input (native picker) */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 12px;
+}
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 12px;
+}
+
+/* Animations & Micro-interactions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+/* Staggered animations for lists */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 50ms; }
+.stagger-3 { animation-delay: 100ms; }
+.stagger-4 { animation-delay: 150ms; }
+.stagger-5 { animation-delay: 200ms; }
+.stagger-6 { animation-delay: 250ms; }
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Glow effect for interactive elements */
+.glow-hover {
+  transition: box-shadow 0.3s ease;
+}
+.dark .glow-hover:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+.glow-hover:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* Smooth color transition */
+.color-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Tab indicator animation */
+.tab-indicator {
+  position: relative;
+}
+.tab-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--tab-indicator);
+  transition: width 0.2s ease, left 0.2s ease;
+}
+.tab-indicator.active::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e4e4e7 25%, #d4d4d8 50%, #e4e4e7 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 2px;
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.1s ease;
+}
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Card hover effect */
+.dark .card-hover:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.card-hover {
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.card-hover:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+  background-color: rgba(0, 0, 0, 0.02);
+}
