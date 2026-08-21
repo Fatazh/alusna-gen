@@ -37,12 +37,12 @@ Status: **verified**
 
 ## Phase 3: Shared foundation and ALUSNA identity
 
-Status: **planned**
+Status: **verified**
 
-- [ ] Add centralized ALUSNA brand configuration.
-- [ ] Implement tested CIKP-to-ALUSNA storage migration.
-- [ ] Update visible identity, slogan, favicon, metadata, structured data, and exports.
-- [ ] Move generic UI primitives and helpers into `shared`.
+- [x] Add centralized ALUSNA brand configuration.
+- [x] Implement tested CIKP-to-ALUSNA storage migration.
+- [x] Update visible identity, slogan, favicon, metadata, structured data, and exports.
+- [x] Move generic UI primitives and helpers into `shared`.
 
 ## Phase 4: Incremental feature migration
 

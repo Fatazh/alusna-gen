@@ -2,9 +2,9 @@ import { useState } from "react";
 import { PALETTES, hexToRgb, rgbToHex, type RGB } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../../components/Swatch";
-import { CopyButton } from "../../components/CopyButton";
+import { CopyButton } from "../../shared/ui/CopyButton";
 
 export function PatternModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);

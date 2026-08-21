@@ -1,7 +1,7 @@
 import { useEffect, useMemo, type ReactNode } from "react";
 import { useStudio } from "../../store/studio";
 import { bestTextOn, rgbToHex } from "../../lib/color";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { type BrandKit } from "../../lib/designSystem";
 import { loadGoogleFont } from "../../lib/font";
 

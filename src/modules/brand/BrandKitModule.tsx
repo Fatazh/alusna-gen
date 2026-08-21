@@ -6,8 +6,8 @@ import {
   brandKitToW3cTokens,
   parseBrandKitImport,
 } from "../../lib/brandKitInterop";
-import { Card, CardHeader, CardBody } from "../../components/Card";
-import { useToast } from "../../components/toastContext";
+import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
+import { useToast } from "../../shared/ui/toastContext";
 import { PaletteTab } from "./PaletteTab";
 import { TypographyTab } from "./TypographyTab";
 import { GuidelinesTab } from "./GuidelinesTab";

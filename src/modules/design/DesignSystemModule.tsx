@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { useStudio } from "../../store/studio";
 import { rgbToHex } from "../../lib/color";
-import { Card, CardHeader, CardBody } from "../../components/Card";
-import { CopyButton } from "../../components/CopyButton";
+import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
+import { CopyButton } from "../../shared/ui/CopyButton";
 import {
   generateDesignSystem,
   exportDesignSystem,

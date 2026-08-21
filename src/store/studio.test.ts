@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { STUDIO_LIMITS, sanitizePersistedStudioState, useStudio } from "./studio";
+import { sanitizePersistedStudioState } from "./persistence/sanitizeStudioState";
+import { STUDIO_LIMITS } from "./studio.constants";
+import { useStudio } from "./studio";
 
 const rgb = { r: 10, g: 20, b: 30 };
 

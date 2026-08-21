@@ -9,10 +9,10 @@ import {
   type FontDef,
 } from "../../lib/font";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { ColorPicker } from "../../components/ColorPicker";
 import { rgbToHex, formatRgba } from "../../lib/color";
-import { CopyButton } from "../../components/CopyButton";
+import { CopyButton } from "../../shared/ui/CopyButton";
 
 type SampleText = {
   label: string;

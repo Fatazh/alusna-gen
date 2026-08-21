@@ -8,7 +8,9 @@ URL path/query
   -> lazy-loaded feature UI
   -> useStudio selectors/actions
   -> Zustand persist middleware
-  -> localStorage: cikp-studio
+  -> versioned persistence adapter
+       -> localStorage: alusna-studio
+       -> one-time sanitized copy from cikp-studio when target is absent
 ```
 
 Color selection is shared with typography and downstream generators. Brand Kit composes color choices, font choices, tone configuration, optional logo data, saved state, and multiple exports.
@@ -36,7 +38,7 @@ router
 
 ## Persistence migration contract
 
-The current key is `cikp-studio`. The target key will be `alusna-studio` with an explicit schema version.
+The active key is `alusna-studio` at schema version 1. The legacy `cikp-studio` key is read only when the target is absent and is retained as a rollback copy.
 
 Migration requirements:
 
@@ -46,7 +48,7 @@ Migration requirements:
 4. Keep the legacy key during at least the first migration release so rollback remains possible.
 5. Migration must be idempotent.
 6. Corrupt or oversized data must fail safely without breaking application startup.
-7. Unit tests must cover valid, missing, corrupt, oversized, and already-migrated states.
+7. Unit tests cover valid, missing, corrupt, oversized, and already-migrated states; browser E2E verifies the live Zustand integration.
 
 ## Public URL contract
 

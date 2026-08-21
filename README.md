@@ -1,4 +1,6 @@
-# CIKP Studio
+# ALUSNA
+
+**Bagusnya dimulai di sini.**
 
 Frontend studio untuk eksplorasi warna, preview tipografi, pembuatan design token, dan penyusunan brand kit. Seluruh pemrosesan utama berjalan di browser.
 
@@ -49,7 +51,7 @@ Saat ini terdapat 96 unit/contract test dan 13 browser E2E test. GitHub Actions 
 
 ## Penyimpanan dan privasi
 
-Warna, palet, tema, font upload, dan brand kit disimpan secara lokal di browser. Gambar yang dipakai untuk ekstraksi palet tidak dikirim ke server. Font dan logo yang dipersistensikan disimpan sebagai base64 sehingga penggunaan banyak file besar dapat mencapai quota browser; aplikasi akan menampilkan peringatan apabila penyimpanan gagal.
+Warna, palet, tema, font upload, dan brand kit disimpan secara lokal di browser pada storage versioned `alusna-studio`. Data lama `cikp-studio` disalin secara aman ketika ALUSNA pertama kali dibuka dan tetap dipertahankan sebagai rollback copy. Gambar yang dipakai untuk ekstraksi palet tidak dikirim ke server. Font dan logo yang dipersistensikan disimpan sebagai base64 sehingga penggunaan banyak file besar dapat mencapai quota browser; aplikasi akan menampilkan peringatan apabila penyimpanan gagal.
 
 Google Fonts dimuat dari `fonts.googleapis.com` dan `fonts.gstatic.com` ketika font terkait dipilih. Hal ini memerlukan koneksi internet dan mengirim permintaan ke layanan Google.
 

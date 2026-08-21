@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { SEO_PAGES } from "./src/lib/seoPages.ts";
+import { APP_BRAND } from "./src/shared/config/brand.ts";
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -8,7 +9,7 @@ const escapeHtml = (value: string) =>
 function staticSeoPages(siteUrl: string): Plugin {
   const origin = siteUrl.replace(/\/+$/, "");
   return {
-    name: "cikp-static-seo-pages",
+    name: `${APP_BRAND.name.toLowerCase()}-static-seo-pages`,
     enforce: "post",
     generateBundle(_options, bundle) {
       const index = bundle["index.html"];
@@ -19,6 +20,7 @@ function staticSeoPages(siteUrl: string): Plugin {
         const canonical = origin ? `${origin}${page.path}` : "";
         const socialMeta = [
           `<meta property="og:type" content="website">`,
+          `<meta property="og:site_name" content="${escapeHtml(APP_BRAND.name)}">`,
           `<meta property="og:title" content="${escapeHtml(page.title)}">`,
           `<meta property="og:description" content="${escapeHtml(page.description)}">`,
           canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}">` : "",

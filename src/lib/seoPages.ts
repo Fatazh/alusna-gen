@@ -17,7 +17,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/color-palette-generator",
     topTab: "color",
     colorTab: "pattern",
-    title: "Color Palette Generator Gratis | CIKP Studio",
+    title: withBrandTitle("Color Palette Generator Gratis"),
     heading: "Color Palette Generator Gratis",
     description:
       "Buat, simpan, dan ekspor palet warna untuk website, aplikasi, dan identitas brand langsung dari browser.",
@@ -26,7 +26,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/color-matching",
     topTab: "color",
     colorTab: "matching",
-    title: "Color Matching dan Harmoni Warna | CIKP Studio",
+    title: withBrandTitle("Color Matching dan Harmoni Warna"),
     heading: "Color Matching dan Harmoni Warna",
     description:
       "Temukan kombinasi warna complementary, analogous, triadic, dan harmoni lain untuk kebutuhan desain.",
@@ -35,7 +35,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/color-mixer",
     topTab: "color",
     colorTab: "experiment",
-    title: "Color Mixer Online Gratis | CIKP Studio",
+    title: withBrandTitle("Color Mixer Online Gratis"),
     heading: "Color Mixer Online",
     description:
       "Campurkan warna secara visual dan lihat hasil HEX, RGB, HSL, serta komposisi warna secara instan.",
@@ -44,7 +44,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/gradient-generator",
     topTab: "color",
     colorTab: "gradient",
-    title: "CSS Gradient Generator Gratis | CIKP Studio",
+    title: withBrandTitle("CSS Gradient Generator Gratis"),
     heading: "CSS Gradient Generator",
     description:
       "Buat gradien CSS, atur arah dan color stop, lalu salin kode siap pakai untuk proyek web.",
@@ -53,7 +53,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/shade-generator",
     topTab: "color",
     colorTab: "shades",
-    title: "Color Shade Generator 50–950 | CIKP Studio",
+    title: withBrandTitle("Color Shade Generator 50–950"),
     heading: "Color Shade Generator",
     description:
       "Hasilkan skala warna 50 sampai 950 untuk design system, Tailwind CSS, dan UI aplikasi.",
@@ -62,7 +62,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/image-color-extractor",
     topTab: "color",
     colorTab: "image",
-    title: "Ekstrak Palet Warna dari Gambar | CIKP Studio",
+    title: withBrandTitle("Ekstrak Palet Warna dari Gambar"),
     heading: "Image Color Palette Extractor",
     description:
       "Upload gambar dan ekstrak warna dominan secara lokal di browser tanpa mengirim gambar ke server.",
@@ -71,7 +71,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/color-blindness-simulator",
     topTab: "color",
     colorTab: "a11y",
-    title: "Simulasi Buta Warna Online | CIKP Studio",
+    title: withBrandTitle("Simulasi Buta Warna Online"),
     heading: "Color Blindness Simulator",
     description:
       "Simulasikan beberapa jenis buta warna dan periksa apakah palet tetap mudah dibedakan.",
@@ -80,7 +80,7 @@ export const SEO_PAGES: SeoPage[] = [
     path: "/contrast-checker",
     topTab: "color",
     colorTab: "contrast",
-    title: "WCAG Contrast Checker Gratis | CIKP Studio",
+    title: withBrandTitle("WCAG Contrast Checker Gratis"),
     heading: "WCAG Color Contrast Checker",
     description:
       "Periksa rasio kontras warna dan status WCAG AA atau AAA untuk teks, tombol, dan antarmuka.",
@@ -88,7 +88,7 @@ export const SEO_PAGES: SeoPage[] = [
   {
     path: "/font-pairing",
     topTab: "font",
-    title: "Font Pairing dan Typography Preview | CIKP Studio",
+    title: withBrandTitle("Font Pairing dan Typography Preview"),
     heading: "Font Pairing dan Typography Preview",
     description:
       "Bandingkan pasangan font, atur ukuran dan ketebalan, lalu salin CSS tipografi untuk proyek desain.",
@@ -96,7 +96,7 @@ export const SEO_PAGES: SeoPage[] = [
   {
     path: "/design-token-generator",
     topTab: "design",
-    title: "Design Token Generator | CSS, Tailwind dan JSON",
+    title: withBrandTitle("Design Token Generator | CSS, Tailwind dan JSON"),
     heading: "Design Token Generator",
     description:
       "Buat color roles, typography, spacing, radius, dan shadow lalu ekspor ke CSS, Tailwind, JSON, atau React Native.",
@@ -104,7 +104,7 @@ export const SEO_PAGES: SeoPage[] = [
   {
     path: "/brand-kit-generator",
     topTab: "brand",
-    title: "Brand Kit Generator Gratis | CIKP Studio",
+    title: withBrandTitle("Brand Kit Generator Gratis"),
     heading: "Brand Kit Generator",
     description:
       "Susun palet, tipografi, panduan brand, dan audit aksesibilitas dalam satu alat yang berjalan di browser.",
@@ -125,3 +125,4 @@ export function findPageForModule(topTab: TopModule, colorTab: ColorTab = "patte
     ) ?? DEFAULT_SEO_PAGE
   );
 }
+import { withBrandTitle } from "../shared/config/brand.ts";

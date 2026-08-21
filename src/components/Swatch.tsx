@@ -1,8 +1,8 @@
 import { type RGB, rgbToHex, bestTextOn, describe, formatRgba } from "../lib/color";
 import { getColorName } from "../lib/colorNames";
-import { CopyButton } from "./CopyButton";
-import { cn } from "../lib/cn";
-import { useToast } from "./toastContext";
+import { CopyButton } from "../shared/ui/CopyButton";
+import { cn } from "../shared/lib/cn";
+import { useToast } from "../shared/ui/toastContext";
 
 // ---------------------------------------------------------------------------
 // ColorDetail — shows color name + all code formats

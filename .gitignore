@@ -8,6 +8,7 @@ dist-ssr
 .DS_Store
 .vite
 .vite-config-types
+.vs
 *.tsbuildinfo
 vite.config.d.ts
 playwright-report

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useStudio } from "../../store/studio";
 import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../lib/color";
-import { Card, CardHeader, CardBody } from "../../components/Card";
-import { useToast } from "../../components/toastContext";
+import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
+import { useToast } from "../../shared/ui/toastContext";
 import { TONE_PROFILES, type BrandKit } from "../../lib/designSystem";
 import { loadGoogleFont } from "../../lib/font";
 

@@ -1,4 +1,4 @@
-import { sanitizePersistedStudioState } from "../studio";
+import { sanitizePersistedStudioState } from "../persistence/sanitizeStudioState";
 
 export const LEGACY_STUDIO_STORAGE_KEY = "cikp-studio";
 export const ALUSNA_STUDIO_STORAGE_KEY = "alusna-studio";

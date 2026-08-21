@@ -5,6 +5,7 @@ import {
   brandKitToW3cTokens,
   parseBrandKitImport,
 } from "./brandKitInterop";
+import { APP_BRAND } from "../shared/config/brand";
 
 const exportedBrandKit = JSON.stringify({
   brandName: "Acme",
@@ -41,6 +42,7 @@ describe("brand kit interoperability", () => {
     const kit = generateBrandKit({ r: 99, g: 102, b: 241 }, "Acme", "modern");
     const tokens = JSON.parse(brandKitToW3cTokens(kit));
     expect(tokens.color.primary).toEqual({ $type: "color", $value: "#6366F1" });
+    expect(tokens.$description).toContain(APP_BRAND.name);
     expect(tokens.font.headline.$type).toBe("fontFamily");
     expect(brandKitToTailwindConfig(kit)).toContain("colors: { brand:");
   });

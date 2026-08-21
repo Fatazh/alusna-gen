@@ -2,8 +2,8 @@ import { useMemo, useRef, useState } from "react";
 import { hexToRgb } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
-import { CopyButton } from "../../components/CopyButton";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
+import { CopyButton } from "../../shared/ui/CopyButton";
 
 type Stop = { id: number; hex: string; pos: number };
 type GradientType = "linear" | "radial" | "conic";

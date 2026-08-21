@@ -10,11 +10,11 @@ import {
 import { getColorName } from "../../lib/colorNames";
 import { getSmartPairings, ROLE_META, type ColorPair } from "../../lib/colorMatch";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../../components/Swatch";
 import { ColorPicker } from "../../components/ColorPicker";
-import { cn } from "../../lib/cn";
-import { useToast } from "../../components/toastContext";
+import { cn } from "../../shared/lib/cn";
+import { useToast } from "../../shared/ui/toastContext";
 
 // ---------------------------------------------------------------------------
 // Constants

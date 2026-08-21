@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { rgbToHex, type RGB } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { extractPalette } from "../../lib/imagePalette";
-import { useToast } from "../../components/toastContext";
+import { useToast } from "../../shared/ui/toastContext";
+import { APP_BRAND } from "../../shared/config/brand";
 
 export function ImageModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
@@ -78,7 +79,7 @@ export function ImageModule() {
         <Card>
           <CardHeader
             title="Ekstrak Palet dari Gambar"
-            subtitle="Upload foto, CIKP mengekstrak warna dominan. Klik HEX untuk menyalin."
+            subtitle={`Upload foto, ${APP_BRAND.name} mengekstrak warna dominan. Klik HEX untuk menyalin.`}
           />
           <CardBody className="space-y-5">
             <input

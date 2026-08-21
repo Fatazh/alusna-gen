@@ -1,11 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useStudio } from "./store/studio";
 import { rgbToHex, hexToRgb } from "./lib/color";
-import { CopyButton } from "./components/CopyButton";
-import { ToastProvider } from "./components/Toast";
-import { useToast } from "./components/toastContext";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { SponsorSlot } from "./components/SponsorSlot";
+import { CopyButton } from "./shared/ui/CopyButton";
+import { ToastProvider } from "./shared/ui/Toast";
+import { useToast } from "./shared/ui/toastContext";
+import { ErrorBoundary } from "./shared/ui/ErrorBoundary";
+import { SponsorSlot } from "./shared/ui/SponsorSlot";
+import { APP_BRAND, APP_EVENTS } from "./shared/config/brand";
 import {
   findPageForModule,
   findSeoPage,
@@ -94,6 +95,10 @@ function applySeoMetadata(page: SeoPage) {
   document.title = page.title;
   upsertMeta('meta[name="description"]', { name: "description", content: page.description });
   upsertMeta('meta[property="og:title"]', { property: "og:title", content: page.title });
+  upsertMeta('meta[property="og:site_name"]', {
+    property: "og:site_name",
+    content: APP_BRAND.name,
+  });
   upsertMeta('meta[property="og:description"]', {
     property: "og:description",
     content: page.description,
@@ -108,21 +113,27 @@ function applySeoMetadata(page: SeoPage) {
   }
   canonical.href = canonicalUrl;
 
-  let structuredData = document.head.querySelector<HTMLScriptElement>("#cikp-structured-data");
+  let structuredData = document.head.querySelector<HTMLScriptElement>(
+    `#${APP_BRAND.structuredDataId}`,
+  );
   if (!structuredData) {
     structuredData = document.createElement("script");
-    structuredData.id = "cikp-structured-data";
+    structuredData.id = APP_BRAND.structuredDataId;
     structuredData.type = "application/ld+json";
     document.head.appendChild(structuredData);
   }
   structuredData.textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: page.heading,
+    name: `${page.heading} — ${APP_BRAND.name}`,
+    alternateName: APP_BRAND.slogan,
     description: page.description,
     url: canonicalUrl,
     applicationCategory: "DesignApplication",
     operatingSystem: "Any",
+    inLanguage: "id-ID",
+    isAccessibleForFree: true,
+    brand: { "@type": "Brand", name: APP_BRAND.name },
     offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
   });
 }
@@ -251,18 +262,19 @@ export default function App() {
           >
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
               <div className="flex items-center gap-2.5">
-                <div className="grid h-9 w-9 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-lg">
-                  <span className="bg-rose-500" />
-                  <span className="bg-sky-500" />
-                  <span className="bg-emerald-500" />
-                  <span className="bg-amber-500" />
+                <div
+                  className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 text-sm font-black text-white shadow-sm"
+                  aria-hidden="true"
+                >
+                  A
+                  <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-amber-300" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold" style={{ color: "var(--chrome-text)" }}>
-                    CIKP Studio
+                    {APP_BRAND.name}
                   </div>
                   <p className="text-[11px]" style={{ color: "var(--chrome-sub)" }}>
-                    Design System & Brand Kit Generator
+                    {APP_BRAND.slogan}
                   </p>
                 </div>
               </div>
@@ -443,8 +455,8 @@ function StorageWarningListener() {
   useEffect(() => {
     const onStorageError = () =>
       show("Penyimpanan browser penuh. Perubahan baru hanya tersimpan sementara.");
-    window.addEventListener("cikp:storage-error", onStorageError);
-    return () => window.removeEventListener("cikp:storage-error", onStorageError);
+    window.addEventListener(APP_EVENTS.storageError, onStorageError);
+    return () => window.removeEventListener(APP_EVENTS.storageError, onStorageError);
   }, [show]);
 
   return null;

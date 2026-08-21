@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "../../lib/color";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
-import { CopyButton } from "../../components/CopyButton";
-import { cn } from "../../lib/cn";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
+import { CopyButton } from "../../shared/ui/CopyButton";
+import { cn } from "../../shared/lib/cn";
 
 type WCAGLevel = "AA" | "AAA" | "AALarge" | "Fail";
 

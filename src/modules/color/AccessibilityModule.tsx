@@ -7,7 +7,7 @@ import {
 } from "../../lib/colorBlind";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { Swatch } from "../../components/Swatch";
 
 export function AccessibilityModule() {

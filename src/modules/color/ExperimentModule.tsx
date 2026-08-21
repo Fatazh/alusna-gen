@@ -2,9 +2,9 @@ import { useMemo, useRef, useState } from "react";
 import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../../components/Swatch";
-import { CopyButton } from "../../components/CopyButton";
+import { CopyButton } from "../../shared/ui/CopyButton";
 
 type Slot = { id: number; hex: string; weight: number };
 

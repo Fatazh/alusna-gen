@@ -2,11 +2,11 @@ import { useMemo, useState } from "react";
 import { rgbToHex, type RGB } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
-import { Card, CardBody, CardHeader } from "../../components/Card";
-import { CopyButton } from "../../components/CopyButton";
+import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
+import { CopyButton } from "../../shared/ui/CopyButton";
 import { generateShades, shadesToCssVars, shadesToTailwind, type Shade } from "../../lib/shades";
 import { sanitizeTokenName } from "../../lib/designSystem";
-import { useToast } from "../../components/toastContext";
+import { useToast } from "../../shared/ui/toastContext";
 
 export function ShadeModule() {
   const selectedColor = useStudio((s) => s.selectedColor);

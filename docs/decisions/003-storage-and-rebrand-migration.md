@@ -16,3 +16,7 @@ Introduce a versioned `alusna-studio` persistence key and a tested one-way copy 
 - Rebranding cannot be implemented as blind search-and-replace.
 - Migration code must precede switching the persistence key.
 - Legacy cleanup is a later, explicit product decision.
+
+## Implementation
+
+Implemented in Phase 3 through `store/persistence/studioStateStorage.ts`. The active key is `alusna-studio` version 1. Migration copies sanitized data only when the target is absent and retains `cikp-studio` for rollback.
