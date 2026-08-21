@@ -17,7 +17,7 @@ export function AppFooter({ onNavigate }: { onNavigate: (path: string) => void }
                 event.preventDefault();
                 onNavigate(page.path);
               }}
-              className="transition hover:underline"
+              className="inline-flex min-h-6 items-center transition hover:underline"
               style={{ color: "var(--text-secondary)" }}
             >
               {page.id === "about"

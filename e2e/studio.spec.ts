@@ -12,6 +12,11 @@ test.describe("public tool routes", () => {
 
       await expect(page).toHaveTitle(route.title);
       await expect(page.getByRole("heading", { name: route.heading, level: 1 })).toBeVisible();
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        "href",
+        new RegExp(`${route.path}/?$`),
+      );
       await expect(page.locator("#boot-error")).toBeHidden();
     });
   }
@@ -98,6 +103,47 @@ test("color tool navigation preserves the selected color in the share URL", asyn
   await page.getByRole("tab", { name: /Contrast/ }).click();
   await expect(page).toHaveURL(/\/contrast-checker\/?\?c=%23FF0000$/);
   await expect(page.getByRole("heading", { name: "WCAG Color Contrast Checker" })).toBeVisible();
+});
+
+test("representative tools do not overflow at mobile, tablet, or desktop widths", async ({
+  page,
+}) => {
+  const cases = [
+    { width: 390, height: 844, path: "/color-palette-generator/" },
+    { width: 1024, height: 768, path: "/brand-kit-generator/" },
+    { width: 1440, height: 900, path: "/design-token-generator/" },
+  ];
+
+  for (const current of cases) {
+    await page.setViewportSize({ width: current.width, height: current.height });
+    await page.goto(current.path);
+    await expect(page.locator("h1")).toHaveCount(1);
+
+    const dimensions = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }));
+    expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
+
+    if (current.width === 390) {
+      const hexTarget = page.getByRole("button", { name: "Salin #FF6B6B" });
+      const privacyTarget = page.getByRole("link", { name: "Privasi", exact: true });
+      expect((await hexTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);
+      expect((await privacyTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);
+    }
+  }
+});
+
+test("Brand Kit exposes usable export previews", async ({ page }) => {
+  await page.goto("/brand-kit-generator/");
+  await page.getByRole("button", { name: "📦 Export" }).click();
+
+  await expect(page.getByRole("heading", { name: "Export Options" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /HTML Guidelines/ })).toBeEnabled();
+  await expect(page.getByRole("button", { name: /W3C Design Tokens/ })).toBeEnabled();
+  await expect(page.getByRole("button", { name: /Tailwind Config/ })).toBeEnabled();
+  await expect(page.getByRole("heading", { name: "Preview" })).toBeVisible();
+  await expect(page.getByText('"brandName": "My Brand"', { exact: false })).toBeVisible();
 });
 
 test("legacy CIKP storage migrates to ALUSNA without deleting the rollback copy", async ({

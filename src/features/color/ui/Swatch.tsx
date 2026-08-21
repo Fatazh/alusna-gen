@@ -157,7 +157,7 @@ export function Swatch({
         <button
           type="button"
           onClick={copyHex}
-          className="absolute right-2 top-2 cursor-pointer rounded-md px-1.5 py-0.5 text-[10px] font-mono backdrop-blur transition hover:scale-110 hover:brightness-125"
+          className="absolute right-2 top-2 min-h-6 cursor-pointer rounded-md px-1.5 py-0.5 text-[10px] font-mono backdrop-blur transition hover:scale-110 hover:brightness-125"
           style={{
             color: textColor,
             backgroundColor:
@@ -175,7 +175,7 @@ export function Swatch({
         <button
           type="button"
           onClick={onAdd}
-          className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow transition group-hover:opacity-100"
+          className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full opacity-100 shadow transition focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
           style={{ backgroundColor: "var(--surface)", color: "var(--text-primary)" }}
           title="Tambah ke palet tersimpan"
         >
