@@ -1,6 +1,6 @@
 import { CopyButton } from "../../shared/ui/CopyButton";
 import { APP_BRAND } from "../../shared/config/brand";
-import { findPageForModule, type ColorTab, type TopModule } from "../../lib/seoPages";
+import { findPageForModule, type ColorTab, type TopModule } from "../router/routes";
 
 const TOP_TABS: { id: TopModule; label: string; icon: string; desc: string }[] = [
   { id: "color", label: "Warna", icon: "🎨", desc: "Color Playground" },

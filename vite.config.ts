@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { SEO_PAGES } from "./src/lib/seoPages.ts";
+import { SEO_PAGES } from "./src/app/router/routes.ts";
 import { APP_BRAND } from "./src/shared/config/brand.ts";
 
 const escapeHtml = (value: string) =>

@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 5 is in progress. App providers are extracted; layout/routing separation is next.
+Phase 5 is in progress. Providers, layout, and browser routing are extracted; SEO is next.
 
 ## Completed
 
@@ -47,17 +47,19 @@ Phase 5 is in progress. App providers are extracted; layout/routing separation i
 - All 15 browser E2E checks, production build, static gates, and production dependency audit pass after Phase 4.
 - Phase 4 validation completed.
 - App-level error, toast, theme, and storage-warning effects moved into `app/providers`.
+- Header, page intro, loading state, and color history moved into `app/layout`.
+- Route catalog, history mutation, legacy `?m=` compatibility, URL state restoration, keyboard navigation, and popstate handling moved into `app/router`.
+- Router contract coverage added; unit and contract suite expanded to 105 tests across 12 files.
 
 ## In progress
 
-- Extract layout and browser routing while preserving current tool navigation.
+- Extract SEO metadata and structured-data lifecycle from `App.tsx`.
 
 ## Known risks
 
 - `App.tsx` currently couples routing, SEO, and layout; moving all three at once would create a broad regression surface.
 - E2E covers route rendering and primary navigation, but not every editing and export workflow.
 - The ALUSNA domain and final production origin are not configured yet.
-- The legacy `?m=` route compatibility effect has one documented lint exception until routing extraction.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
 - `App.tsx` still reaches feature UI through thin legacy module facades; these remain until routing and app composition move in Phase 5.
 - Store persistence still uses narrow `lib/color.ts` and `lib/font.ts` compatibility facades to avoid a store-to-feature-UI cycle; state slicing/public domain entry design should resolve this later.

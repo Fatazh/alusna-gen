@@ -1,20 +1,15 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { HistoryBar } from "./app/layout/HistoryBar";
 import { ModuleLoading } from "./app/layout/ModuleLoading";
 import { StudioHeader } from "./app/layout/StudioHeader";
 import { ToolPageIntro } from "./app/layout/ToolPageIntro";
 import { AppProviders } from "./app/providers/AppProviders";
+import { useStudioRouter } from "./app/router/useStudioRouter";
 import { useStudio } from "./store/studio";
-import { rgbToHex, hexToRgb } from "./lib/color";
+import { rgbToHex } from "./lib/color";
 import { SponsorSlot } from "./shared/ui/SponsorSlot";
 import { APP_BRAND } from "./shared/config/brand";
-import {
-  findPageForModule,
-  findSeoPage,
-  type ColorTab,
-  type SeoPage,
-  type TopModule,
-} from "./lib/seoPages";
+import { findPageForModule, type ColorTab, type SeoPage } from "./app/router/routes";
 
 const PatternModule = lazy(() =>
   import("./modules/color/PatternModule").then((module) => ({ default: module.PatternModule })),
@@ -66,13 +61,6 @@ const COLOR_TABS: { id: ColorTab; label: string; desc: string }[] = [
   { id: "a11y", label: "Akses", desc: "Buta warna" },
   { id: "contrast", label: "Contrast", desc: "WCAG checker" },
 ];
-
-function updateBrowserPath(path: string, replace = false) {
-  const url = new URL(window.location.href);
-  url.pathname = path;
-  url.searchParams.delete("m");
-  window.history[replace ? "replaceState" : "pushState"]({}, "", url);
-}
 
 function upsertMeta(selector: string, attributes: Record<string, string>) {
   let element = document.head.querySelector<HTMLMetaElement>(selector);
@@ -133,8 +121,6 @@ function applySeoMetadata(page: SeoPage) {
 }
 
 export default function App() {
-  const initialPage = findSeoPage(window.location.pathname);
-  const setActiveModule = useStudio((s) => s.setActiveModule);
   const theme = useStudio((s) => s.theme);
   const setTheme = useStudio((s) => s.setTheme);
 
@@ -143,81 +129,11 @@ export default function App() {
   const selectedColor = useStudio((s) => s.selectedColor);
   const colorHistory = useStudio((s) => s.colorHistory);
   const activeFontFamily = useStudio((s) => s.activeFontFamily);
-  const setActiveFontFamily = useStudio((s) => s.setActiveFontFamily);
-
-  const [colorTab, setColorTab] = useState<ColorTab>(initialPage.colorTab ?? "pattern");
-  const [topTab, setTopTab] = useState<TopModule>(initialPage.topTab);
-  const currentPage = findPageForModule(topTab, colorTab);
-
-  // Restore shared state from URL params (e.g. ?c=%23ff0000&m=color&f=Inter).
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const c = p.get("c");
-    const m = p.get("m");
-    const f = p.get("f");
-    if (c && hexToRgb(c)) {
-      const rgb = hexToRgb(c)!;
-      setSelectedColor(rgb);
-      pushColorHistory(rgb);
-    }
-    if (window.location.pathname === "/" && m && ["color", "font", "design", "brand"].includes(m)) {
-      const legacyModule = m as TopModule;
-      // This one-time compatibility update translates the legacy `?m=` URL.
-      // Routing extraction in Phase 5 will move it out of a React effect.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTopTab(legacyModule);
-      if (m === "color" || m === "font") setActiveModule(m);
-      updateBrowserPath(findPageForModule(legacyModule).path, true);
-    }
-    // Validate font family to prevent CSS injection via URL parameter
-    const SAFE_FONT_PATTERN = /^[a-zA-Z0-9\s\-_]+$/;
-    if (f && SAFE_FONT_PATTERN.test(f) && f.length <= 100) {
-      setActiveFontFamily(f);
-    }
-  }, [setSelectedColor, pushColorHistory, setActiveModule, setActiveFontFamily]);
+  const { colorTab, topTab, currentPage, switchTopTab, switchColorTab } = useStudioRouter();
 
   useEffect(() => {
-    if (window.location.pathname !== currentPage.path) updateBrowserPath(currentPage.path, true);
     applySeoMetadata(currentPage);
   }, [currentPage]);
-
-  useEffect(() => {
-    const onPopState = () => {
-      const page = findSeoPage(window.location.pathname);
-      setTopTab(page.topTab);
-      if (page.colorTab) setColorTab(page.colorTab);
-      if (page.topTab === "color" || page.topTab === "font") setActiveModule(page.topTab);
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, [setActiveModule]);
-
-  // Global keyboard shortcuts (ignore while typing in inputs).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const k = e.key.toLowerCase();
-      if (k === "c") {
-        setTopTab("color");
-        setActiveModule("color");
-        updateBrowserPath(findPageForModule("color", colorTab).path);
-      } else if (k === "f") {
-        setTopTab("font");
-        setActiveModule("font");
-        updateBrowserPath(findPageForModule("font").path);
-      } else if (k === "d") {
-        setTopTab("design");
-        updateBrowserPath(findPageForModule("design").path);
-      } else if (k === "b") {
-        setTopTab("brand");
-        updateBrowserPath(findPageForModule("brand").path);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [colorTab, setActiveModule]);
 
   const shareUrl = (() => {
     const p = new URLSearchParams();
@@ -225,19 +141,6 @@ export default function App() {
     p.set("f", activeFontFamily);
     return `${window.location.origin}${window.location.pathname}?${p.toString()}`;
   })();
-
-  const switchTopTab = (tab: TopModule) => {
-    setTopTab(tab);
-    if (tab === "color" || tab === "font") setActiveModule(tab);
-    updateBrowserPath(findPageForModule(tab, colorTab).path);
-  };
-
-  const switchColorTab = (tab: ColorTab) => {
-    setColorTab(tab);
-    setTopTab("color");
-    setActiveModule("color");
-    updateBrowserPath(findPageForModule("color", tab).path);
-  };
 
   return (
     <AppProviders>

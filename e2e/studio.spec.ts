@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { SEO_PAGES } from "../src/lib/seoPages";
+import { SEO_PAGES } from "../src/app/router/routes";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   LEGACY_STUDIO_STORAGE_KEY,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SEO_PAGES, findPageForModule, findSeoPage } from "./seoPages";
+import { SEO_PAGES, findPageForModule, findSeoPage } from "./routes";
 
 describe("SEO page routing", () => {
   it("uses a unique, crawlable path for every tool", () => {

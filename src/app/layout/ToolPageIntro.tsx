@@ -1,4 +1,4 @@
-import { type SeoPage } from "../../lib/seoPages";
+import { type SeoPage } from "../router/routes";
 
 export function ToolPageIntro({ page }: { page: SeoPage }) {
   return (

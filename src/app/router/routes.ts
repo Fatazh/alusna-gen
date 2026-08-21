@@ -125,4 +125,4 @@ export function findPageForModule(topTab: TopModule, colorTab: ColorTab = "patte
     ) ?? DEFAULT_SEO_PAGE
   );
 }
-import { withBrandTitle } from "../shared/config/brand.ts";
+import { withBrandTitle } from "../../shared/config/brand.ts";
