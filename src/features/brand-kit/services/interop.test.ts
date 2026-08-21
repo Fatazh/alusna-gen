@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { generateBrandKit } from "./designSystem";
-import {
-  brandKitToTailwindConfig,
-  brandKitToW3cTokens,
-  parseBrandKitImport,
-} from "./brandKitInterop";
-import { APP_BRAND } from "../shared/config/brand";
+import { generateBrandKit } from "../model/brandKit";
+import { brandKitToTailwindConfig, brandKitToW3cTokens, parseBrandKitImport } from "./interop";
+import { APP_BRAND } from "../../../shared/config/brand";
 
 const exportedBrandKit = JSON.stringify({
   brandName: "Acme",

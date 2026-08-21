@@ -46,12 +46,12 @@ Status: **verified**
 
 ## Phase 4: Incremental feature migration
 
-Status: **in-progress**
+Status: **verified**
 
 - [x] Migrate color feature and public API.
 - [x] Migrate typography feature and public API.
 - [x] Split design-system generation from serializers and migrate it.
-- [ ] Migrate Brand Kit last as an integration feature.
+- [x] Migrate Brand Kit last as an integration feature.
 
 ## Phase 5: App shell, routing, SEO, and monetization
 

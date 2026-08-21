@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { brandKitToHtml, generateBrandKit } from "./designSystem";
+import { generateBrandKit } from "../model/brandKit";
+import { brandKitToHtml } from "./htmlSerializer";
 
 const indigo = { r: 99, g: 102, b: 241 };
 

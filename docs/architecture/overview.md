@@ -9,37 +9,40 @@ Make ALUSNA easy to maintain through explicit module ownership, stable public AP
 ```text
 main.tsx
   -> App.tsx
-       -> lazy feature modules
-       -> shared components
+       -> lazy compatibility facades
+            -> feature UI
+       -> shared UI/config
        -> seoPages.ts
        -> studio.ts
 
-feature modules
-  -> src/lib domain utilities
-  -> src/components shared UI
+feature UI
+  -> owning feature model/services
+  -> other feature public index.ts APIs
+  -> shared UI
   -> studio.ts shared state
 
 studio.ts
-  -> color and font utilities
+  -> narrow color/font compatibility facades
   -> Zustand localStorage persistence
 ```
 
 Current strengths:
 
-- Framework-independent color and design-system calculations already exist.
+- Color, typography, design-system, and Brand Kit have explicit feature ownership and public APIs.
+- Framework-independent domain calculations and serializers are separated from React UI.
 - Feature modules are lazy-loaded.
 - Persistence input is sanitized.
-- Main domain utilities have unit-test coverage.
+- Domain utilities, serializers, and migration contracts have unit-test coverage.
 - Static SEO pages are produced at build time.
+- Dependency-cruiser enforces cross-feature public API access.
 
 Current pressure points:
 
 - `App.tsx` owns composition, navigation, browser history, metadata, structured data, layout, and keyboard shortcuts.
 - `studio.ts` combines navigation, color, palette, font, theme, and Brand Kit state.
-- The generic `lib` directory mixes several domains and infrastructure concerns.
-- Feature modules import internal files directly instead of exposing stable public APIs.
-- Several files exceed 400 lines and combine UI with orchestration or serialization.
-- There is no automated boundary check or browser-level regression suite.
+- Thin legacy module facades still bridge `App.tsx` to feature UI until app composition moves.
+- Store persistence still uses narrow color/font compatibility facades until state boundaries are refined.
+- Several large React tools remain candidates for UI-only decomposition, but no longer own domain serialization.
 
 ## Target architecture
 

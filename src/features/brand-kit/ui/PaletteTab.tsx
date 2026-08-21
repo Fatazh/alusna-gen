@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { useStudio } from "../../store/studio";
-import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../lib/color";
-import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
-import { useToast } from "../../shared/ui/toastContext";
-import { TONE_PROFILES, type BrandKit } from "../../lib/designSystem";
-import { loadGoogleFont } from "../../lib/font";
+import { useStudio } from "../../../store/studio";
+import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
+import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
+import { useToast } from "../../../shared/ui/toastContext";
+import { TONE_PROFILES, type BrandKit } from "../model/brandKit";
+import { loadGoogleFont } from "../../typography";
 
 // ---------------------------------------------------------------------------
 // Palette Tab

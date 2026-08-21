@@ -4,8 +4,13 @@ import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
-import { generateShades, shadesToCssVars, shadesToTailwind, type Shade } from "../../model/shades";
-import { sanitizeTokenName } from "../../../../lib/designSystem";
+import {
+  generateShades,
+  sanitizeShadeName,
+  shadesToCssVars,
+  shadesToTailwind,
+  type Shade,
+} from "../../model/shades";
 import { useToast } from "../../../../shared/ui/toastContext";
 
 export function ShadeModule() {
@@ -125,7 +130,7 @@ export function ShadeModule() {
               onChange={(e) =>
                 // Only alphanumerics, dash & underscore are allowed: the name
                 // is embedded into exported CSS variable names.
-                setName(sanitizeTokenName(e.target.value))
+                setName(sanitizeShadeName(e.target.value))
               }
               className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
               style={{

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { rgbToHex, contrastRatio } from "../../lib/color";
-import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
-import { CopyButton } from "../../shared/ui/CopyButton";
-import { type BrandKit } from "../../lib/designSystem";
+import { rgbToHex, contrastRatio } from "../../color";
+import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
+import { CopyButton } from "../../../shared/ui/CopyButton";
+import { type BrandKit } from "../model/brandKit";
 
 // ---------------------------------------------------------------------------
 // Accessibility Tab

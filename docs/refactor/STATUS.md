@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 4 is in progress. Color, typography, and design-system are migrated; Brand Kit is next.
+Phase 4 is verified. All four product features now have explicit ownership and public APIs.
 
 ## Completed
 
@@ -35,27 +35,32 @@ Phase 4 is in progress. Color, typography, and design-system are migrated; Brand
 - Phase 3 validation completed.
 - Color domain logic, image palette service, reusable color UI, and all eight color tools moved under `features/color`.
 - `features/color/index.ts` now defines the supported color API.
-- Thin legacy facades preserve current `App.tsx` lazy imports and remaining store/feature imports until their owning migration steps.
+- Thin legacy facades preserve current `App.tsx` lazy imports and narrow store dependencies until their owning migration steps.
 - Typography catalog and validation moved to a pure model, while Google Font, upload, and restore browser operations moved to a dedicated service.
 - `features/typography/index.ts` now defines the supported typography API; the old font module and utility paths are thin compatibility facades.
 - Design-system generation and five export serializers now live in separate pure modules behind `features/design-system/index.ts`.
-- Legacy `lib/designSystem.ts` temporarily owns only Brand Kit behavior and re-exports the new design-system API until the Brand Kit migration is complete.
+- The temporary combined design-system/Brand Kit facade was removed after both feature APIs stabilized.
+- Brand Kit model/generation, sanitized HTML serialization, import/export interop, and UI moved under `features/brand-kit` last.
+- Cross-feature imports now use each feature's root `index.ts`; dependency-cruiser enforces this rule for all four features.
+- Unused compatibility facades were removed; only app-shell and store compatibility paths with known consumers remain.
+- Unit and contract suite expanded to 102 passing tests across 11 files.
+- All 15 browser E2E checks, production build, static gates, and production dependency audit pass after Phase 4.
+- Phase 4 validation completed.
 
 ## In progress
 
-- Migrate Brand Kit as the final Phase 4 integration feature.
+- No implementation task. The next authorized work begins Phase 5.
 
 ## Known risks
 
 - `App.tsx` currently couples routing, SEO, and layout; moving all three at once would create a broad regression surface.
-- Brand Kit depends on multiple domains and must migrate after color, typography, and design-system APIs stabilize.
 - E2E covers route rendering and primary navigation, but not every editing and export workflow.
-- Module boundaries are enforced for the target folders; most legacy code has not moved into those folders yet.
 - The ALUSNA domain and final production origin are not configured yet.
 - The legacy `?m=` route compatibility effect has one documented lint exception until routing extraction.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
-- Color facades under `lib`, `components`, and `modules/color` remain temporary compatibility boundaries; removal depends on later Phase 4 consumers and the Phase 5 app-shell migration.
+- `App.tsx` still reaches feature UI through thin legacy module facades; these remain until routing and app composition move in Phase 5.
+- Store persistence still uses narrow `lib/color.ts` and `lib/font.ts` compatibility facades to avoid a store-to-feature-UI cycle; state slicing/public domain entry design should resolve this later.
 
 ## Next task
 
-Phase 4 should migrate Brand Kit last, then run the complete phase verification gate.
+Phase 5 should extract providers/layout first, then routing and SEO lifecycle, before adding trust/legal pages and transparent advertising integration.

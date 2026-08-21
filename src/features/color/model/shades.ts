@@ -17,6 +17,10 @@ const SHADE_STOPS: { step: number; l: number }[] = [
 
 export type Shade = { step: number; rgb: RGB };
 
+export function sanitizeShadeName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32);
+}
+
 export function generateShades(base: RGB): Shade[] {
   const { h, s } = rgbToHsl(base);
   return SHADE_STOPS.map(({ step, l }) => ({

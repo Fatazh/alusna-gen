@@ -1,6 +1,6 @@
-import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
-import { CopyButton } from "../../shared/ui/CopyButton";
-import { type BrandKit } from "../../lib/designSystem";
+import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
+import { CopyButton } from "../../../shared/ui/CopyButton";
+import { type BrandKit } from "../model/brandKit";
 
 // ---------------------------------------------------------------------------
 // Guidelines Tab

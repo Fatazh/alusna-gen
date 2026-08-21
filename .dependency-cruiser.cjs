@@ -19,6 +19,30 @@ module.exports = {
       to: { path: "^src/app" },
     },
     {
+      name: "color-uses-feature-public-api",
+      severity: "error",
+      from: { path: "^src/features/color" },
+      to: { path: "^src/features/(typography|design-system|brand-kit)/(?!index\\.ts$)" },
+    },
+    {
+      name: "typography-uses-feature-public-api",
+      severity: "error",
+      from: { path: "^src/features/typography" },
+      to: { path: "^src/features/(color|design-system|brand-kit)/(?!index\\.ts$)" },
+    },
+    {
+      name: "design-system-uses-feature-public-api",
+      severity: "error",
+      from: { path: "^src/features/design-system" },
+      to: { path: "^src/features/(color|typography|brand-kit)/(?!index\\.ts$)" },
+    },
+    {
+      name: "brand-kit-uses-feature-public-api",
+      severity: "error",
+      from: { path: "^src/features/brand-kit" },
+      to: { path: "^src/features/(color|typography|design-system)/(?!index\\.ts$)" },
+    },
+    {
       name: "store-does-not-depend-on-ui",
       severity: "error",
       from: { path: "^src/store" },

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, type ReactNode } from "react";
-import { useStudio } from "../../store/studio";
-import { bestTextOn, rgbToHex } from "../../lib/color";
-import { Card, CardBody, CardHeader } from "../../shared/ui/Card";
-import { type BrandKit } from "../../lib/designSystem";
-import { loadGoogleFont } from "../../lib/font";
+import { useStudio } from "../../../store/studio";
+import { bestTextOn, rgbToHex } from "../../color";
+import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
+import { type BrandKit } from "../model/brandKit";
+import { loadGoogleFont } from "../../typography";
 
 type FontOption = {
   family: string;

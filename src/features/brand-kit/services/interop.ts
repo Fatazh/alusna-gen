@@ -1,7 +1,7 @@
-import { hexToRgb, rgbToHex, type RGB } from "./color";
-import { sanitizeFontFamily } from "./font";
-import { type BrandKit, type BrandTone } from "./designSystem";
-import { APP_BRAND } from "../shared/config/brand";
+import { hexToRgb, rgbToHex, type RGB } from "../../color";
+import { sanitizeFontFamily } from "../../typography";
+import { type BrandKit, type BrandTone } from "../model/brandKit";
+import { APP_BRAND } from "../../../shared/config/brand";
 
 export type ImportedBrandKit = {
   brandName: string;

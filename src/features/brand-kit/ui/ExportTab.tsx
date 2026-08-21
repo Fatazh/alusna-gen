@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { rgbToHex } from "../../lib/color";
-import { Card, CardHeader, CardBody } from "../../shared/ui/Card";
-import { useToast } from "../../shared/ui/toastContext";
-import { type BrandKit } from "../../lib/designSystem";
+import { rgbToHex } from "../../color";
+import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
+import { useToast } from "../../../shared/ui/toastContext";
+import { type BrandKit } from "../model/brandKit";
 
 // ---------------------------------------------------------------------------
 // Export Tab
