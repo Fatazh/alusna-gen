@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 5 is in progress. Providers, layout, and browser routing are extracted; SEO is next.
+Phase 5 is in progress. App shell, routing, and SEO are extracted; trust/legal pages are next.
 
 ## Completed
 
@@ -50,10 +50,12 @@ Phase 5 is in progress. Providers, layout, and browser routing are extracted; SE
 - Header, page intro, loading state, and color history moved into `app/layout`.
 - Route catalog, history mutation, legacy `?m=` compatibility, URL state restoration, keyboard navigation, and popstate handling moved into `app/router`.
 - Router contract coverage added; unit and contract suite expanded to 105 tests across 12 files.
+- Runtime title, canonical, Open Graph, and JSON-LD lifecycle moved into `app/seo` with pure metadata builders.
+- SEO contract coverage added; unit and contract suite expanded to 107 tests across 13 files.
 
 ## In progress
 
-- Extract SEO metadata and structured-data lifecycle from `App.tsx`.
+- Add trust/legal pages before expanding advertising integration.
 
 ## Known risks
 

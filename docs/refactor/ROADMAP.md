@@ -59,7 +59,7 @@ Status: **in-progress**
 
 - [x] Extract app providers and layout.
 - [x] Extract browser routing/history.
-- [ ] Extract SEO lifecycle and retain all public paths.
+- [x] Extract SEO lifecycle and retain all public paths.
 - [ ] Add required trust/legal pages before third-party ad scripts.
 - [ ] Validate transparent advertising placement.
 

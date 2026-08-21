@@ -1,15 +1,15 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { HistoryBar } from "./app/layout/HistoryBar";
 import { ModuleLoading } from "./app/layout/ModuleLoading";
 import { StudioHeader } from "./app/layout/StudioHeader";
 import { ToolPageIntro } from "./app/layout/ToolPageIntro";
 import { AppProviders } from "./app/providers/AppProviders";
 import { useStudioRouter } from "./app/router/useStudioRouter";
+import { usePageSeo } from "./app/seo/usePageSeo";
 import { useStudio } from "./store/studio";
 import { rgbToHex } from "./lib/color";
 import { SponsorSlot } from "./shared/ui/SponsorSlot";
-import { APP_BRAND } from "./shared/config/brand";
-import { findPageForModule, type ColorTab, type SeoPage } from "./app/router/routes";
+import { findPageForModule, type ColorTab } from "./app/router/routes";
 
 const PatternModule = lazy(() =>
   import("./modules/color/PatternModule").then((module) => ({ default: module.PatternModule })),
@@ -62,64 +62,6 @@ const COLOR_TABS: { id: ColorTab; label: string; desc: string }[] = [
   { id: "contrast", label: "Contrast", desc: "WCAG checker" },
 ];
 
-function upsertMeta(selector: string, attributes: Record<string, string>) {
-  let element = document.head.querySelector<HTMLMetaElement>(selector);
-  if (!element) {
-    element = document.createElement("meta");
-    document.head.appendChild(element);
-  }
-  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
-}
-
-function applySeoMetadata(page: SeoPage) {
-  const configuredOrigin = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, "");
-  const canonicalUrl = `${configuredOrigin || window.location.origin}${page.path}`;
-  document.title = page.title;
-  upsertMeta('meta[name="description"]', { name: "description", content: page.description });
-  upsertMeta('meta[property="og:title"]', { property: "og:title", content: page.title });
-  upsertMeta('meta[property="og:site_name"]', {
-    property: "og:site_name",
-    content: APP_BRAND.name,
-  });
-  upsertMeta('meta[property="og:description"]', {
-    property: "og:description",
-    content: page.description,
-  });
-  upsertMeta('meta[property="og:url"]', { property: "og:url", content: canonicalUrl });
-
-  let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  if (!canonical) {
-    canonical = document.createElement("link");
-    canonical.rel = "canonical";
-    document.head.appendChild(canonical);
-  }
-  canonical.href = canonicalUrl;
-
-  let structuredData = document.head.querySelector<HTMLScriptElement>(
-    `#${APP_BRAND.structuredDataId}`,
-  );
-  if (!structuredData) {
-    structuredData = document.createElement("script");
-    structuredData.id = APP_BRAND.structuredDataId;
-    structuredData.type = "application/ld+json";
-    document.head.appendChild(structuredData);
-  }
-  structuredData.textContent = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: `${page.heading} — ${APP_BRAND.name}`,
-    alternateName: APP_BRAND.slogan,
-    description: page.description,
-    url: canonicalUrl,
-    applicationCategory: "DesignApplication",
-    operatingSystem: "Any",
-    inLanguage: "id-ID",
-    isAccessibleForFree: true,
-    brand: { "@type": "Brand", name: APP_BRAND.name },
-    offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
-  });
-}
-
 export default function App() {
   const theme = useStudio((s) => s.theme);
   const setTheme = useStudio((s) => s.setTheme);
@@ -131,9 +73,7 @@ export default function App() {
   const activeFontFamily = useStudio((s) => s.activeFontFamily);
   const { colorTab, topTab, currentPage, switchTopTab, switchColorTab } = useStudioRouter();
 
-  useEffect(() => {
-    applySeoMetadata(currentPage);
-  }, [currentPage]);
+  usePageSeo(currentPage);
 
   const shareUrl = (() => {
     const p = new URLSearchParams();
