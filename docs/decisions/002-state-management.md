@@ -17,4 +17,3 @@ Retain Zustand, but split shared state by domain slices. Persist only durable us
 - Existing selectors and actions can move slice by slice.
 - Stored data shapes become explicit compatibility contracts.
 - Brand Kit may consume public state selectors from several slices but will not own those slices.
-

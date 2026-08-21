@@ -2,7 +2,7 @@ import { type RGB, rgbToHex, bestTextOn, describe, formatRgba } from "../lib/col
 import { getColorName } from "../lib/colorNames";
 import { CopyButton } from "./CopyButton";
 import { cn } from "../lib/cn";
-import { useToast } from "./Toast";
+import { useToast } from "./toastContext";
 
 // ---------------------------------------------------------------------------
 // ColorDetail — shows color name + all code formats
@@ -14,12 +14,7 @@ type ColorDetailProps = {
   className?: string;
 };
 
-export function ColorDetail({
-  rgb,
-  alpha = 1,
-  showAlpha = false,
-  className,
-}: ColorDetailProps) {
+export function ColorDetail({ rgb, alpha = 1, showAlpha = false, className }: ColorDetailProps) {
   const info = describe(rgb);
   const colorInfo = getColorName(rgb);
   const rgba = formatRgba({ ...rgb, a: alpha });
@@ -35,7 +30,10 @@ export function ColorDetail({
   return (
     <div className={cn("space-y-2", className)}>
       {/* Color name badge */}
-      <div className="flex items-center justify-between gap-2 rounded-lg px-3 py-2.5" style={{ backgroundColor: "var(--chip-bg)" }}>
+      <div
+        className="flex items-center justify-between gap-2 rounded-lg px-3 py-2.5"
+        style={{ backgroundColor: "var(--chip-bg)" }}
+      >
         <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
           {colorInfo.name}
         </span>
@@ -59,10 +57,15 @@ export function ColorDetail({
           style={{ backgroundColor: "var(--chip-bg)" }}
         >
           <div className="flex items-center gap-2">
-            <span className="w-10 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+            <span
+              className="w-10 text-[10px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--text-muted)" }}
+            >
               {row.label}
             </span>
-            <code className="text-xs" style={{ color: "var(--text-secondary)" }}>{row.value}</code>
+            <code className="text-xs" style={{ color: "var(--text-secondary)" }}>
+              {row.value}
+            </code>
           </div>
           <CopyButton value={row.value} />
         </div>
@@ -127,9 +130,7 @@ export function Swatch({
         className={cn(
           "relative w-full overflow-hidden rounded-xl border transition",
           dims,
-          selected
-            ? "ring-2 ring-indigo-500/30"
-            : "",
+          selected ? "ring-2 ring-indigo-500/30" : "",
         )}
         style={{
           backgroundColor: hex,
@@ -149,7 +150,6 @@ export function Swatch({
         >
           {displayLabel}
         </span>
-
       </button>
 
       {/* HEX badge is a sibling to avoid nesting interactive controls. */}
@@ -161,9 +161,7 @@ export function Swatch({
           style={{
             color: textColor,
             backgroundColor:
-              textColor === "#FFFFFF"
-                ? "rgba(0,0,0,0.25)"
-                : "rgba(255,255,255,0.25)",
+              textColor === "#FFFFFF" ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.25)",
           }}
           aria-label={`Salin ${hex}`}
           title="Klik untuk salin HEX"

@@ -1,10 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  rgbToHex,
-  contrastRatio,
-  hexToRgb,
-  type RGB,
-} from "../../lib/color";
+import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "../../lib/color";
 import { useStudio } from "../../store/studio";
 import { Card, CardBody, CardHeader } from "../../components/Card";
 import { CopyButton } from "../../components/CopyButton";
@@ -22,7 +17,11 @@ function getWCAGLevel(ratio: number): WCAGLevel {
 const LEVEL_META: Record<WCAGLevel, { label: string; color: string; bg: string }> = {
   AAA: { label: "AAA", color: "text-emerald-600 dark:text-emerald-300", bg: "bg-emerald-500/15" },
   AA: { label: "AA", color: "text-green-600 dark:text-green-300", bg: "bg-green-500/15" },
-  AALarge: { label: "AA Large", color: "text-amber-600 dark:text-amber-300", bg: "bg-amber-500/15" },
+  AALarge: {
+    label: "AA Large",
+    color: "text-amber-600 dark:text-amber-300",
+    bg: "bg-amber-500/15",
+  },
   Fail: { label: "Fail", color: "text-rose-600 dark:text-rose-300", bg: "bg-rose-500/15" },
 };
 
@@ -38,10 +37,7 @@ export function ContrastModule() {
 
   const [bgColor, setBgColor] = useState<RGB>({ r: 255, g: 255, b: 255 });
   const [fgColor, setFgColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
-  const ratio = useMemo(
-    () => contrastRatio(fgColor, bgColor),
-    [fgColor, bgColor]
-  );
+  const ratio = useMemo(() => contrastRatio(fgColor, bgColor), [fgColor, bgColor]);
 
   const level = getWCAGLevel(ratio);
   const meta = LEVEL_META[level];
@@ -61,7 +57,10 @@ export function ContrastModule() {
           <CardBody className="space-y-5">
             {/* Quick presets */}
             <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="mb-2 text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Preset Cepat
               </p>
               <div className="flex flex-wrap gap-2">
@@ -87,7 +86,10 @@ export function ContrastModule() {
 
             {/* Use selected color as */}
             <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="mb-2 text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Gunakan Warna Aktif Sebagai
               </p>
               <div className="flex gap-2">
@@ -117,7 +119,10 @@ export function ContrastModule() {
             {/* Color inputs */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-2 block text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                <label
+                  className="mb-2 block text-[11px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   Foreground (Teks)
                 </label>
                 <div className="flex items-center gap-3">
@@ -138,12 +143,19 @@ export function ContrastModule() {
                       if (rgb) setFgColor(rgb);
                     }}
                     className="flex-1 rounded-lg border px-3 py-2 font-mono text-sm outline-none"
-                    style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+                    style={{
+                      borderColor: "var(--input-border)",
+                      backgroundColor: "var(--input-bg)",
+                      color: "var(--input-text)",
+                    }}
                   />
                 </div>
               </div>
               <div>
-                <label className="mb-2 block text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                <label
+                  className="mb-2 block text-[11px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   Background
                 </label>
                 <div className="flex items-center gap-3">
@@ -164,7 +176,11 @@ export function ContrastModule() {
                       if (rgb) setBgColor(rgb);
                     }}
                     className="flex-1 rounded-lg border px-3 py-2 font-mono text-sm outline-none"
-                    style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+                    style={{
+                      borderColor: "var(--input-border)",
+                      backgroundColor: "var(--input-bg)",
+                      color: "var(--input-text)",
+                    }}
                   />
                 </div>
               </div>
@@ -172,7 +188,10 @@ export function ContrastModule() {
 
             {/* Live preview */}
             <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="mb-2 text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Preview
               </p>
               <div
@@ -183,8 +202,8 @@ export function ContrastModule() {
                   Heading Contoh
                 </p>
                 <p className="text-base" style={{ color: fgHex }}>
-                  Ini adalah contoh paragraf teks dengan ukuran normal. Pastikan
-                  kontras yang cukup untuk keterbacaan yang baik.
+                  Ini adalah contoh paragraf teks dengan ukuran normal. Pastikan kontras yang cukup
+                  untuk keterbacaan yang baik.
                 </p>
                 <p className="text-sm" style={{ color: fgHex }}>
                   Teks kecil (14px): Perhatikan kontras untuk ukuran ini.
@@ -224,22 +243,35 @@ export function ContrastModule() {
           <CardHeader title="Hasil Pemeriksaan" />
           <CardBody className="space-y-4">
             {/* Contrast ratio */}
-            <div className="rounded-xl p-4 text-center" style={{ backgroundColor: "var(--chip-bg)" }}>
-              <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Contrast Ratio</p>
+            <div
+              className="rounded-xl p-4 text-center"
+              style={{ backgroundColor: "var(--chip-bg)" }}
+            >
+              <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                Contrast Ratio
+              </p>
               <p className="mt-1 text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
                 {ratio.toFixed(2)}
-                <span className="text-lg" style={{ color: "var(--text-muted)" }}>: 1</span>
-              </p>
-              <div className={cn("mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1", meta.bg)}>
-                <span className={cn("text-sm font-semibold", meta.color)}>
-                  {meta.label}
+                <span className="text-lg" style={{ color: "var(--text-muted)" }}>
+                  : 1
                 </span>
+              </p>
+              <div
+                className={cn(
+                  "mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1",
+                  meta.bg,
+                )}
+              >
+                <span className={cn("text-sm font-semibold", meta.color)}>{meta.label}</span>
               </div>
             </div>
 
             {/* WCAG levels */}
             <div className="space-y-2">
-              <p className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 WCAG 2.1 Requirements
               </p>
               {[
@@ -254,17 +286,29 @@ export function ContrastModule() {
                     key={req.label}
                     className={cn(
                       "flex items-center justify-between rounded-lg px-3 py-2",
-                      pass ? "bg-emerald-500/10" : "bg-rose-500/10"
+                      pass ? "bg-emerald-500/10" : "bg-rose-500/10",
                     )}
                   >
                     <div>
-                      <span className={cn("text-sm font-medium", pass ? "text-emerald-600 dark:text-emerald-300" : "text-rose-600 dark:text-rose-300")}>
+                      <span
+                        className={cn(
+                          "text-sm font-medium",
+                          pass
+                            ? "text-emerald-600 dark:text-emerald-300"
+                            : "text-rose-600 dark:text-rose-300",
+                        )}
+                      >
                         {req.label}
                       </span>
-                      <span className="ml-2 text-[10px]" style={{ color: "var(--text-muted)" }}>{req.desc}</span>
+                      <span className="ml-2 text-[10px]" style={{ color: "var(--text-muted)" }}>
+                        {req.desc}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs" style={{ color: "var(--text-secondary)" }}>
+                      <span
+                        className="font-mono text-xs"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
                         {req.min}:1
                       </span>
                       <span className={cn("text-lg", pass ? "text-emerald-500" : "text-rose-500")}>
@@ -293,10 +337,15 @@ export function ContrastModule() {
             {/* Copy CSS */}
             <div className="rounded-xl p-3" style={{ backgroundColor: "var(--chip-bg)" }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>CSS</span>
+                <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  CSS
+                </span>
                 <CopyButton value={`color: ${fgHex}; background-color: ${bgHex};`} label="Salin" />
               </div>
-              <pre className="overflow-x-auto whitespace-pre-wrap text-[11px]" style={{ color: "var(--text-secondary)" }}>
+              <pre
+                className="overflow-x-auto whitespace-pre-wrap text-[11px]"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {`color: ${fgHex};\nbackground-color: ${bgHex};`}
               </pre>
             </div>

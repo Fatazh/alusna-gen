@@ -199,7 +199,7 @@ describe("mixColors", () => {
   it("average of equal halves is midpoint", () => {
     const mix = mixColors(
       [{ color: { r: 0, g: 0, b: 0 } }, { color: { r: 100, g: 100, b: 100 } }],
-      "average"
+      "average",
     );
     expect(mix).toEqual({ r: 50, g: 50, b: 50 });
   });
@@ -209,7 +209,7 @@ describe("mixColors", () => {
         { color: { r: 0, g: 0, b: 0 }, weight: 3 },
         { color: { r: 100, g: 100, b: 100 }, weight: 1 },
       ],
-      "weighted"
+      "weighted",
     );
     expect(mix.r).toBe(25);
   });
@@ -219,14 +219,14 @@ describe("mixColors", () => {
         { color: { r: 0, g: 0, b: 0 }, weight: 9 },
         { color: { r: 100, g: 100, b: 100 }, weight: 1 },
       ],
-      "average"
+      "average",
     );
     expect(mix.r).toBe(50);
   });
   it("subtractive stays within bounds", () => {
     const mix = mixColors(
       [{ color: { r: 200, g: 100, b: 50 } }, { color: { r: 50, g: 200, b: 150 } }],
-      "subtractive"
+      "subtractive",
     );
     for (const v of [mix.r, mix.g, mix.b]) {
       expect(v).toBeGreaterThanOrEqual(0);
@@ -236,7 +236,7 @@ describe("mixColors", () => {
   it("additive stays within bounds", () => {
     const mix = mixColors(
       [{ color: { r: 200, g: 100, b: 50 } }, { color: { r: 50, g: 200, b: 150 } }],
-      "additive"
+      "additive",
     );
     for (const v of [mix.r, mix.g, mix.b]) {
       expect(v).toBeGreaterThanOrEqual(0);

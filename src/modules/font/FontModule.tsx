@@ -56,12 +56,8 @@ export function FontModule() {
   const [bgMode, setBgMode] = useState<"surface" | "color">("surface");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [samples, setSamples] = useState<SampleText[]>(SAMPLE_TEXTS);
-  const [pairing, setPairing] = useState<{ heading: string; body: string } | null>(
-    null,
-  );
-  const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">(
-    "desktop",
-  );
+  const [pairing, setPairing] = useState<{ heading: string; body: string } | null>(null);
+  const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Curated heading/body pairings (all present in GOOGLE_FONTS).
@@ -97,8 +93,7 @@ export function FontModule() {
 
   // Load Google Font for active family on demand.
   const activeDef = useMemo<FontDef | undefined>(() => {
-    if (uploadedFonts.some((f) => f.family === activeFontFamily))
-      return undefined;
+    if (uploadedFonts.some((f) => f.family === activeFontFamily)) return undefined;
     return GOOGLE_FONTS.find((f) => f.family === activeFontFamily);
   }, [activeFontFamily, uploadedFonts]);
 
@@ -112,8 +107,7 @@ export function FontModule() {
     return GOOGLE_FONTS.filter((f) => {
       const matchCat = category === "all" || f.category === category;
       const matchSearch =
-        search.trim() === "" ||
-        f.family.toLowerCase().includes(search.toLowerCase());
+        search.trim() === "" || f.family.toLowerCase().includes(search.toLowerCase());
       return matchCat && matchSearch;
     });
   }, [category, search]);
@@ -160,17 +154,24 @@ export function FontModule() {
 
   const textColor = bgMode === "color" ? "#FFFFFF" : rgbToHex(selectedColor);
   const bgColor =
-    bgMode === "color"
-      ? formatRgba({ ...selectedColor, a: selectedAlpha })
-      : "var(--surface)";
+    bgMode === "color" ? formatRgba({ ...selectedColor, a: selectedAlpha }) : "var(--surface)";
 
   const cssSnippet = `font-family: ${fontFamilyStack};\nfont-size: ${size}px;\nfont-weight: ${weight};\ncolor: ${rgbToHex(selectedColor)};`;
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
 
-  const getChipStyle = (active: boolean): React.CSSProperties => active
-    ? { borderColor: "var(--border)", backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-    : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)", color: "var(--text-secondary)" };
+  const getChipStyle = (active: boolean): React.CSSProperties =>
+    active
+      ? {
+          borderColor: "var(--border)",
+          backgroundColor: "var(--chip-active-bg)",
+          color: "var(--text-primary)",
+        }
+      : {
+          borderColor: "var(--border)",
+          backgroundColor: "var(--chip-bg)",
+          color: "var(--text-secondary)",
+        };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -248,7 +249,11 @@ export function FontModule() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+              style={{
+                borderColor: "var(--input-border)",
+                backgroundColor: "var(--input-bg)",
+                color: "var(--input-text)",
+              }}
             />
 
             <div className="grid max-h-64 grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
@@ -260,20 +265,29 @@ export function FontModule() {
                   className="rounded-lg border px-3 py-2 text-left transition"
                   style={{
                     borderColor: activeFontFamily === f.family ? "var(--border)" : "var(--border)",
-                    backgroundColor: activeFontFamily === f.family ? "var(--chip-active-bg)" : "transparent",
+                    backgroundColor:
+                      activeFontFamily === f.family ? "var(--chip-active-bg)" : "transparent",
                   }}
                 >
-                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>{f.family}</div>
+                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    {f.family}
+                  </div>
                   <div
                     className="mt-0.5 truncate text-sm"
-                    style={{ fontFamily: fontStack(f.family, f.category), color: "var(--text-primary)" }}
+                    style={{
+                      fontFamily: fontStack(f.family, f.category),
+                      color: "var(--text-primary)",
+                    }}
                   >
                     {f.family}
                   </div>
                 </button>
               ))}
               {filteredFonts.length === 0 && (
-                <p className="col-span-full py-4 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                <p
+                  className="col-span-full py-4 text-center text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   Tidak ada font yang cocok.
                 </p>
               )}
@@ -314,8 +328,7 @@ export function FontModule() {
             )}
             <div className="grid gap-2 sm:grid-cols-3">
               {SUGGESTED_PAIRINGS.slice(0, 3).map((p) => {
-                const active =
-                  pairing?.heading === p.heading && pairing?.body === p.body;
+                const active = pairing?.heading === p.heading && pairing?.body === p.body;
                 return (
                   <button
                     key={`${p.heading}-${p.body}`}
@@ -358,9 +371,10 @@ export function FontModule() {
                     type="button"
                     onClick={() => setBgMode("surface")}
                     className="rounded-md px-2.5 py-1 text-[11px] font-medium transition"
-                    style={bgMode === "surface"
-                      ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-                      : { color: "var(--text-secondary)" }
+                    style={
+                      bgMode === "surface"
+                        ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
+                        : { color: "var(--text-secondary)" }
                     }
                   >
                     Pada surface
@@ -369,9 +383,10 @@ export function FontModule() {
                     type="button"
                     onClick={() => setBgMode("color")}
                     className="rounded-md px-2.5 py-1 text-[11px] font-medium transition"
-                    style={bgMode === "color"
-                      ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-                      : { color: "var(--text-secondary)" }
+                    style={
+                      bgMode === "color"
+                        ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
+                        : { color: "var(--text-secondary)" }
                     }
                   >
                     Pada warna
@@ -384,16 +399,16 @@ export function FontModule() {
                       type="button"
                       onClick={() => setViewport(vp)}
                       className="rounded-md px-2.5 py-1 text-[11px] font-medium transition"
-                      style={viewport === vp
-                        ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-                        : { color: "var(--text-secondary)" }
+                      style={
+                        viewport === vp
+                          ? {
+                              backgroundColor: "var(--chip-active-bg)",
+                              color: "var(--text-primary)",
+                            }
+                          : { color: "var(--text-secondary)" }
                       }
                     >
-                      {vp === "desktop"
-                        ? "Desktop"
-                        : vp === "tablet"
-                          ? "Tablet"
-                          : "Mobile"}
+                      {vp === "desktop" ? "Desktop" : vp === "tablet" ? "Tablet" : "Mobile"}
                     </button>
                   ))}
                 </div>
@@ -445,8 +460,7 @@ export function FontModule() {
             <div
               className="mx-auto transition-all"
               style={{
-                maxWidth:
-                  viewport === "mobile" ? 320 : viewport === "tablet" ? 640 : 1024,
+                maxWidth: viewport === "mobile" ? 320 : viewport === "tablet" ? 640 : 1024,
               }}
             >
               <div
@@ -465,14 +479,16 @@ export function FontModule() {
                         value={s.text}
                         onChange={(e) =>
                           setSamples((prev) =>
-                            prev.map((p, idx) =>
-                              idx === i ? { ...p, text: e.target.value } : p,
-                            ),
+                            prev.map((p, idx) => (idx === i ? { ...p, text: e.target.value } : p)),
                           )
                         }
                         aria-label={`Teks contoh ${s.label}`}
                         className="mb-1 w-full rounded-md border px-2 py-1 text-[11px] outline-none"
-                        style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+                        style={{
+                          borderColor: "var(--input-border)",
+                          backgroundColor: "var(--input-bg)",
+                          color: "var(--input-text)",
+                        }}
                       />
                       <div
                         style={{
@@ -500,10 +516,15 @@ export function FontModule() {
 
             <div className="rounded-xl p-4" style={{ backgroundColor: "var(--chip-bg)" }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>CSS snippet</span>
+                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  CSS snippet
+                </span>
                 <CopyButton value={cssSnippet} label="Salin CSS" />
               </div>
-              <pre className="overflow-x-auto whitespace-pre-wrap text-[11px]" style={{ color: "var(--text-secondary)" }}>
+              <pre
+                className="overflow-x-auto whitespace-pre-wrap text-[11px]"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {cssSnippet}
               </pre>
             </div>
@@ -512,10 +533,7 @@ export function FontModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader
-          title="Warna Teks"
-          subtitle="Warna dari modul warna dipakai di sini"
-        />
+        <CardHeader title="Warna Teks" subtitle="Warna dari modul warna dipakai di sini" />
         <CardBody className="space-y-4">
           <div
             className="h-20 rounded-xl border"

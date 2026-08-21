@@ -10,9 +10,9 @@ describe("sanitizeFontFamily", () => {
 
   it("strips CSS-breaking / HTML characters", () => {
     expect(sanitizeFontFamily("O'Brien")).toBe("OBrien");
-    expect(
-      sanitizeFontFamily('Foo";}</style><script>alert(1)</script>'),
-    ).toBe("Foostylescriptalert1script");
+    expect(sanitizeFontFamily('Foo";}</style><script>alert(1)</script>')).toBe(
+      "Foostylescriptalert1script",
+    );
   });
 
   it("falls back to a safe default when empty", () => {
@@ -25,9 +25,7 @@ describe("sanitizeFontFamily", () => {
 describe("fontStack", () => {
   it("quotes the family and appends fallbacks", () => {
     expect(fontStack("Inter")).toBe("'Inter', system-ui, sans-serif");
-    expect(fontStack("Playfair Display", "serif")).toBe(
-      "'Playfair Display', Georgia, serif",
-    );
+    expect(fontStack("Playfair Display", "serif")).toBe("'Playfair Display', Georgia, serif");
     expect(fontStack("JetBrains Mono", "monospace")).toBe(
       "'JetBrains Mono', Menlo, Monaco, monospace",
     );

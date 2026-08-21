@@ -8,8 +8,7 @@ export type CMYK = { c: number; m: number; y: number; k: number };
 
 export type ColorFormat = "hex" | "rgb" | "rgba" | "cmyk" | "hsl";
 
-const clamp = (n: number, min = 0, max = 255) =>
-  Math.min(max, Math.max(min, n));
+const clamp = (n: number, min = 0, max = 255) => Math.min(max, Math.max(min, n));
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const round = (n: number) => Math.round(n);
 
@@ -191,12 +190,7 @@ export function describe(rgb: RGB): {
 
 // ---------- Harmony ----------
 export type HarmonyType =
-  | "complementary"
-  | "analogous"
-  | "triadic"
-  | "tetradic"
-  | "splitComplementary"
-  | "monochromatic";
+  "complementary" | "analogous" | "triadic" | "tetradic" | "splitComplementary" | "monochromatic";
 
 export function rotateHue(rgb: RGB, deg: number): RGB {
   const hsl = rgbToHsl(rgb);
@@ -217,10 +211,8 @@ export function withSaturation(rgb: RGB, s: number): RGB {
 // This helper produces meaningful lightness-based harmony instead.
 function achromaticHarmony(hsl: HSL, type: HarmonyType): RGB[] {
   const { l, s } = hsl;
-  const g = (lv: number) =>
-    hslToRgb({ h: 0, s, l: Math.max(0, Math.min(100, lv)) });
-  const t = (h: number, lv: number) =>
-    hslToRgb({ h, s: 20, l: Math.max(0, Math.min(100, lv)) });
+  const g = (lv: number) => hslToRgb({ h: 0, s, l: Math.max(0, Math.min(100, lv)) });
+  const t = (h: number, lv: number) => hslToRgb({ h, s: 20, l: Math.max(0, Math.min(100, lv)) });
 
   switch (type) {
     case "complementary":
@@ -256,22 +248,14 @@ export function harmony(rgb: RGB, type: HarmonyType): RGB[] {
     case "triadic":
       return [rgb, rotateHue(rgb, 120), rotateHue(rgb, 240)];
     case "tetradic":
-      return [
-        rgb,
-        rotateHue(rgb, 90),
-        rotateHue(rgb, 180),
-        rotateHue(rgb, 270),
-      ];
+      return [rgb, rotateHue(rgb, 90), rotateHue(rgb, 180), rotateHue(rgb, 270)];
     case "splitComplementary":
       return [rgb, rotateHue(rgb, 150), rotateHue(rgb, 210)];
     case "monochromatic": {
       const levels = [10, 25, 40, 55, 70, 85, 95];
       return levels
         .map((l) => withLightness(rgb, l))
-        .filter(
-          (c, i, arr) =>
-            arr.findIndex((x) => formatHex(x) === formatHex(c)) === i,
-        );
+        .filter((c, i, arr) => arr.findIndex((x) => formatHex(x) === formatHex(c)) === i);
     }
   }
 }
@@ -314,63 +298,33 @@ export function mixColors(
   switch (mode) {
     case "additive":
       return {
-        r: clamp(
-          (colors.reduce((a, c) => a + c.color.r * (c.weight ?? 1), 0) /
-            totalWeight) *
-            2,
-        ),
-        g: clamp(
-          (colors.reduce((a, c) => a + c.color.g * (c.weight ?? 1), 0) /
-            totalWeight) *
-            2,
-        ),
-        b: clamp(
-          (colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) /
-            totalWeight) *
-            2,
-        ),
+        r: clamp((colors.reduce((a, c) => a + c.color.r * (c.weight ?? 1), 0) / totalWeight) * 2),
+        g: clamp((colors.reduce((a, c) => a + c.color.g * (c.weight ?? 1), 0) / totalWeight) * 2),
+        b: clamp((colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) / totalWeight) * 2),
       };
     case "subtractive":
       return {
         r: clamp(
-          colors.reduce(
-            (a, c) => a * (c.color.r / 255) ** (c.weight ?? 1),
-            1,
-          ) **
+          colors.reduce((a, c) => a * (c.color.r / 255) ** (c.weight ?? 1), 1) **
             (1 / totalWeight) *
             255,
         ),
         g: clamp(
-          colors.reduce(
-            (a, c) => a * (c.color.g / 255) ** (c.weight ?? 1),
-            1,
-          ) **
+          colors.reduce((a, c) => a * (c.color.g / 255) ** (c.weight ?? 1), 1) **
             (1 / totalWeight) *
             255,
         ),
         b: clamp(
-          colors.reduce(
-            (a, c) => a * (c.color.b / 255) ** (c.weight ?? 1),
-            1,
-          ) **
+          colors.reduce((a, c) => a * (c.color.b / 255) ** (c.weight ?? 1), 1) **
             (1 / totalWeight) *
             255,
         ),
       };
     case "weighted":
       return {
-        r: round(
-          colors.reduce((a, c) => a + c.color.r * (c.weight ?? 1), 0) /
-            totalWeight,
-        ),
-        g: round(
-          colors.reduce((a, c) => a + c.color.g * (c.weight ?? 1), 0) /
-            totalWeight,
-        ),
-        b: round(
-          colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) /
-            totalWeight,
-        ),
+        r: round(colors.reduce((a, c) => a + c.color.r * (c.weight ?? 1), 0) / totalWeight),
+        g: round(colors.reduce((a, c) => a + c.color.g * (c.weight ?? 1), 0) / totalWeight),
+        b: round(colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) / totalWeight),
       };
     case "average":
     default:

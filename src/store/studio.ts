@@ -89,8 +89,7 @@ const initialRgb = hexToRgb(initialHex) ?? { r: 99, g: 102, b: 241 };
 let idCounter = 0;
 const uid = () => `c${Date.now()}_${idCounter++}`;
 
-const sameRgb = (a: RGB, b: RGB) =>
-  a.r === b.r && a.g === b.g && a.b === b.b;
+const sameRgb = (a: RGB, b: RGB) => a.r === b.r && a.g === b.g && a.b === b.b;
 
 export const STUDIO_LIMITS = {
   savedColors: 200,
@@ -118,16 +117,11 @@ const isRgb = (value: unknown): value is RGB =>
   isRecord(value) &&
   [value.r, value.g, value.b].every(
     (channel) =>
-      typeof channel === "number" &&
-      Number.isInteger(channel) &&
-      channel >= 0 &&
-      channel <= 255,
+      typeof channel === "number" && Number.isInteger(channel) && channel >= 0 && channel <= 255,
   );
 
 const safeText = (value: unknown, fallback = ""): string =>
-  typeof value === "string"
-    ? value.trim().slice(0, MAX_TEXT_LENGTH) || fallback
-    : fallback;
+  typeof value === "string" ? value.trim().slice(0, MAX_TEXT_LENGTH) || fallback : fallback;
 
 function sanitizeSavedColors(value: unknown): SavedColor[] {
   if (!Array.isArray(value)) return [];
@@ -223,9 +217,7 @@ export function sanitizePersistedStudioState(value: unknown): Partial<StudioStat
         bodyFont: sanitizeFontFamily(safeText(kit.bodyFont, "Inter")),
         monoFont: sanitizeFontFamily(safeText(kit.monoFont, "JetBrains Mono")),
         tone: kit.tone as SavedBrandKit["tone"],
-        ...(typeof kit.logoDataUrl === "string"
-          ? { logoDataUrl: kit.logoDataUrl }
-          : {}),
+        ...(typeof kit.logoDataUrl === "string" ? { logoDataUrl: kit.logoDataUrl } : {}),
         createdAt: kit.createdAt as number,
       }));
   }
@@ -283,79 +275,78 @@ export const useStudio = create<StudioState>()(
             : { colorHistory: [rgb, ...s.colorHistory].slice(0, HISTORY_CAP) },
         ),
 
-  theme: "dark" as Theme,
-  setTheme: (t) => set({ theme: t }),
+      theme: "dark" as Theme,
+      setTheme: (t) => set({ theme: t }),
 
-  savedBrandKits: [],
-  saveBrandKit: (kit) =>
-    set((s) => {
-      const id = `bk_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-      return {
-        savedBrandKits: [
-          ...s.savedBrandKits.slice(-(MAX_BRAND_KITS - 1)),
-          { ...kit, id, createdAt: Date.now() },
-        ],
-      };
-    }),
-  loadBrandKit: (id) => {
-    return get().savedBrandKits.find((k) => k.id === id);
-  },
-  deleteBrandKit: (id) =>
-    set((s) => ({
-      savedBrandKits: s.savedBrandKits.filter((k) => k.id !== id),
-    })),
-  renameBrandKit: (id, name) =>
-    set((s) => ({
-      savedBrandKits: s.savedBrandKits.map((k) =>
-        k.id === id ? { ...k, name: name.trim() || k.name } : k,
-      ),
-    })),
+      savedBrandKits: [],
+      saveBrandKit: (kit) =>
+        set((s) => {
+          const id = `bk_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+          return {
+            savedBrandKits: [
+              ...s.savedBrandKits.slice(-(MAX_BRAND_KITS - 1)),
+              { ...kit, id, createdAt: Date.now() },
+            ],
+          };
+        }),
+      loadBrandKit: (id) => {
+        return get().savedBrandKits.find((k) => k.id === id);
+      },
+      deleteBrandKit: (id) =>
+        set((s) => ({
+          savedBrandKits: s.savedBrandKits.filter((k) => k.id !== id),
+        })),
+      renameBrandKit: (id, name) =>
+        set((s) => ({
+          savedBrandKits: s.savedBrandKits.map((k) =>
+            k.id === id ? { ...k, name: name.trim() || k.name } : k,
+          ),
+        })),
 
-  paletteLibrary: [],
-  saveCurrentPaletteAs: (name) =>
-    set((s) => {
-      const trimmed = name.trim() || `Palet ${s.paletteLibrary.length + 1}`;
-      return {
-        paletteLibrary: [
-          ...s.paletteLibrary.slice(-(MAX_PALETTES - 1)),
-          {
-            id: uid(),
-            name: trimmed,
-            colors: s.savedColors.map((c) => ({ ...c })),
-          },
-        ],
-      };
-    }),
-  loadPalette: (id) =>
-    set((s) => {
-      const pal = s.paletteLibrary.find((p) => p.id === id);
-      return pal ? { savedColors: pal.colors.map((c) => ({ ...c })) } : s;
-    }),
-  renamePalette: (id, name) =>
-    set((s) => ({
-      paletteLibrary: s.paletteLibrary.map((p) =>
-        p.id === id ? { ...p, name: name.trim() || p.name } : p,
-      ),
-    })),
-  deletePalette: (id) =>
-    set((s) => ({
-      paletteLibrary: s.paletteLibrary.filter((p) => p.id !== id),
-    })),
+      paletteLibrary: [],
+      saveCurrentPaletteAs: (name) =>
+        set((s) => {
+          const trimmed = name.trim() || `Palet ${s.paletteLibrary.length + 1}`;
+          return {
+            paletteLibrary: [
+              ...s.paletteLibrary.slice(-(MAX_PALETTES - 1)),
+              {
+                id: uid(),
+                name: trimmed,
+                colors: s.savedColors.map((c) => ({ ...c })),
+              },
+            ],
+          };
+        }),
+      loadPalette: (id) =>
+        set((s) => {
+          const pal = s.paletteLibrary.find((p) => p.id === id);
+          return pal ? { savedColors: pal.colors.map((c) => ({ ...c })) } : s;
+        }),
+      renamePalette: (id, name) =>
+        set((s) => ({
+          paletteLibrary: s.paletteLibrary.map((p) =>
+            p.id === id ? { ...p, name: name.trim() || p.name } : p,
+          ),
+        })),
+      deletePalette: (id) =>
+        set((s) => ({
+          paletteLibrary: s.paletteLibrary.filter((p) => p.id !== id),
+        })),
 
-  savedColors: [
-    { id: uid(), name: "Indigo", rgb: { r: 99, g: 102, b: 241 } },
-    { id: uid(), name: "Emerald", rgb: { r: 16, g: 185, b: 129 } },
-    { id: uid(), name: "Rose", rgb: { r: 244, g: 63, b: 94 } },
-  ],
-  saveColor: (rgb, name) =>
-    set((s) => ({
       savedColors: [
-        ...s.savedColors.slice(-(MAX_SAVED_COLORS - 1)),
-        { id: uid(), rgb, name: name ?? rgbToHex(rgb) },
+        { id: uid(), name: "Indigo", rgb: { r: 99, g: 102, b: 241 } },
+        { id: uid(), name: "Emerald", rgb: { r: 16, g: 185, b: 129 } },
+        { id: uid(), name: "Rose", rgb: { r: 244, g: 63, b: 94 } },
       ],
-    })),
-  removeColor: (id) =>
-    set((s) => ({ savedColors: s.savedColors.filter((c) => c.id !== id) })),
+      saveColor: (rgb, name) =>
+        set((s) => ({
+          savedColors: [
+            ...s.savedColors.slice(-(MAX_SAVED_COLORS - 1)),
+            { id: uid(), rgb, name: name ?? rgbToHex(rgb) },
+          ],
+        })),
+      removeColor: (id) => set((s) => ({ savedColors: s.savedColors.filter((c) => c.id !== id) })),
 
       uploadedFonts: [],
       addUploadedFont: (f) =>

@@ -1,24 +1,10 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { ToastContext } from "./toastContext";
 
 // ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
 type ToastItem = { id: number; message: string };
-type ToastCtx = { show: (msg: string) => void };
-
-const ToastContext = createContext<ToastCtx>({ show: () => {} });
-
-export function useToast() {
-  return useContext(ToastContext);
-}
 
 // ---------------------------------------------------------------------------
 // Provider
@@ -41,9 +27,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   // Cleanup all timers on unmount
   useEffect(() => {
+    const timers = timersRef.current;
     return () => {
-      timersRef.current.forEach((t) => clearTimeout(t));
-      timersRef.current.clear();
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
     };
   }, []);
 
@@ -68,11 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               strokeWidth={3}
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
             {t.message}
           </div>

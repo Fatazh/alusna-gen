@@ -23,4 +23,3 @@ Adopt feature-based modules with `app`, `features`, `shared`, and `store` as top
 - Temporary adapters and old/new folder coexistence are allowed during migration.
 - Cross-feature imports must be reviewed.
 - A future boundary-checking tool should enforce the documented dependency direction.
-

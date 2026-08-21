@@ -22,9 +22,7 @@ describe("design system exports", () => {
   });
 
   it("sanitizes token identifiers", () => {
-    expect(sanitizeTokenName('brand;}</style><script>')).toBe(
-      "brandstylescript",
-    );
+    expect(sanitizeTokenName("brand;}</style><script>")).toBe("brandstylescript");
   });
 });
 
@@ -38,8 +36,6 @@ describe("brandKitToHtml", () => {
     expect(html).not.toContain("<script>alert");
     expect(html).not.toContain("<img src=x");
     expect(html).toContain("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
-    expect(html).toContain(
-      "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;",
-    );
+    expect(html).toContain("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;");
   });
 });

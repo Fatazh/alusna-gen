@@ -46,12 +46,16 @@ store ---------> shared
 Run targeted tests while editing, then run all required checks before completing a phase:
 
 ```sh
+npm run lint
+npm run format:check
+npm run check:boundaries
 npm test
 npm run build
+npm run test:e2e
 npm audit --omit=dev
 ```
 
-E2E and lint commands are not available at the Phase 0 baseline. Adding them is a planned safety-net task, not a reason to skip existing checks.
+Use `npm run check` for the local static, unit, boundary, and build gate. Run E2E separately because it starts a production preview and requires the Playwright Chromium binary.
 
 ## Completion report
 
@@ -63,4 +67,3 @@ Every completed task must record:
 - validation performed;
 - remaining risks;
 - next planned task.
-

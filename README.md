@@ -24,10 +24,18 @@ Vite menggunakan `http://localhost:5173` secara default.
 ## Validasi
 
 ```sh
-npm test
-npm run build
+npm run check
+npm run test:e2e
 npm audit --omit=dev
 ```
+
+`npm run check` menjalankan lint, pemeriksaan format, batas dependensi modul, unit test, dan production build. Untuk E2E lokal, pasang Chromium Playwright satu kali terlebih dahulu:
+
+```sh
+npx playwright install chromium
+```
+
+Saat ini terdapat 96 unit/contract test dan 13 browser E2E test. GitHub Actions menjalankan quality gate yang sama pada push dan pull request.
 
 ## Struktur
 

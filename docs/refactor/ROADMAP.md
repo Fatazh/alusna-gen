@@ -27,13 +27,13 @@ Status: **verified**
 
 ## Phase 2: Safety net
 
-Status: **planned**
+Status: **verified**
 
-- [ ] Add ESLint and formatting with minimal churn.
-- [ ] Add a browser E2E runner and critical navigation smoke tests.
-- [ ] Add storage migration contract tests before changing the key.
-- [ ] Add automated module-boundary checks.
-- [ ] Add CI for test, build, lint, and dependency audit.
+- [x] Add ESLint and formatting with one isolated baseline formatting pass.
+- [x] Add a browser E2E runner and critical navigation smoke tests.
+- [x] Add storage migration contract tests before changing the key.
+- [x] Add automated module-boundary checks.
+- [x] Add CI for test, build, lint, formatting, boundaries, E2E, and dependency audit.
 
 ## Phase 3: Shared foundation and ALUSNA identity
 

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { useStudio } from "../../store/studio";
 import { bestTextOn, rgbToHex } from "../../lib/color";
 import { Card, CardBody, CardHeader } from "../../components/Card";
@@ -67,7 +67,10 @@ export function TypographyTab({
   onSelectMono,
 }: TypographyTabProps) {
   const uploadedFonts = useStudio((state) => state.uploadedFonts);
-  const uploadedFamilies = new Set(uploadedFonts.map((font) => font.family));
+  const uploadedFamilies = useMemo(
+    () => new Set(uploadedFonts.map((font) => font.family)),
+    [uploadedFonts],
+  );
   const headlineOptions = addUploadedFonts(HEADLINE_FONTS, uploadedFonts);
   const bodyOptions = addUploadedFonts(BODY_FONTS, uploadedFonts);
   const monoOptions = addUploadedFonts(MONO_FONTS, uploadedFonts);
@@ -81,7 +84,7 @@ export function TypographyTab({
     selected.forEach(({ family, variants }) => {
       if (!uploadedFamilies.has(family)) loadGoogleFont(family, variants);
     });
-  }, [kit.headlineFont, kit.bodyFont, kit.monoFont, uploadedFonts]);
+  }, [kit.headlineFont, kit.bodyFont, kit.monoFont, uploadedFamilies]);
 
   const heroText = bestTextOn(kit.primaryColor);
 
@@ -93,7 +96,10 @@ export function TypographyTab({
           subtitle="Pilihan font langsung diterapkan ke Brand Kit dan seluruh hasil export"
         />
         <CardBody>
-          <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--border)" }}>
+          <div
+            className="overflow-hidden rounded-xl border"
+            style={{ borderColor: "var(--border)" }}
+          >
             <div
               className="px-6 py-8 text-center"
               style={{ backgroundColor: rgbToHex(kit.primaryColor), color: heroText }}
@@ -113,13 +119,17 @@ export function TypographyTab({
             </div>
             <div
               className="space-y-3 px-6 py-5"
-              style={{ backgroundColor: rgbToHex(kit.backgroundColor), color: rgbToHex(kit.textColor) }}
+              style={{
+                backgroundColor: rgbToHex(kit.backgroundColor),
+                color: rgbToHex(kit.textColor),
+              }}
             >
               <p
                 className="text-sm leading-relaxed"
                 style={{ fontFamily: `'${kit.bodyFont}', sans-serif` }}
               >
-                Tipografi body digunakan untuk paragraf, deskripsi produk, dan komunikasi sehari-hari.
+                Tipografi body digunakan untuk paragraf, deskripsi produk, dan komunikasi
+                sehari-hari.
               </p>
               <code
                 className="block rounded-lg px-3 py-2 text-xs"
@@ -132,10 +142,20 @@ export function TypographyTab({
               </code>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
-            <span>Heading: <strong style={{ color: "var(--text-secondary)" }}>{kit.headlineFont}</strong></span>
-            <span>Body: <strong style={{ color: "var(--text-secondary)" }}>{kit.bodyFont}</strong></span>
-            <span>Mono: <strong style={{ color: "var(--text-secondary)" }}>{kit.monoFont}</strong></span>
+          <div
+            className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px]"
+            style={{ color: "var(--text-muted)" }}
+          >
+            <span>
+              Heading:{" "}
+              <strong style={{ color: "var(--text-secondary)" }}>{kit.headlineFont}</strong>
+            </span>
+            <span>
+              Body: <strong style={{ color: "var(--text-secondary)" }}>{kit.bodyFont}</strong>
+            </span>
+            <span>
+              Mono: <strong style={{ color: "var(--text-secondary)" }}>{kit.monoFont}</strong>
+            </span>
           </div>
         </CardBody>
       </Card>
@@ -148,7 +168,10 @@ export function TypographyTab({
         uploadedFamilies={uploadedFamilies}
         onSelect={onSelectHeadline}
         sample={(family) => (
-          <span className="block truncate text-xl font-bold" style={{ fontFamily: `'${family}', sans-serif` }}>
+          <span
+            className="block truncate text-xl font-bold"
+            style={{ fontFamily: `'${family}', sans-serif` }}
+          >
             {kit.brandName} — The quick brown fox
           </span>
         )}
@@ -162,7 +185,10 @@ export function TypographyTab({
         uploadedFamilies={uploadedFamilies}
         onSelect={onSelectBody}
         sample={(family) => (
-          <span className="block text-sm leading-relaxed" style={{ fontFamily: `'${family}', sans-serif` }}>
+          <span
+            className="block text-sm leading-relaxed"
+            style={{ fontFamily: `'${family}', sans-serif` }}
+          >
             The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.
           </span>
         )}
@@ -228,12 +254,22 @@ function FontSection({
                   boxShadow: active ? "0 0 0 2px rgb(99 102 241 / 0.12)" : undefined,
                 }}
               >
-                <span className="mb-1 flex items-center gap-2 text-[10px]" style={{ color: "var(--text-muted)" }}>
+                <span
+                  className="mb-1 flex items-center gap-2 text-[10px]"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   <span>{option.family}</span>
-                  <span className="rounded-full px-1.5 py-0.5" style={{ backgroundColor: "var(--chip-bg)" }}>
+                  <span
+                    className="rounded-full px-1.5 py-0.5"
+                    style={{ backgroundColor: "var(--chip-bg)" }}
+                  >
                     {option.category}
                   </span>
-                  {active && <span className="ml-auto font-semibold text-indigo-600 dark:text-indigo-300">Aktif ✓</span>}
+                  {active && (
+                    <span className="ml-auto font-semibold text-indigo-600 dark:text-indigo-300">
+                      Aktif ✓
+                    </span>
+                  )}
                 </span>
                 <span style={{ color: "var(--text-secondary)" }}>{sample(option.family)}</span>
               </button>

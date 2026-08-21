@@ -10,3 +10,5 @@ dist-ssr
 .vite-config-types
 *.tsbuildinfo
 vite.config.d.ts
+playwright-report
+test-results

@@ -1,0 +1,9 @@
+node_modules
+dist
+.vite
+.vite-config-types
+audit-monetization
+playwright-report
+test-results
+package-lock.json
+*.tsbuildinfo

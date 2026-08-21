@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useStudio } from "../../store/studio";
 import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../lib/color";
 import { Card, CardHeader, CardBody } from "../../components/Card";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 import { TONE_PROFILES, type BrandKit } from "../../lib/designSystem";
 import { loadGoogleFont } from "../../lib/font";
 
@@ -57,22 +57,19 @@ export function PaletteTab({
   const heroText = bestTextOn(kit.primaryColor);
 
   // Generate secondary/accent based on tone when auto-adjust is ON
-  const deriveColors = useCallback(
-    (primary: RGB) => {
-      const hsl = rgbToHsl(primary);
+  const deriveColors = useCallback((primary: RGB) => {
+    const hsl = rgbToHsl(primary);
 
-      // Secondary: complementary-ish hue rotation
-      const secondaryHueShift = hsl.s < 20 ? 0 : 150;
-      const secondary = rotateHue(primary, secondaryHueShift);
+    // Secondary: complementary-ish hue rotation
+    const secondaryHueShift = hsl.s < 20 ? 0 : 150;
+    const secondary = rotateHue(primary, secondaryHueShift);
 
-      // Accent: analogous hue rotation
-      const accentHueShift = hsl.s < 20 ? 0 : 30;
-      const accent = rotateHue(primary, accentHueShift);
+    // Accent: analogous hue rotation
+    const accentHueShift = hsl.s < 20 ? 0 : 30;
+    const accent = rotateHue(primary, accentHueShift);
 
-      return { secondary, accent };
-    },
-    [],
-  );
+    return { secondary, accent };
+  }, []);
 
   // Handle primary color change with auto-adjust
   const handlePrimaryChange = useCallback(
@@ -87,7 +84,15 @@ export function PaletteTab({
         setTextColorOverride(null);
       }
     },
-    [autoAdjust, deriveColors, setPrimaryOverride, setSecondaryOverride, setAccentOverride, setBackgroundOverride, setTextColorOverride],
+    [
+      autoAdjust,
+      deriveColors,
+      setPrimaryOverride,
+      setSecondaryOverride,
+      setAccentOverride,
+      setBackgroundOverride,
+      setTextColorOverride,
+    ],
   );
 
   // Handle secondary color change with auto-adjust
@@ -121,7 +126,8 @@ export function PaletteTab({
     },
     {
       label: "Accent",
-      color: kit.accentColor,              onChange: (c: RGB) => setAccentOverride(c),
+      color: kit.accentColor,
+      onChange: (c: RGB) => setAccentOverride(c),
       role: "accent" as const,
       editable: true,
     },
@@ -152,8 +158,10 @@ export function PaletteTab({
                 🔄
               </div>
               <div>
-                <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>Sesuaikan Otomatis</div>
-                <div className="text-[10px]" style={{ color: "var(--text-secondary)" }}> 
+                <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                  Sesuaikan Otomatis
+                </div>
+                <div className="text-[10px]" style={{ color: "var(--text-secondary)" }}>
                   {autoAdjust
                     ? "Mengubah warna akan menyesuaikan warna lain secara harmonis"
                     : "Pilih warna bebas untuk setiap kolom — hanya tone yang disesuaikan"}
@@ -189,9 +197,11 @@ export function PaletteTab({
       <Card>
         <CardHeader
           title="Palette Utama"
-          subtitle={autoAdjust
-            ? "Klik untuk copy HEX, atau gunakan tombol di bawah untuk pilih warna"
-            : "Pilih warna bebas untuk setiap kolom"}
+          subtitle={
+            autoAdjust
+              ? "Klik untuk copy HEX, atau gunakan tombol di bawah untuk pilih warna"
+              : "Pilih warna bebas untuk setiap kolom"
+          }
         />
         <CardBody>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
@@ -227,8 +237,18 @@ export function PaletteTab({
                   </div>
                   {/* Label & hex */}
                   <div className="mt-2 text-center">
-                    <div className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{item.label}</div>
-                    <div className="font-mono text-[10px]" style={{ color: "var(--text-secondary)" }}>{hex}</div>
+                    <div
+                      className="text-[11px] font-semibold"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {item.label}
+                    </div>
+                    <div
+                      className="font-mono text-[10px]"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {hex}
+                    </div>
                   </div>
                   {/* Color picker button for editable colors */}
                   {item.editable && item.onChange && (
@@ -257,7 +277,10 @@ export function PaletteTab({
                   {/* Lock indicator for non-editable */}
                   {!item.editable && (
                     <div className="mt-1.5 flex justify-center">
-                      <span className="rounded-md px-2 py-0.5 text-[9px]" style={{ color: "var(--text-muted)" }}>
+                      <span
+                        className="rounded-md px-2 py-0.5 text-[9px]"
+                        style={{ color: "var(--text-muted)" }}
+                      >
                         {autoAdjust ? "🔒 Otomatis" : "🔒 Manual"}
                       </span>
                     </div>
@@ -324,7 +347,11 @@ export function PaletteTab({
         <CardBody>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {[
-              { label: "Complementary", color: suggestions.secondary, target: "secondary" as const },
+              {
+                label: "Complementary",
+                color: suggestions.secondary,
+                target: "secondary" as const,
+              },
               { label: "Analogous", color: suggestions.analogous, target: "accent" as const },
               { label: "Triadic I", color: suggestions.triadic1, target: "secondary" as const },
               { label: "Triadic II", color: suggestions.triadic2, target: "accent" as const },
@@ -339,12 +366,20 @@ export function PaletteTab({
                     if (s.target === "secondary") setSecondaryOverride(s.color);
                     else setAccentOverride(s.color);
                   }}
-                  className="group overflow-hidden rounded-xl border transition hover:scale-105 hover:border-indigo-500/50" style={{ borderColor: "var(--border)" }}
+                  className="group overflow-hidden rounded-xl border transition hover:scale-105 hover:border-indigo-500/50"
+                  style={{ borderColor: "var(--border)" }}
                 >
                   <div className="h-14 w-full" style={{ backgroundColor: hex }} />
                   <div className="px-2 py-1.5" style={{ backgroundColor: "var(--surface)" }}>
-                    <div className="text-[10px] font-medium" style={{ color: "var(--text-secondary)" }}>{s.label}</div>
-                    <div className="font-mono text-[9px]" style={{ color: "var(--text-muted)" }}>{hex}</div>
+                    <div
+                      className="text-[10px] font-medium"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {s.label}
+                    </div>
+                    <div className="font-mono text-[9px]" style={{ color: "var(--text-muted)" }}>
+                      {hex}
+                    </div>
                   </div>
                 </button>
               );
@@ -354,7 +389,10 @@ export function PaletteTab({
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
-                onClick={() => { setSecondaryOverride(null); setAccentOverride(null); }}
+                onClick={() => {
+                  setSecondaryOverride(null);
+                  setAccentOverride(null);
+                }}
                 className="rounded-lg border px-3 py-1.5 text-[11px] transition"
                 style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
               >
@@ -368,9 +406,9 @@ export function PaletteTab({
       {/* Brand Preview */}
       <Card>
         <CardHeader title="Preview Brand" subtitle="Seperti apa brand Anda terlihat" />
-        <CardBody>            <div className="overflow-hidden border"
-            style={{ borderRadius: toneStyle.radius + 4 }}
-          >
+        <CardBody>
+          {" "}
+          <div className="overflow-hidden border" style={{ borderRadius: toneStyle.radius + 4 }}>
             {/* Hero */}
             <div
               className="text-center"
@@ -380,7 +418,11 @@ export function PaletteTab({
               }}
             >
               {kit.logoDataUrl && (
-                <img src={kit.logoDataUrl} alt="Logo" className="mx-auto mb-4 h-16 object-contain" />
+                <img
+                  src={kit.logoDataUrl}
+                  alt="Logo"
+                  className="mx-auto mb-4 h-16 object-contain"
+                />
               )}
               <h2
                 style={{
@@ -404,9 +446,7 @@ export function PaletteTab({
               )}
             </div>
             {/* Content */}
-            <div
-              style={{ backgroundColor: rgbToHex(effectiveBg), padding: toneStyle.spacing }}
-            >
+            <div style={{ backgroundColor: rgbToHex(effectiveBg), padding: toneStyle.spacing }}>
               <div className="grid grid-cols-3 gap-4">
                 <div
                   className="border"
@@ -420,11 +460,20 @@ export function PaletteTab({
                 >
                   <div
                     className="text-xs font-semibold"
-                    style={{ color: rgbToHex(kit.secondaryColor), fontFamily: `'${kit.headlineFont}', sans-serif` }}
+                    style={{
+                      color: rgbToHex(kit.secondaryColor),
+                      fontFamily: `'${kit.headlineFont}', sans-serif`,
+                    }}
                   >
                     Feature 1
                   </div>
-                  <div className="mt-1 text-[10px]" style={{ color: rgbToHex(effectiveText) + "99", fontFamily: `'${kit.bodyFont}', sans-serif` }}>
+                  <div
+                    className="mt-1 text-[10px]"
+                    style={{
+                      color: rgbToHex(effectiveText) + "99",
+                      fontFamily: `'${kit.bodyFont}', sans-serif`,
+                    }}
+                  >
                     Description text
                   </div>
                 </div>
@@ -440,11 +489,20 @@ export function PaletteTab({
                 >
                   <div
                     className="text-xs font-semibold"
-                    style={{ color: rgbToHex(kit.accentColor), fontFamily: `'${kit.headlineFont}', sans-serif` }}
+                    style={{
+                      color: rgbToHex(kit.accentColor),
+                      fontFamily: `'${kit.headlineFont}', sans-serif`,
+                    }}
                   >
                     Feature 2
                   </div>
-                  <div className="mt-1 text-[10px]" style={{ color: rgbToHex(effectiveText) + "99", fontFamily: `'${kit.bodyFont}', sans-serif` }}>
+                  <div
+                    className="mt-1 text-[10px]"
+                    style={{
+                      color: rgbToHex(effectiveText) + "99",
+                      fontFamily: `'${kit.bodyFont}', sans-serif`,
+                    }}
+                  >
                     Description text
                   </div>
                 </div>
@@ -460,19 +518,28 @@ export function PaletteTab({
                 >
                   <div
                     className="text-xs font-semibold"
-                    style={{ color: rgbToHex(kit.primaryColor), fontFamily: `'${kit.headlineFont}', sans-serif` }}
+                    style={{
+                      color: rgbToHex(kit.primaryColor),
+                      fontFamily: `'${kit.headlineFont}', sans-serif`,
+                    }}
                   >
                     Feature 3
                   </div>
-                  <div className="mt-1 text-[10px]" style={{ color: rgbToHex(effectiveText) + "99", fontFamily: `'${kit.bodyFont}', sans-serif` }}>
+                  <div
+                    className="mt-1 text-[10px]"
+                    style={{
+                      color: rgbToHex(effectiveText) + "99",
+                      fontFamily: `'${kit.bodyFont}', sans-serif`,
+                    }}
+                  >
                     Description text
                   </div>
                 </div>
               </div>
               <div className="mt-2 text-center">
-              <button
-                type="button"
-                className="text-xs font-semibold transition hover:opacity-90"
+                <button
+                  type="button"
+                  className="text-xs font-semibold transition hover:opacity-90"
                   style={{
                     backgroundColor: rgbToHex(kit.primaryColor),
                     color: heroText,

@@ -1,9 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  rgbToHex,
-  contrastRatio,
-  type RGB,
-} from "../../lib/color";
+import { rgbToHex, contrastRatio, type RGB } from "../../lib/color";
 import {
   simulateColorBlindness,
   COLOR_BLIND_TYPES,
@@ -35,7 +31,10 @@ export function AccessibilityModule() {
     let worst = Infinity;
     for (let i = 0; i < paletteRgbs.length; i++) {
       for (let j = i + 1; j < paletteRgbs.length; j++) {
-        const ratio = contrastRatio(sim(paletteRgbs[i]), sim(paletteRgbs[j]));
+        const ratio = contrastRatio(
+          simulateColorBlindness(paletteRgbs[i], type),
+          simulateColorBlindness(paletteRgbs[j], type),
+        );
         if (ratio < worst) worst = ratio;
       }
     }
@@ -71,20 +70,21 @@ export function AccessibilityModule() {
 
             {/* Original vs simulated */}
             <div className="grid grid-cols-2 gap-3">
-              <p className="col-span-full text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="col-span-full text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Asli
               </p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {paletteRgbs.map((rgb, i) => (
-                  <Swatch
-                    key={`orig-${rgbToHex(rgb)}-${i}`}
-                    rgb={rgb}
-                    size="sm"
-                    showCode={false}
-                  />
+                  <Swatch key={`orig-${rgbToHex(rgb)}-${i}`} rgb={rgb} size="sm" showCode={false} />
                 ))}
               </div>
-              <p className="col-span-full mt-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="col-span-full mt-2 text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 {COLOR_BLIND_TYPES.find((t) => t.id === type)?.label}
               </p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -101,12 +101,18 @@ export function AccessibilityModule() {
 
             {/* Mock UI under simulation */}
             <div>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="mb-2 text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Preview UI
               </p>
               <div
                 className="rounded-2xl border p-5"
-                style={{ borderColor: "var(--border)", backgroundColor: rgbToHex(sim(selectedColor)) }}
+                style={{
+                  borderColor: "var(--border)",
+                  backgroundColor: rgbToHex(sim(selectedColor)),
+                }}
               >
                 <p
                   className="text-xl font-bold"
@@ -141,7 +147,10 @@ export function AccessibilityModule() {
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
             Kontras terendah antar-warna palet di bawah simulasi:
           </p>
-          <div className="flex items-center justify-between rounded-lg px-3 py-2" style={{ backgroundColor: "var(--chip-bg)" }}>
+          <div
+            className="flex items-center justify-between rounded-lg px-3 py-2"
+            style={{ backgroundColor: "var(--chip-bg)" }}
+          >
             <span
               className="font-mono text-sm"
               style={{ color: worstContrast >= 3 ? "#34D399" : "#FB7185" }}
@@ -153,8 +162,7 @@ export function AccessibilityModule() {
             </span>
           </div>
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Semakin rendah, semakin sulit membedakan warna bagi tipe penglihatan
-            tersebut.
+            Semakin rendah, semakin sulit membedakan warna bagi tipe penglihatan tersebut.
           </p>
         </CardBody>
       </Card>

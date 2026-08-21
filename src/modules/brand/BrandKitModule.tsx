@@ -1,9 +1,13 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { useStudio } from "../../store/studio";
 import { type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../lib/color";
-import { brandKitToTailwindConfig, brandKitToW3cTokens, parseBrandKitImport } from "../../lib/brandKitInterop";
+import {
+  brandKitToTailwindConfig,
+  brandKitToW3cTokens,
+  parseBrandKitImport,
+} from "../../lib/brandKitInterop";
 import { Card, CardHeader, CardBody } from "../../components/Card";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 import { PaletteTab } from "./PaletteTab";
 import { TypographyTab } from "./TypographyTab";
 import { GuidelinesTab } from "./GuidelinesTab";
@@ -32,7 +36,9 @@ export function BrandKitModule() {
   const [tagline, setTagline] = useState("");
   const [tone, setTone] = useState<BrandTone>("modern");
   const [logoDataUrl, setLogoDataUrl] = useState<string | undefined>();
-  const [activeTab, setActiveTab] = useState<"palette" | "typography" | "guidelines" | "export" | "accessibility">("palette");
+  const [activeTab, setActiveTab] = useState<
+    "palette" | "typography" | "guidelines" | "export" | "accessibility"
+  >("palette");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
 
@@ -89,39 +95,45 @@ export function BrandKitModule() {
 
   const [isDragging, setIsDragging] = useState(false);
 
-  const processLogoFile = useCallback(async (file: File) => {
-    // Type validation (SVG excluded — external resource / tracking concerns).
-    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      show("Format logo tidak didukung. Gunakan PNG, JPG, atau WebP.");
-      return;
-    }
-    // Size validation (max 2MB — the logo is embedded as a base64 data URL).
-    const MAX_LOGO_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_LOGO_SIZE) {
-      show("Logo terlalu besar. Maksimal 2MB.");
-      return;
-    }
-    try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(reader.error ?? new Error("Gagal membaca file"));
-        reader.readAsDataURL(file);
-      });
-      setLogoDataUrl(dataUrl);
-      show("✓ Logo berhasil diunggah!");
-    } catch {
-      show("Gagal mengunggah logo");
-    }
-  }, [show]);
+  const processLogoFile = useCallback(
+    async (file: File) => {
+      // Type validation (SVG excluded — external resource / tracking concerns).
+      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+        show("Format logo tidak didukung. Gunakan PNG, JPG, atau WebP.");
+        return;
+      }
+      // Size validation (max 2MB — the logo is embedded as a base64 data URL).
+      const MAX_LOGO_SIZE = 2 * 1024 * 1024;
+      if (file.size > MAX_LOGO_SIZE) {
+        show("Logo terlalu besar. Maksimal 2MB.");
+        return;
+      }
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.error ?? new Error("Gagal membaca file"));
+          reader.readAsDataURL(file);
+        });
+        setLogoDataUrl(dataUrl);
+        show("✓ Logo berhasil diunggah!");
+      } catch {
+        show("Gagal mengunggah logo");
+      }
+    },
+    [show],
+  );
 
-  const handleLogoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Clear the input so picking the same file again re-fires onChange.
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    await processLogoFile(file);
-  }, [processLogoFile]);
+  const handleLogoUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      // Clear the input so picking the same file again re-fires onChange.
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      await processLogoFile(file);
+    },
+    [processLogoFile],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -135,15 +147,18 @@ export function BrandKitModule() {
     setIsDragging(false);
   }, []);
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      await processLogoFile(file);
-    }
-  }, [processLogoFile]);
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        await processLogoFile(file);
+      }
+    },
+    [processLogoFile],
+  );
 
   const handleSaveBrandKit = useCallback(() => {
     saveBrandKit({
@@ -214,24 +229,35 @@ export function BrandKitModule() {
     URL.revokeObjectURL(url);
   }, []);
 
-  const handleImportJson = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      if (file.size > 1024 * 1024) throw new Error("File Brand Kit maksimal 1 MB.");
-      const imported = parseBrandKitImport(await file.text());
-      setBrandName(imported.brandName); setTagline(imported.tagline); setTone(imported.tone); setLogoDataUrl(undefined);
-      setPrimaryOverride(imported.primaryColor); setSecondaryOverride(imported.secondaryColor); setAccentOverride(imported.accentColor);
-      setBackgroundOverride(imported.backgroundColor); setTextColorOverride(imported.textColor);
-      setHeadlineFontOverride(imported.headlineFont); setBodyFontOverride(imported.bodyFont); setMonoFontOverride(imported.monoFont);
-      setActiveTab("palette");
-      show("Brand kit berhasil diimpor.");
-    } catch (error) {
-      show(error instanceof Error ? error.message : "Gagal mengimpor Brand Kit.");
-    } finally {
-      event.target.value = "";
-    }
-  }, [show]);
+  const handleImportJson = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        if (file.size > 1024 * 1024) throw new Error("File Brand Kit maksimal 1 MB.");
+        const imported = parseBrandKitImport(await file.text());
+        setBrandName(imported.brandName);
+        setTagline(imported.tagline);
+        setTone(imported.tone);
+        setLogoDataUrl(undefined);
+        setPrimaryOverride(imported.primaryColor);
+        setSecondaryOverride(imported.secondaryColor);
+        setAccentOverride(imported.accentColor);
+        setBackgroundOverride(imported.backgroundColor);
+        setTextColorOverride(imported.textColor);
+        setHeadlineFontOverride(imported.headlineFont);
+        setBodyFontOverride(imported.bodyFont);
+        setMonoFontOverride(imported.monoFont);
+        setActiveTab("palette");
+        show("Brand kit berhasil diimpor.");
+      } catch (error) {
+        show(error instanceof Error ? error.message : "Gagal mengimpor Brand Kit.");
+      } finally {
+        event.target.value = "";
+      }
+    },
+    [show],
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -239,12 +265,18 @@ export function BrandKitModule() {
       <Card>
         <CardBody>
           <div className="flex flex-col sm:flex-row items-start gap-6">
-            <input ref={importInputRef} type="file" accept="application/json,.json" className="hidden" onChange={handleImportJson} />
+            <input
+              ref={importInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={handleImportJson}
+            />
             {/* Logo Preview */}
             <div
               className={`flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 bg-black/[0.02] transition dark:bg-white/5 ${
-                isDragging 
-                  ? "border-indigo-500 bg-indigo-500/10 scale-105" 
+                isDragging
+                  ? "border-indigo-500 bg-indigo-500/10 scale-105"
                   : "border-black/10 hover:border-indigo-500/50 dark:border-white/10"
               }`}
               onClick={() => fileInputRef.current?.click()}
@@ -258,7 +290,9 @@ export function BrandKitModule() {
               ) : (
                 <div className="text-center">
                   <div className="text-2xl">{isDragging ? "📥" : "📸"}</div>
-                  <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>{isDragging ? "Drop" : "Upload"}</div>
+                  <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>
+                    {isDragging ? "Drop" : "Upload"}
+                  </div>
                 </div>
               )}
               <input
@@ -273,31 +307,54 @@ export function BrandKitModule() {
             {/* Brand Info */}
             <div className="flex-1 space-y-3">
               <div>
-                <label className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Brand Name</label>
+                <label
+                  className="text-[11px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Brand Name
+                </label>
                 <input
                   type="text"
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value || "My Brand")}
                   className="mt-1 w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:border-indigo-500/50"
-                  style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+                  style={{
+                    borderColor: "var(--input-border)",
+                    backgroundColor: "var(--input-bg)",
+                    color: "var(--input-text)",
+                  }}
                 />
               </div>
               <div>
-                <label className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Tagline</label>
+                <label
+                  className="text-[11px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Tagline
+                </label>
                 <input
                   type="text"
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
                   placeholder="Your brand tagline..."
                   className="mt-1 w-full rounded-lg border px-3 py-2 text-xs outline-none focus:border-indigo-500/50"
-                  style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+                  style={{
+                    borderColor: "var(--input-border)",
+                    backgroundColor: "var(--input-bg)",
+                    color: "var(--input-text)",
+                  }}
                 />
               </div>
             </div>
 
             {/* Brand Tone */}
             <div className="w-full sm:w-56">
-              <label className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Tone</label>
+              <label
+                className="text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Tone
+              </label>
               <div className="mt-1 space-y-1">
                 {TONE_OPTIONS.map((t) => (
                   <button
@@ -333,7 +390,12 @@ export function BrandKitModule() {
                       >
                         {t.label}
                       </span>
-                      <span className="block truncate text-[9px]" style={{ color: "var(--text-muted)" }}>{t.desc}</span>
+                      <span
+                        className="block truncate text-[9px]"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {t.desc}
+                      </span>
                     </span>
                   </button>
                 ))}
@@ -342,9 +404,19 @@ export function BrandKitModule() {
 
             {/* Save Button */}
             <div className="w-full sm:w-32">
-              <label className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Actions</label>
+              <label
+                className="text-[11px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Actions
+              </label>
               <div className="mt-1">
-                <button type="button" onClick={() => importInputRef.current?.click()} className="mb-2 flex w-full items-center justify-center rounded-lg border px-3 py-2 text-xs font-medium transition" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                <button
+                  type="button"
+                  onClick={() => importInputRef.current?.click()}
+                  className="mb-2 flex w-full items-center justify-center rounded-lg border px-3 py-2 text-xs font-medium transition"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                >
                   Impor JSON
                 </button>
                 <button
@@ -361,21 +433,26 @@ export function BrandKitModule() {
       </Card>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 rounded-xl border p-1" style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}>
+      <div
+        className="flex gap-1 rounded-xl border p-1"
+        style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+      >
         {[
-          { id: "palette" as const, label: "🎨 Palet Warna", },
-          { id: "typography" as const, label: "📝 Tipografi", },
-          { id: "guidelines" as const, label: "📋 Panduan", },
-          { id: "export" as const, label: "📦 Export", },
+          { id: "palette" as const, label: "🎨 Palet Warna" },
+          { id: "typography" as const, label: "📝 Tipografi" },
+          { id: "guidelines" as const, label: "📋 Panduan" },
+          { id: "export" as const, label: "📦 Export" },
         ].map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
             className="flex-1 rounded-lg px-3 py-2 text-xs font-medium transition"
-            style={activeTab === tab.id
-              ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-              : { color: "var(--text-muted)" }}
+            style={
+              activeTab === tab.id
+                ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
+                : { color: "var(--text-muted)" }
+            }
           >
             {tab.label}
           </button>
@@ -384,9 +461,11 @@ export function BrandKitModule() {
           type="button"
           onClick={() => setActiveTab("accessibility")}
           className="flex-1 rounded-lg px-3 py-2 text-xs font-medium transition"
-          style={activeTab === "accessibility"
-            ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-            : { color: "var(--text-muted)" }}
+          style={
+            activeTab === "accessibility"
+              ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
+              : { color: "var(--text-muted)" }
+          }
         >
           ♿ Aksesibilitas
         </button>
@@ -398,12 +477,12 @@ export function BrandKitModule() {
           kit={kit}
           suggestions={suggestions}
           secondaryOverride={secondaryOverride}
-           accentOverride={accentOverride}
-           setPrimaryOverride={setPrimaryOverride}
-           setSecondaryOverride={setSecondaryOverride}
-           setAccentOverride={setAccentOverride}
-           setBackgroundOverride={setBackgroundOverride}
-           setTextColorOverride={setTextColorOverride}
+          accentOverride={accentOverride}
+          setPrimaryOverride={setPrimaryOverride}
+          setSecondaryOverride={setSecondaryOverride}
+          setAccentOverride={setAccentOverride}
+          setBackgroundOverride={setBackgroundOverride}
+          setTextColorOverride={setTextColorOverride}
         />
       )}
 
@@ -416,13 +495,9 @@ export function BrandKitModule() {
         />
       )}
 
-      {activeTab === "guidelines" && (
-        <GuidelinesTab kit={kit} />
-      )}
+      {activeTab === "guidelines" && <GuidelinesTab kit={kit} />}
 
-      {activeTab === "accessibility" && (
-        <AccessibilityTab kit={kit} />
-      )}
+      {activeTab === "accessibility" && <AccessibilityTab kit={kit} />}
 
       {activeTab === "export" && (
         <ExportTab
@@ -430,11 +505,19 @@ export function BrandKitModule() {
           onExportHtml={handleExportHtml}
           onExportJson={handleExportJson}
           onExportW3cTokens={() => {
-            downloadText(brandKitToW3cTokens(kit), `${brandName.toLowerCase().replace(/\s+/g, "-")}-tokens.json`, "application/json");
+            downloadText(
+              brandKitToW3cTokens(kit),
+              `${brandName.toLowerCase().replace(/\s+/g, "-")}-tokens.json`,
+              "application/json",
+            );
             show("W3C design tokens downloaded!");
           }}
           onExportTailwind={() => {
-            downloadText(brandKitToTailwindConfig(kit), `${brandName.toLowerCase().replace(/\s+/g, "-")}-tailwind.config.js`, "text/javascript");
+            downloadText(
+              brandKitToTailwindConfig(kit),
+              `${brandName.toLowerCase().replace(/\s+/g, "-")}-tailwind.config.js`,
+              "text/javascript",
+            );
             show("Tailwind config downloaded!");
           }}
         />
@@ -458,8 +541,15 @@ export function BrandKitModule() {
                       style={{ backgroundColor: rgbToHex(savedKit.primaryColor) }}
                     />
                     <div className="flex-1">
-                      <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{savedKit.name}</div>
-                      <div className="text-[10px]" style={{ color: "var(--text-muted)" }}>{new Date(savedKit.createdAt).toLocaleDateString()}</div>
+                      <div
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {savedKit.name}
+                      </div>
+                      <div className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                        {new Date(savedKit.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
                   <div className="mt-3 flex gap-2">
@@ -470,12 +560,12 @@ export function BrandKitModule() {
                         setTagline(savedKit.tagline);
                         setTone(savedKit.tone);
                         setLogoDataUrl(savedKit.logoDataUrl);
-                         setPrimaryOverride(savedKit.primaryColor);
-                         setSecondaryOverride(savedKit.secondaryColor);
-                         setAccentOverride(savedKit.accentColor);
-                         setBackgroundOverride(savedKit.backgroundColor);
-                         setTextColorOverride(savedKit.textColor);
-                         setHeadlineFontOverride(savedKit.headlineFont);
+                        setPrimaryOverride(savedKit.primaryColor);
+                        setSecondaryOverride(savedKit.secondaryColor);
+                        setAccentOverride(savedKit.accentColor);
+                        setBackgroundOverride(savedKit.backgroundColor);
+                        setTextColorOverride(savedKit.textColor);
+                        setHeadlineFontOverride(savedKit.headlineFont);
                         setBodyFontOverride(savedKit.bodyFont);
                         setMonoFontOverride(savedKit.monoFont);
                         show("✓ Brand kit loaded!");

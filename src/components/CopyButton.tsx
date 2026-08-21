@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "../lib/cn";
-import { useToast } from "./Toast";
+import { useToast } from "./toastContext";
 
 type CopyButtonProps = {
   value: string;

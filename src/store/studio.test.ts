@@ -60,10 +60,7 @@ describe("sanitizePersistedStudioState", () => {
     const result = sanitizePersistedStudioState({
       theme: "system",
       activeModule: "admin",
-      savedColors: [
-        { id: "bad", name: "Bad", rgb: { r: 999, g: 0, b: 0 } },
-        null,
-      ],
+      savedColors: [{ id: "bad", name: "Bad", rgb: { r: 999, g: 0, b: 0 } }, null],
       uploadedFonts: [
         {
           family: "Remote",
@@ -118,7 +115,9 @@ describe("studio storage limits", () => {
       });
     }
     for (let index = 0; index < STUDIO_LIMITS.uploadedFonts + 1; index += 1) {
-      useStudio.getState().addUploadedFont({ family: `Font ${index}`, fileName: `font-${index}.woff2` });
+      useStudio
+        .getState()
+        .addUploadedFont({ family: `Font ${index}`, fileName: `font-${index}.woff2` });
     }
 
     const state = useStudio.getState();

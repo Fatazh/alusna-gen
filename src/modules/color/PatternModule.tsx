@@ -16,9 +16,7 @@ export function PatternModule() {
 
   const [activePalette, setActivePalette] = useState(PALETTES[0].name);
   const palette = PALETTES.find((p) => p.name === activePalette)!;
-  const paletteRgbs: RGB[] = palette.colors
-    .map((h) => hexToRgb(h))
-    .filter(Boolean) as RGB[];
+  const paletteRgbs: RGB[] = palette.colors.map((h) => hexToRgb(h)).filter(Boolean) as RGB[];
 
   const exportCss = () => {
     const css = `:root {\n${palette.colors
@@ -27,12 +25,7 @@ export function PatternModule() {
     return css;
   };
 
-  const exportJson = () =>
-    JSON.stringify(
-      { name: palette.name, colors: palette.colors },
-      null,
-      2,
-    );
+  const exportJson = () => JSON.stringify({ name: palette.name, colors: palette.colors }, null, 2);
 
   const exportTailwind = () => {
     const obj = palette.colors
@@ -64,9 +57,14 @@ export function PatternModule() {
   };
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
-  const getChipStyle = (active: boolean): React.CSSProperties => active
-    ? { borderColor: "rgba(99,102,241,0.5)", backgroundColor: "rgba(99,102,241,0.15)", color: "#6366f1" }
-    : { borderColor: "var(--border)", color: "var(--text-secondary)" };
+  const getChipStyle = (active: boolean): React.CSSProperties =>
+    active
+      ? {
+          borderColor: "rgba(99,102,241,0.5)",
+          backgroundColor: "rgba(99,102,241,0.15)",
+          color: "#6366f1",
+        }
+      : { borderColor: "var(--border)", color: "var(--text-secondary)" };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -108,7 +106,10 @@ export function PatternModule() {
                       }}
                       onAdd={() => saveColor(rgb, colorInfo.label)}
                     />
-                    <p className="truncate text-center text-[10px]" style={{ color: "var(--text-muted)" }}>
+                    <p
+                      className="truncate text-center text-[10px]"
+                      style={{ color: "var(--text-muted)" }}
+                    >
                       {colorInfo.label}
                     </p>
                   </div>
@@ -116,10 +117,18 @@ export function PatternModule() {
               })}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ backgroundColor: "var(--chip-bg)" }}>
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3"
+              style={{ backgroundColor: "var(--chip-bg)" }}
+            >
               <div>
-                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Ekspor CSS variables</p>
-                <code className="mt-1 block max-w-full overflow-x-auto text-[11px]" style={{ color: "var(--text-muted)" }}>
+                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  Ekspor CSS variables
+                </p>
+                <code
+                  className="mt-1 block max-w-full overflow-x-auto text-[11px]"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   {palette.colors.join(" · ")}
                 </code>
               </div>
@@ -140,10 +149,7 @@ export function PatternModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader
-          title="Detail Warna Aktif"
-          subtitle="Kode warna yang sedang dipilih"
-        />
+        <CardHeader title="Detail Warna Aktif" subtitle="Kode warna yang sedang dipilih" />
         <CardBody className="space-y-4">
           <Swatch rgb={selectedColor} size="lg" showCode={false} />
           <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />

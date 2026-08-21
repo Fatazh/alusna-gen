@@ -1,11 +1,6 @@
 // Font utilities: Google Fonts catalog, loader, font file parsing.
 
-export type FontCategory =
-  | "serif"
-  | "sans-serif"
-  | "display"
-  | "handwriting"
-  | "monospace";
+export type FontCategory = "serif" | "sans-serif" | "display" | "handwriting" | "monospace";
 
 export type FontDef = {
   family: string;
@@ -108,10 +103,7 @@ export function sanitizeFontFamily(name: string): string {
 
 const loadedFamilies = new Set<string>();
 
-export function loadGoogleFont(
-  family: string,
-  variants: string[] = ["400"],
-): void {
+export function loadGoogleFont(family: string, variants: string[] = ["400"]): void {
   if (loadedFamilies.has(family)) return;
   const params = new URLSearchParams({
     family: `${family}:wght@${variants.map((v) => v).join(";")}`,
@@ -128,9 +120,7 @@ export function loadGoogleFont(
 // Note: FontFace with an ArrayBuffer does not require an explicit format hint.
 export async function loadUploadedFont(file: File): Promise<{ family: string; dataUrl: string }> {
   const buffer = await file.arrayBuffer();
-  const family = sanitizeFontFamily(
-    file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "),
-  );
+  const family = sanitizeFontFamily(file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "));
   const face = new FontFace(family, buffer);
   await face.load();
   (document.fonts as FontFaceSet).add(face);

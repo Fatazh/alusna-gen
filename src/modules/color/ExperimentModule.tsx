@@ -1,11 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import {
-  mixColors,
-  rgbToHex,
-  hexToRgb,
-  type MixMode,
-  type RGB,
-} from "../../lib/color";
+import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
 import { Card, CardBody, CardHeader } from "../../components/Card";
@@ -84,9 +78,14 @@ export function ExperimentModule() {
   const hasCustomWeights = slots.some((s) => s.weight !== 1);
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
-  const getChipStyle = (active: boolean): React.CSSProperties => active
-    ? { borderColor: "rgba(99,102,241,0.5)", backgroundColor: "rgba(99,102,241,0.15)", color: "#6366f1" }
-    : { borderColor: "var(--border)", color: "var(--text-secondary)" };
+  const getChipStyle = (active: boolean): React.CSSProperties =>
+    active
+      ? {
+          borderColor: "rgba(99,102,241,0.5)",
+          backgroundColor: "rgba(99,102,241,0.15)",
+          color: "#6366f1",
+        }
+      : { borderColor: "var(--border)", color: "var(--text-secondary)" };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -139,11 +138,9 @@ export function ExperimentModule() {
               <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
                 <span className="mt-0.5 text-amber-500 dark:text-amber-400">⚠</span>
                 <p className="text-[11px] text-amber-700 dark:text-amber-300/90">
-                  Mode <span className="font-semibold">Average</span>{" "}
-                  menggunakan rata-rata sama rata — bobot yang kamu atur
-                  diabaikan. Gunakan mode{" "}
-                  <span className="font-semibold">Weighted</span> agar bobot
-                  berpengaruh.
+                  Mode <span className="font-semibold">Average</span> menggunakan rata-rata sama
+                  rata — bobot yang kamu atur diabaikan. Gunakan mode{" "}
+                  <span className="font-semibold">Weighted</span> agar bobot berpengaruh.
                 </p>
               </div>
             )}
@@ -159,9 +156,7 @@ export function ExperimentModule() {
                     <input
                       type="color"
                       value={slot.hex}
-                      onChange={(e) =>
-                        updateSlot(slot.id, { hex: e.target.value })
-                      }
+                      onChange={(e) => updateSlot(slot.id, { hex: e.target.value })}
                       className="h-10 w-12 rounded-lg"
                     />
                     {slots.length > 1 && (
@@ -190,7 +185,10 @@ export function ExperimentModule() {
                     style={{ backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
                   />
                   <div className="mt-3">
-                    <div className="mb-1 flex items-center justify-between text-[10px]" style={{ color: "var(--text-muted)" }}>
+                    <div
+                      className="mb-1 flex items-center justify-between text-[10px]"
+                      style={{ color: "var(--text-muted)" }}
+                    >
                       <span>Bobot</span>
                       <span className="font-mono">{slot.weight}</span>
                     </div>
@@ -200,9 +198,7 @@ export function ExperimentModule() {
                       max={5}
                       step={0.1}
                       value={slot.weight}
-                      onChange={(e) =>
-                        updateSlot(slot.id, { weight: Number(e.target.value) })
-                      }
+                      onChange={(e) => updateSlot(slot.id, { weight: Number(e.target.value) })}
                       className="w-full"
                     />
                   </div>
@@ -221,11 +217,19 @@ export function ExperimentModule() {
               )}
             </div>
 
-            <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}>
+            <div
+              className="rounded-xl border p-5"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Hasil perpaduan</p>
-                  <p className="mt-0.5 text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                  <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    Hasil perpaduan
+                  </p>
+                  <p
+                    className="mt-0.5 text-base font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {getColorName(result).label}
                   </p>
                   <p className="font-mono text-xs" style={{ color: "var(--text-muted)" }}>
@@ -241,16 +245,16 @@ export function ExperimentModule() {
                       pushColorHistory(result);
                     }}
                     className="rounded-md px-3 py-1 text-xs font-medium transition"
-                    style={{ backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }}
+                    style={{
+                      backgroundColor: "var(--chip-active-bg)",
+                      color: "var(--text-primary)",
+                    }}
                   >
                     Jadikan aktif
                   </button>
                 </div>
               </div>
-              <div
-                className="mt-4 h-28 rounded-xl"
-                style={{ backgroundColor: rgbToHex(result) }}
-              />
+              <div className="mt-4 h-28 rounded-xl" style={{ backgroundColor: rgbToHex(result) }} />
             </div>
           </CardBody>
         </Card>

@@ -37,12 +37,7 @@ export function shadesToCssVars(name: string, shades: Shade[]): string {
 
 export function shadesToTailwind(name: string, shades: Shade[]): string {
   const obj = shades
-    .map(
-      (sh) =>
-        `        ${sh.step}: '#${toHex(sh.rgb.r)}${toHex(sh.rgb.g)}${toHex(
-          sh.rgb.b,
-        )}',`,
-    )
+    .map((sh) => `        ${sh.step}: '#${toHex(sh.rgb.r)}${toHex(sh.rgb.g)}${toHex(sh.rgb.b)}',`)
     .join("\n");
   return `// tailwind.config.js\nexport default {\n  theme: {\n    extend: {\n      colors: {\n        ${name}: {\n${obj}\n        },\n      },\n    },\n  },\n};`;
 }

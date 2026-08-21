@@ -36,11 +36,7 @@ function medianCut(pixels: Pixel[], depth: number): Pixel[][] {
     b: channelRange(pixels, "b")[1] - channelRange(pixels, "b")[0],
   };
   const ch: keyof Pixel =
-    ranges.r >= ranges.g && ranges.r >= ranges.b
-      ? "r"
-      : ranges.g >= ranges.b
-        ? "g"
-        : "b";
+    ranges.r >= ranges.g && ranges.r >= ranges.b ? "r" : ranges.g >= ranges.b ? "g" : "b";
   pixels.sort((a, b) => a[ch] - b[ch]);
   const mid = Math.floor(pixels.length / 2);
   return [
@@ -58,10 +54,7 @@ function average(pixels: Pixel[]): RGB {
   };
 }
 
-export async function extractPalette(
-  file: File,
-  count = 6,
-): Promise<RGB[]> {
+export async function extractPalette(file: File, count = 6): Promise<RGB[]> {
   const img = await loadImage(file);
   const maxDim = 220; // downscale for speed
   const scale = Math.min(1, maxDim / Math.max(img.width, img.height));

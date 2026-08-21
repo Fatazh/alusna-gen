@@ -107,4 +107,3 @@ This is a feature-based modular architecture, not a multi-layer enterprise rewri
 6. App shell, routing, and SEO cleanup after stable feature APIs exist.
 
 Brand Kit moves last because it consumes color, typography, design-system, storage, import, and export behavior.
-

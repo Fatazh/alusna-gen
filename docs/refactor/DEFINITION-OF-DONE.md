@@ -44,8 +44,9 @@ A phase reaches `verified` only after:
 
 - `npm test` passes;
 - `npm run build` passes;
+- `npm run lint`, `npm run format:check`, and `npm run check:boundaries` pass;
+- relevant Playwright E2E checks pass;
 - `npm audit --omit=dev` has no production vulnerability, or an accepted risk is documented;
 - phase-specific browser or output checks pass;
 - roadmap and status are updated;
 - the worktree is committed and clean.
-

@@ -1,5 +1,13 @@
 import { useId, useState, useMemo, useEffect, useRef } from "react";
-import { type RGB, rgbToHex, rgbToHsl, hslToRgb, rgbToHsv, randomColor, hexToRgb } from "../lib/color";
+import {
+  type RGB,
+  rgbToHex,
+  rgbToHsl,
+  hslToRgb,
+  rgbToHsv,
+  randomColor,
+  hexToRgb,
+} from "../lib/color";
 import { searchColorNames } from "../lib/colorNames";
 import { bestTextOn } from "../lib/color";
 
@@ -11,8 +19,7 @@ type ColorPickerProps = {
   showAlpha?: boolean;
 };
 
-const hasEyeDropper =
-  typeof window !== "undefined" && "EyeDropper" in window;
+const hasEyeDropper = typeof window !== "undefined" && "EyeDropper" in window;
 
 export function ColorPicker({
   rgb,
@@ -120,7 +127,11 @@ export function ColorPicker({
               }
             }}
             className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+            style={{
+              borderColor: "var(--input-border)",
+              backgroundColor: "var(--input-bg)",
+              color: "var(--input-text)",
+            }}
           />
         </div>
         {/* Search toggle */}
@@ -133,7 +144,11 @@ export function ColorPicker({
               ? "border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
               : "")
           }
-          style={!searchOpen ? { borderColor: "var(--input-border)", color: "var(--text-secondary)" } : undefined}
+          style={
+            !searchOpen
+              ? { borderColor: "var(--input-border)", color: "var(--text-secondary)" }
+              : undefined
+          }
           title="Cari warna berdasarkan nama"
         >
           Cari nama
@@ -156,7 +171,11 @@ export function ColorPicker({
             type="button"
             onClick={async () => {
               try {
-                const ed = new (window as unknown as { EyeDropper: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper();
+                const ed = new (
+                  window as unknown as {
+                    EyeDropper: new () => { open: () => Promise<{ sRGBHex: string }> };
+                  }
+                ).EyeDropper();
                 const res = await ed.open();
                 const rgb = hexToRgb(res.sRGBHex);
                 if (rgb) onRgbChange(rgb);
@@ -175,7 +194,10 @@ export function ColorPicker({
 
       {/* ── Search panel ── */}
       {searchOpen && (
-        <div className="rounded-xl border p-3 space-y-2" style={{ borderColor: "var(--card-border)", backgroundColor: "var(--card-bg)" }}>
+        <div
+          className="rounded-xl border p-3 space-y-2"
+          style={{ borderColor: "var(--card-border)", backgroundColor: "var(--card-bg)" }}
+        >
           <input
             type="text"
             autoFocus
@@ -183,11 +205,18 @@ export function ColorPicker({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+            style={{
+              borderColor: "var(--input-border)",
+              backgroundColor: "var(--input-bg)",
+              color: "var(--input-text)",
+            }}
           />
           <div className="grid max-h-52 grid-cols-3 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-4">
             {searchResults.length === 0 && (
-              <p className="col-span-full py-3 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+              <p
+                className="col-span-full py-3 text-center text-xs"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Tidak ada warna yang cocok
               </p>
             )}
@@ -263,21 +292,9 @@ export function ColorPicker({
 
       {/* ── RGB fields ── */}
       <div className="grid grid-cols-3 gap-2 pt-1">
-        <NumberField
-          label="R"
-          value={rgb.r}
-          onChange={(r) => onRgbChange({ ...rgb, r })}
-        />
-        <NumberField
-          label="G"
-          value={rgb.g}
-          onChange={(g) => onRgbChange({ ...rgb, g })}
-        />
-        <NumberField
-          label="B"
-          value={rgb.b}
-          onChange={(b) => onRgbChange({ ...rgb, b })}
-        />
+        <NumberField label="R" value={rgb.r} onChange={(r) => onRgbChange({ ...rgb, r })} />
+        <NumberField label="G" value={rgb.g} onChange={(g) => onRgbChange({ ...rgb, g })} />
+        <NumberField label="B" value={rgb.b} onChange={(b) => onRgbChange({ ...rgb, b })} />
       </div>
 
       {/* ── Alpha ── */}
@@ -325,7 +342,9 @@ function Slider({
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-[11px]">
-        <span className="font-medium" style={{ color: "var(--text-muted)" }}>{label}</span>
+        <span className="font-medium" style={{ color: "var(--text-muted)" }}>
+          {label}
+        </span>
         <span className="font-mono" style={{ color: "var(--text-secondary)" }}>
           {value}
           {suffix}
@@ -376,7 +395,11 @@ function NumberField({
           if (!Number.isNaN(v)) onChange(Math.max(0, Math.min(255, v)));
         }}
         className="w-full rounded-lg border px-2 py-1.5 text-sm outline-none"
-        style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+        style={{
+          borderColor: "var(--input-border)",
+          backgroundColor: "var(--input-bg)",
+          color: "var(--input-text)",
+        }}
       />
     </div>
   );

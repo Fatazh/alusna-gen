@@ -5,10 +5,7 @@ import "./index.css";
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {
-  window.__showBootError?.(
-    "Root element tidak ditemukan",
-    "Elemen #root tidak ada di index.html.",
-  );
+  window.__showBootError?.("Root element tidak ditemukan", "Elemen #root tidak ada di index.html.");
 } else {
   try {
     createRoot(rootEl).render(

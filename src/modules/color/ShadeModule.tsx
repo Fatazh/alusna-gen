@@ -6,7 +6,7 @@ import { Card, CardBody, CardHeader } from "../../components/Card";
 import { CopyButton } from "../../components/CopyButton";
 import { generateShades, shadesToCssVars, shadesToTailwind, type Shade } from "../../lib/shades";
 import { sanitizeTokenName } from "../../lib/designSystem";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 
 export function ShadeModule() {
   const selectedColor = useStudio((s) => s.selectedColor);
@@ -53,8 +53,8 @@ export function ShadeModule() {
           />
           <CardBody className="space-y-5">
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Skala diambil dari warna aktif (hue & saturation dipertahankan,
-              lightness bervariasi). Klik HEX untuk menyalin.
+              Skala diambil dari warna aktif (hue & saturation dipertahankan, lightness bervariasi).
+              Klik HEX untuk menyalin.
             </p>
             <div className="space-y-1">
               {shades
@@ -77,16 +77,14 @@ export function ShadeModule() {
                       >
                         <span
                           className={
-                            "w-12 font-mono text-xs " +
-                            (dark ? "text-white" : "text-zinc-900")
+                            "w-12 font-mono text-xs " + (dark ? "text-white" : "text-zinc-900")
                           }
                         >
                           {sh.step}
                         </span>
                         <span
                           className={
-                            "ml-auto text-[11px] " +
-                            (dark ? "text-white/60" : "text-zinc-900/50")
+                            "ml-auto text-[11px] " + (dark ? "text-white/60" : "text-zinc-900/50")
                           }
                         >
                           {getColorName(sh.rgb).label}
@@ -97,7 +95,9 @@ export function ShadeModule() {
                         onClick={(e) => copyHex(hex, e)}
                         className={
                           "cursor-pointer font-mono text-xs transition hover:underline " +
-                          (dark ? "text-white/80 hover:text-white" : "text-zinc-900/70 hover:text-zinc-900")
+                          (dark
+                            ? "text-white/80 hover:text-white"
+                            : "text-zinc-900/70 hover:text-zinc-900")
                         }
                         aria-label={`Salin ${hex}`}
                         title="Klik untuk salin HEX"
@@ -128,7 +128,11 @@ export function ShadeModule() {
                 setName(sanitizeTokenName(e.target.value))
               }
               className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              style={{ borderColor: "var(--input-border)", backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
+              style={{
+                borderColor: "var(--input-border)",
+                backgroundColor: "var(--input-bg)",
+                color: "var(--input-text)",
+              }}
             />
           </div>
           <div className="flex gap-2">
@@ -159,18 +163,21 @@ export function ShadeModule() {
           </div>
           <div className="rounded-xl p-4" style={{ backgroundColor: "var(--chip-bg)" }}>
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Kode</span>
+              <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                Kode
+              </span>
               <CopyButton value={exportText} label="Salin" />
             </div>
-            <pre className="max-h-64 overflow-x-auto whitespace-pre-wrap text-[11px]" style={{ color: "var(--text-secondary)" }}>
+            <pre
+              className="max-h-64 overflow-x-auto whitespace-pre-wrap text-[11px]"
+              style={{ color: "var(--text-secondary)" }}
+            >
               {exportText}
             </pre>
           </div>
           <button
             type="button"
-            onClick={() =>
-              shades.forEach((sh) => saveColor(sh.rgb, `${name} ${sh.step}`))
-            }
+            onClick={() => shades.forEach((sh) => saveColor(sh.rgb, `${name} ${sh.step}`))}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
           >
             Simpan skala ke palet

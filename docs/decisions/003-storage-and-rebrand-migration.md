@@ -16,4 +16,3 @@ Introduce a versioned `alusna-studio` persistence key and a tested one-way copy 
 - Rebranding cannot be implemented as blind search-and-replace.
 - Migration code must precede switching the persistence key.
 - Legacy cleanup is a later, explicit product decision.
-

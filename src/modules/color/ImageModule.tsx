@@ -4,7 +4,7 @@ import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
 import { Card, CardBody, CardHeader } from "../../components/Card";
 import { extractPalette } from "../../lib/imagePalette";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 
 export function ImageModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
@@ -128,7 +128,10 @@ export function ImageModule() {
                         style={{ backgroundColor: hex }}
                         aria-label={`Pilih ${getColorName(rgb).label}`}
                       />
-                      <div className="flex items-center justify-between px-2 py-1.5" style={{ backgroundColor: "var(--chip-bg)" }}>
+                      <div
+                        className="flex items-center justify-between px-2 py-1.5"
+                        style={{ backgroundColor: "var(--chip-bg)" }}
+                      >
                         <button
                           type="button"
                           onClick={(e) => copyHex(hex, e)}
@@ -157,9 +160,7 @@ export function ImageModule() {
         <CardBody className="space-y-3">
           <button
             type="button"
-            onClick={() =>
-              colors.forEach((rgb) => saveColor(rgb, getColorName(rgb).label))
-            }
+            onClick={() => colors.forEach((rgb) => saveColor(rgb, getColorName(rgb).label))}
             disabled={colors.length === 0}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
           >

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { hexToRgb } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
 import { useStudio } from "../../store/studio";
@@ -19,7 +19,7 @@ export function GradientModule() {
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const saveColor = useStudio((s) => s.saveColor);
 
-  const nextId = useState(() => ({ n: 2 }))[0];
+  const nextId = useRef(2);
   const [stops, setStops] = useState<Stop[]>([
     { id: 0, hex: "#6366F1", pos: 0 },
     { id: 1, hex: "#EC4899", pos: 100 },
@@ -27,18 +27,12 @@ export function GradientModule() {
   const [type, setType] = useState<GradientType>("linear");
   const [angle, setAngle] = useState(90);
 
-  const sortedStops = useMemo(
-    () => [...stops].sort((a, b) => a.pos - b.pos),
-    [stops],
-  );
+  const sortedStops = useMemo(() => [...stops].sort((a, b) => a.pos - b.pos), [stops]);
 
   const css = useMemo(() => {
-    const list = sortedStops
-      .map((s) => `${s.hex} ${s.pos}%`)
-      .join(", ");
+    const list = sortedStops.map((s) => `${s.hex} ${s.pos}%`).join(", ");
     if (type === "linear") return `linear-gradient(${angle}deg, ${list})`;
-    if (type === "radial")
-      return `radial-gradient(circle, ${list})`;
+    if (type === "radial") return `radial-gradient(circle, ${list})`;
     return `conic-gradient(from ${angle}deg, ${list})`;
   }, [sortedStops, type, angle]);
 
@@ -46,7 +40,7 @@ export function GradientModule() {
     setStops((prev) => prev.map((s) => (s.id === id ? { ...s, ...partial } : s)));
   const addStop = () => {
     if (stops.length >= 8) return;
-    const id = nextId.n++;
+    const id = nextId.current++;
     const last = sortedStops[sortedStops.length - 1];
     setStops((prev) => [...prev, { id, hex: "#FFFFFF", pos: last.pos }]);
   };
@@ -54,18 +48,20 @@ export function GradientModule() {
     setStops((prev) => (prev.length > 2 ? prev.filter((s) => s.id !== id) : prev));
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
-  const getChipStyle = (active: boolean): React.CSSProperties => active
-    ? { borderColor: "rgba(99,102,241,0.5)", backgroundColor: "rgba(99,102,241,0.15)", color: "#6366f1" }
-    : { borderColor: "var(--border)", color: "var(--text-secondary)" };
+  const getChipStyle = (active: boolean): React.CSSProperties =>
+    active
+      ? {
+          borderColor: "rgba(99,102,241,0.5)",
+          backgroundColor: "rgba(99,102,241,0.15)",
+          color: "#6366f1",
+        }
+      : { borderColor: "var(--border)", color: "var(--text-secondary)" };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
         <Card>
-          <CardHeader
-            title="Generator Gradien"
-            subtitle="Susun stop warna lalu salin CSS-nya"
-          />
+          <CardHeader title="Generator Gradien" subtitle="Susun stop warna lalu salin CSS-nya" />
           <CardBody className="space-y-5">
             <div className="flex flex-wrap gap-2">
               {TYPES.map((t) => (
@@ -80,8 +76,13 @@ export function GradientModule() {
                 </button>
               ))}
               {type !== "radial" && (
-                <div className="flex items-center gap-2 rounded-full border px-3 py-1" style={{ borderColor: "var(--border)" }}>
-                  <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>Sudut</span>
+                <div
+                  className="flex items-center gap-2 rounded-full border px-3 py-1"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                    Sudut
+                  </span>
                   <input
                     type="range"
                     min={0}
@@ -90,7 +91,10 @@ export function GradientModule() {
                     onChange={(e) => setAngle(Number(e.target.value))}
                     className="w-24"
                   />
-                  <span className="font-mono text-[11px]" style={{ color: "var(--text-secondary)" }}>
+                  <span
+                    className="font-mono text-[11px]"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {angle}°
                   </span>
                 </div>
@@ -124,18 +128,21 @@ export function GradientModule() {
                     style={{ backgroundColor: "var(--input-bg)", color: "var(--input-text)" }}
                   />
                   <div className="flex flex-1 items-center gap-2">
-                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>pos</span>
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                      pos
+                    </span>
                     <input
                       type="range"
                       min={0}
                       max={100}
                       value={s.pos}
-                      onChange={(e) =>
-                        updateStop(s.id, { pos: Number(e.target.value) })
-                      }
+                      onChange={(e) => updateStop(s.id, { pos: Number(e.target.value) })}
                       className="w-full"
                     />
-                    <span className="w-10 text-right font-mono text-[11px]" style={{ color: "var(--text-secondary)" }}>
+                    <span
+                      className="w-10 text-right font-mono text-[11px]"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       {s.pos}%
                     </span>
                   </div>
@@ -171,10 +178,15 @@ export function GradientModule() {
 
             <div className="rounded-xl p-4" style={{ backgroundColor: "var(--chip-bg)" }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>CSS</span>
+                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  CSS
+                </span>
                 <CopyButton value={css} label="Salin CSS" />
               </div>
-              <pre className="overflow-x-auto whitespace-pre-wrap text-[11px]" style={{ color: "var(--text-secondary)" }}>
+              <pre
+                className="overflow-x-auto whitespace-pre-wrap text-[11px]"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {css}
               </pre>
             </div>
@@ -205,10 +217,16 @@ export function GradientModule() {
                     style={{ backgroundColor: s.hex }}
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-xs" style={{ color: "var(--text-primary)" }}>
+                    <span
+                      className="block truncate text-xs"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       {getColorName(rgb).label}
                     </span>
-                    <span className="block font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
+                    <span
+                      className="block font-mono text-[10px]"
+                      style={{ color: "var(--text-muted)" }}
+                    >
                       {s.hex}
                     </span>
                   </span>

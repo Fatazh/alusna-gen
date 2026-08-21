@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { rgbToHex } from "../../lib/color";
 import { Card, CardHeader, CardBody } from "../../components/Card";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 import { type BrandKit } from "../../lib/designSystem";
 
 // ---------------------------------------------------------------------------
@@ -24,23 +24,27 @@ export function ExportTab({
   const { show } = useToast();
 
   const jsonPreview = useMemo(() => {
-    return JSON.stringify({
-      brandName: kit.brandName,
-      tagline: kit.tagline,
-      tone: kit.tone,
-      colors: {
-        primary: rgbToHex(kit.primaryColor),
-        secondary: rgbToHex(kit.secondaryColor),
-        accent: rgbToHex(kit.accentColor),
-        background: rgbToHex(kit.backgroundColor),
-        text: rgbToHex(kit.textColor),
+    return JSON.stringify(
+      {
+        brandName: kit.brandName,
+        tagline: kit.tagline,
+        tone: kit.tone,
+        colors: {
+          primary: rgbToHex(kit.primaryColor),
+          secondary: rgbToHex(kit.secondaryColor),
+          accent: rgbToHex(kit.accentColor),
+          background: rgbToHex(kit.backgroundColor),
+          text: rgbToHex(kit.textColor),
+        },
+        typography: {
+          headline: kit.headlineFont,
+          body: kit.bodyFont,
+          mono: kit.monoFont,
+        },
       },
-      typography: {
-        headline: kit.headlineFont,
-        body: kit.bodyFont,
-        mono: kit.monoFont,
-      },
-    }, null, 2);
+      null,
+      2,
+    );
   }, [kit]);
 
   const scssPreview = useMemo(() => {
@@ -101,46 +105,95 @@ export type BrandTheme = typeof brandTheme;`;
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <button
               type="button"
-              onClick={onExportHtml}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              onClick={onExportHtml}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/15 text-xl">📄</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/15 text-xl">
+                📄
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>HTML Guidelines</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Beautiful brand guidelines page</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  HTML Guidelines
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Beautiful brand guidelines page
+                </div>
               </div>
             </button>
             <button
               type="button"
-              onClick={onExportJson}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              onClick={onExportJson}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-xl">📦</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-xl">
+                📦
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>JSON Brand Kit</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Structured data for integrations</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  JSON Brand Kit
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Structured data for integrations
+                </div>
               </div>
             </button>
-            <button type="button" onClick={onExportW3cTokens} className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50" style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}>
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-xs font-bold">W3C</div>
-              <div><div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>W3C Design Tokens</div><div className="text-[11px]" style={{ color: "var(--text-muted)" }}>JSON token standard</div></div>
+            <button
+              type="button"
+              onClick={onExportW3cTokens}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-xs font-bold">
+                W3C
+              </div>
+              <div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  W3C Design Tokens
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  JSON token standard
+                </div>
+              </div>
             </button>
-            <button type="button" onClick={onExportTailwind} className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50" style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}>
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xs font-bold">TW</div>
-              <div><div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Tailwind Config</div><div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Ready-to-use theme extension</div></div>
+            <button
+              type="button"
+              onClick={onExportTailwind}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xs font-bold">
+                TW
+              </div>
+              <div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  Tailwind Config
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Ready-to-use theme extension
+                </div>
+              </div>
             </button>
             <button
               type="button"
               onClick={() => {
                 navigator.clipboard.writeText(jsonPreview);
                 show("✓ Brand kit JSON copied!");
-              }}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              }}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-xl">📋</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-xl">
+                📋
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Copy JSON</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Copy to clipboard</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  Copy JSON
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Copy to clipboard
+                </div>
               </div>
             </button>
             <button
@@ -149,13 +202,20 @@ export type BrandTheme = typeof brandTheme;`;
                 const cssVars = `:root {\n  --brand-primary: ${rgbToHex(kit.primaryColor)};\n  --brand-secondary: ${rgbToHex(kit.secondaryColor)};\n  --brand-accent: ${rgbToHex(kit.accentColor)};\n  --brand-bg: ${rgbToHex(kit.backgroundColor)};\n  --brand-text: ${rgbToHex(kit.textColor)};\n}`;
                 navigator.clipboard.writeText(cssVars);
                 show("✓ CSS Variables copied!");
-              }}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              }}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/15 text-xl">🎨</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/15 text-xl">
+                🎨
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>CSS Variables</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Copy CSS custom properties</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  CSS Variables
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Copy CSS custom properties
+                </div>
               </div>
             </button>
             <button
@@ -163,13 +223,20 @@ export type BrandTheme = typeof brandTheme;`;
               onClick={() => {
                 navigator.clipboard.writeText(scssPreview);
                 show("✓ SCSS Variables copied!");
-              }}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              }}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500/15 text-xl">💅</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500/15 text-xl">
+                💅
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>SCSS Variables</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Copy SCSS variables</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  SCSS Variables
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Copy SCSS variables
+                </div>
               </div>
             </button>
             <button
@@ -177,13 +244,20 @@ export type BrandTheme = typeof brandTheme;`;
               onClick={() => {
                 navigator.clipboard.writeText(reactNativePreview);
                 show("✓ React Native theme copied!");
-              }}                  className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
-                  style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              }}
+              className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xl">📱</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xl">
+                📱
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>React Native Theme</div>
-                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Copy React Native theme</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  React Native Theme
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Copy React Native theme
+                </div>
               </div>
             </button>
           </div>
@@ -192,10 +266,7 @@ export type BrandTheme = typeof brandTheme;`;
 
       {/* Preview Tabs */}
       <Card>
-        <CardHeader
-          title="Preview"
-          subtitle="Brand kit data structure"
-        />
+        <CardHeader title="Preview" subtitle="Brand kit data structure" />
         <CardBody>
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -233,7 +304,14 @@ export type BrandTheme = typeof brandTheme;`;
                 Copy React Native
               </button>
             </div>
-            <div className="max-h-80 overflow-auto rounded-xl border p-4 text-[11px] leading-relaxed" style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)", color: "var(--text-secondary)" }}>
+            <div
+              className="max-h-80 overflow-auto rounded-xl border p-4 text-[11px] leading-relaxed"
+              style={{
+                borderColor: "var(--border)",
+                backgroundColor: "var(--surface)",
+                color: "var(--text-secondary)",
+              }}
+            >
               <pre className="whitespace-pre-wrap">{jsonPreview}</pre>
             </div>
           </div>

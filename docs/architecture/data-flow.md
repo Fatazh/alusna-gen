@@ -51,4 +51,3 @@ Migration requirements:
 ## Public URL contract
 
 The existing eleven tool paths remain stable during architectural migration. A brand/domain change may update canonical origins, but feature paths should not change without a redirect plan.
-

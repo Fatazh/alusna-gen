@@ -1,11 +1,4 @@
-import {
-  type RGB,
-  rgbToHex,
-  rgbToHsl,
-  hslToRgb,
-  rotateHue,
-  withLightness,
-} from "./color";
+import { type RGB, rgbToHex, rgbToHsl, hslToRgb, rotateHue, withLightness } from "./color";
 import { generateShades, type Shade } from "./shades";
 
 // ---------------------------------------------------------------------------
@@ -72,27 +65,40 @@ export type DesignSystem = {
 // Generate full design system from a base color
 // ---------------------------------------------------------------------------
 
-export function generateDesignSystem(
-  base: RGB,
-  name: string = "brand",
-): DesignSystem {
+export function generateDesignSystem(base: RGB, name: string = "brand"): DesignSystem {
   const hsl = rgbToHsl(base);
   const shades = generateShades(base);
 
   // Derive color roles from the base color
   const primary = base;
-  const primaryLight = hslToRgb({ h: hsl.h, s: Math.max(hsl.s - 15, 10), l: Math.min(hsl.l + 25, 90) });
-  const primaryDark = hslToRgb({ h: hsl.h, s: Math.min(hsl.s + 10, 100), l: Math.max(hsl.l - 25, 10) });
+  const primaryLight = hslToRgb({
+    h: hsl.h,
+    s: Math.max(hsl.s - 15, 10),
+    l: Math.min(hsl.l + 25, 90),
+  });
+  const primaryDark = hslToRgb({
+    h: hsl.h,
+    s: Math.min(hsl.s + 10, 100),
+    l: Math.max(hsl.l - 25, 10),
+  });
 
   // Secondary: complementary-ish (rotate 150°)
   const secondary = rotateHue(base, 150);
   const secondaryHsl = rgbToHsl(secondary);
-  const secondaryLight = hslToRgb({ h: secondaryHsl.h, s: Math.max(secondaryHsl.s - 15, 10), l: Math.min(secondaryHsl.l + 25, 90) });
+  const secondaryLight = hslToRgb({
+    h: secondaryHsl.h,
+    s: Math.max(secondaryHsl.s - 15, 10),
+    l: Math.min(secondaryHsl.l + 25, 90),
+  });
 
   // Accent: analogous warm (rotate 30°)
   const accent = rotateHue(base, 30);
   const accentHsl = rgbToHsl(accent);
-  const accentLight = hslToRgb({ h: accentHsl.h, s: Math.max(accentHsl.s - 10, 10), l: Math.min(accentHsl.l + 20, 88) });
+  const accentLight = hslToRgb({
+    h: accentHsl.h,
+    s: Math.max(accentHsl.s - 10, 10),
+    l: Math.min(accentHsl.l + 20, 88),
+  });
 
   // Neutrals: desaturated version of the base
   const neutralBase = withLightness(base, 50);
@@ -100,46 +106,180 @@ export function generateDesignSystem(
   const neutral = (l: number) => hslToRgb({ h: neutralHsl.h, s: Math.min(neutralHsl.s, 15), l });
 
   // Semantic colors
-  const success = { r: 34, g: 197, b: 94 };    // green-500
-  const warning = { r: 234, g: 179, b: 8 };    // yellow-500
-  const error = { r: 239, g: 68, b: 68 };      // red-500
-  const info = { r: 59, g: 130, b: 246 };      // blue-500
+  const success = { r: 34, g: 197, b: 94 }; // green-500
+  const warning = { r: 234, g: 179, b: 8 }; // yellow-500
+  const error = { r: 239, g: 68, b: 68 }; // red-500
+  const info = { r: 59, g: 130, b: 246 }; // blue-500
 
   const colors: ColorRole[] = [
-    { role: "Primary", hex: rgbToHex(primary), rgb: primary, usage: "Main brand color, CTAs, links, focus rings" },
-    { role: "Primary Light", hex: rgbToHex(primaryLight), rgb: primaryLight, usage: "Hover states, secondary buttons, highlights" },
-    { role: "Primary Dark", hex: rgbToHex(primaryDark), rgb: primaryDark, usage: "Active states, emphasis, dark mode accents" },
-    { role: "Secondary", hex: rgbToHex(secondary), rgb: secondary, usage: "Secondary actions, badges, tags" },
-    { role: "Secondary Light", hex: rgbToHex(secondaryLight), rgb: secondaryLight, usage: "Secondary hover, subtle backgrounds" },
-    { role: "Accent", hex: rgbToHex(accent), rgb: accent, usage: "Accents, highlights, illustrations" },
-    { role: "Accent Light", hex: rgbToHex(accentLight), rgb: accentLight, usage: "Accent backgrounds, subtle highlights" },
+    {
+      role: "Primary",
+      hex: rgbToHex(primary),
+      rgb: primary,
+      usage: "Main brand color, CTAs, links, focus rings",
+    },
+    {
+      role: "Primary Light",
+      hex: rgbToHex(primaryLight),
+      rgb: primaryLight,
+      usage: "Hover states, secondary buttons, highlights",
+    },
+    {
+      role: "Primary Dark",
+      hex: rgbToHex(primaryDark),
+      rgb: primaryDark,
+      usage: "Active states, emphasis, dark mode accents",
+    },
+    {
+      role: "Secondary",
+      hex: rgbToHex(secondary),
+      rgb: secondary,
+      usage: "Secondary actions, badges, tags",
+    },
+    {
+      role: "Secondary Light",
+      hex: rgbToHex(secondaryLight),
+      rgb: secondaryLight,
+      usage: "Secondary hover, subtle backgrounds",
+    },
+    {
+      role: "Accent",
+      hex: rgbToHex(accent),
+      rgb: accent,
+      usage: "Accents, highlights, illustrations",
+    },
+    {
+      role: "Accent Light",
+      hex: rgbToHex(accentLight),
+      rgb: accentLight,
+      usage: "Accent backgrounds, subtle highlights",
+    },
     { role: "Background", hex: rgbToHex(neutral(99)), rgb: neutral(99), usage: "Page background" },
-    { role: "Surface", hex: rgbToHex(neutral(98)), rgb: neutral(98), usage: "Card/panel background" },
-    { role: "Surface Variant", hex: rgbToHex(neutral(94)), rgb: neutral(94), usage: "Borders, dividers, subtle backgrounds" },
-    { role: "Text Primary", hex: rgbToHex(neutral(10)), rgb: neutral(10), usage: "Headings, primary body text" },
-    { role: "Text Secondary", hex: rgbToHex(neutral(50)), rgb: neutral(50), usage: "Subtitles, descriptions, captions" },
-    { role: "Text Tertiary", hex: rgbToHex(neutral(60)), rgb: neutral(60), usage: "Placeholders, disabled text" },
-    { role: "Border", hex: rgbToHex(neutral(85)), rgb: neutral(85), usage: "Default borders, dividers" },
-    { role: "Success", hex: rgbToHex(success), rgb: success, usage: "Success states, positive feedback" },
-    { role: "Warning", hex: rgbToHex(warning), rgb: warning, usage: "Warning states, caution indicators" },
+    {
+      role: "Surface",
+      hex: rgbToHex(neutral(98)),
+      rgb: neutral(98),
+      usage: "Card/panel background",
+    },
+    {
+      role: "Surface Variant",
+      hex: rgbToHex(neutral(94)),
+      rgb: neutral(94),
+      usage: "Borders, dividers, subtle backgrounds",
+    },
+    {
+      role: "Text Primary",
+      hex: rgbToHex(neutral(10)),
+      rgb: neutral(10),
+      usage: "Headings, primary body text",
+    },
+    {
+      role: "Text Secondary",
+      hex: rgbToHex(neutral(50)),
+      rgb: neutral(50),
+      usage: "Subtitles, descriptions, captions",
+    },
+    {
+      role: "Text Tertiary",
+      hex: rgbToHex(neutral(60)),
+      rgb: neutral(60),
+      usage: "Placeholders, disabled text",
+    },
+    {
+      role: "Border",
+      hex: rgbToHex(neutral(85)),
+      rgb: neutral(85),
+      usage: "Default borders, dividers",
+    },
+    {
+      role: "Success",
+      hex: rgbToHex(success),
+      rgb: success,
+      usage: "Success states, positive feedback",
+    },
+    {
+      role: "Warning",
+      hex: rgbToHex(warning),
+      rgb: warning,
+      usage: "Warning states, caution indicators",
+    },
     { role: "Error", hex: rgbToHex(error), rgb: error, usage: "Error states, destructive actions" },
-    { role: "Info", hex: rgbToHex(info), rgb: info, usage: "Informational states, neutral highlights" },
+    {
+      role: "Info",
+      hex: rgbToHex(info),
+      rgb: info,
+      usage: "Informational states, neutral highlights",
+    },
   ];
 
   // Typography scale
   const typography: TypographyScale[] = [
-    { name: "Display XL", size: "3.5rem", lineHeight: "1.1", fontWeight: 800, usage: "Hero headings, splash screens" },
-    { name: "Display", size: "2.5rem", lineHeight: "1.15", fontWeight: 700, usage: "Section headings, feature titles" },
+    {
+      name: "Display XL",
+      size: "3.5rem",
+      lineHeight: "1.1",
+      fontWeight: 800,
+      usage: "Hero headings, splash screens",
+    },
+    {
+      name: "Display",
+      size: "2.5rem",
+      lineHeight: "1.15",
+      fontWeight: 700,
+      usage: "Section headings, feature titles",
+    },
     { name: "H1", size: "2rem", lineHeight: "1.2", fontWeight: 700, usage: "Page titles" },
     { name: "H2", size: "1.5rem", lineHeight: "1.25", fontWeight: 600, usage: "Section titles" },
-    { name: "H3", size: "1.25rem", lineHeight: "1.3", fontWeight: 600, usage: "Card titles, subsection headers" },
-    { name: "H4", size: "1.125rem", lineHeight: "1.35", fontWeight: 600, usage: "Small headings, labels" },
-    { name: "Body Large", size: "1.125rem", lineHeight: "1.6", fontWeight: 400, usage: "Lead paragraphs, intros" },
+    {
+      name: "H3",
+      size: "1.25rem",
+      lineHeight: "1.3",
+      fontWeight: 600,
+      usage: "Card titles, subsection headers",
+    },
+    {
+      name: "H4",
+      size: "1.125rem",
+      lineHeight: "1.35",
+      fontWeight: 600,
+      usage: "Small headings, labels",
+    },
+    {
+      name: "Body Large",
+      size: "1.125rem",
+      lineHeight: "1.6",
+      fontWeight: 400,
+      usage: "Lead paragraphs, intros",
+    },
     { name: "Body", size: "1rem", lineHeight: "1.6", fontWeight: 400, usage: "Default body text" },
-    { name: "Body Small", size: "0.875rem", lineHeight: "1.5", fontWeight: 400, usage: "Secondary text, descriptions" },
-    { name: "Caption", size: "0.75rem", lineHeight: "1.4", fontWeight: 500, usage: "Captions, timestamps, metadata" },
-    { name: "Overline", size: "0.6875rem", lineHeight: "1.3", fontWeight: 600, usage: "Labels, categories, uppercase tags" },
-    { name: "Code", size: "0.875rem", lineHeight: "1.6", fontWeight: 400, usage: "Inline code, code blocks (monospace)" },
+    {
+      name: "Body Small",
+      size: "0.875rem",
+      lineHeight: "1.5",
+      fontWeight: 400,
+      usage: "Secondary text, descriptions",
+    },
+    {
+      name: "Caption",
+      size: "0.75rem",
+      lineHeight: "1.4",
+      fontWeight: 500,
+      usage: "Captions, timestamps, metadata",
+    },
+    {
+      name: "Overline",
+      size: "0.6875rem",
+      lineHeight: "1.3",
+      fontWeight: 600,
+      usage: "Labels, categories, uppercase tags",
+    },
+    {
+      name: "Code",
+      size: "0.875rem",
+      lineHeight: "1.6",
+      fontWeight: 400,
+      usage: "Inline code, code blocks (monospace)",
+    },
   ];
 
   // Spacing scale (4px base)
@@ -176,13 +316,41 @@ export function generateDesignSystem(
   // Shadow scale
   const shadows: ShadowScale[] = [
     { name: "xs", css: "0 1px 2px 0 rgba(0,0,0,0.05)", usage: "Subtle lift for small elements" },
-    { name: "sm", css: "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)", usage: "Cards, buttons" },
-    { name: "md", css: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)", usage: "Dropdowns, popovers" },
-    { name: "lg", css: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)", usage: "Modals, cards on hover" },
-    { name: "xl", css: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", usage: "Large modals, floating panels" },
-    { name: "2xl", css: "0 25px 50px -12px rgba(0,0,0,0.25)", usage: "Tooltips, prominent popovers" },
-    { name: "inner", css: "inset 0 2px 4px 0 rgba(0,0,0,0.05)", usage: "Input focus, inset effects" },
-    { name: "glow", css: `0 0 20px 4px ${rgbToHex(base)}33`, usage: "Brand glow, focus ring effect" },
+    {
+      name: "sm",
+      css: "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)",
+      usage: "Cards, buttons",
+    },
+    {
+      name: "md",
+      css: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+      usage: "Dropdowns, popovers",
+    },
+    {
+      name: "lg",
+      css: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+      usage: "Modals, cards on hover",
+    },
+    {
+      name: "xl",
+      css: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)",
+      usage: "Large modals, floating panels",
+    },
+    {
+      name: "2xl",
+      css: "0 25px 50px -12px rgba(0,0,0,0.25)",
+      usage: "Tooltips, prominent popovers",
+    },
+    {
+      name: "inner",
+      css: "inset 0 2px 4px 0 rgba(0,0,0,0.05)",
+      usage: "Input focus, inset effects",
+    },
+    {
+      name: "glow",
+      css: `0 0 20px 4px ${rgbToHex(base)}33`,
+      usage: "Brand glow, focus ring effect",
+    },
   ];
 
   return {
@@ -269,9 +437,7 @@ export function toTailwindConfig(ds: DesignSystem): string {
         },
         spacing: spacingObj,
         borderRadius: radiusObj,
-        boxShadow: Object.fromEntries(
-          ds.shadows.map((s) => [s.name, s.css])
-        ),
+        boxShadow: Object.fromEntries(ds.shadows.map((s) => [s.name, s.css])),
       },
     },
   };
@@ -286,13 +452,10 @@ export function toJsonTokens(ds: DesignSystem): string {
         ds.colors.map((c) => [
           c.role.toLowerCase().replace(/\s+/g, "-"),
           { $type: "color", $value: c.hex, $description: c.usage },
-        ])
+        ]),
       ),
       shade: Object.fromEntries(
-        ds.shades.map((s) => [
-          String(s.step),
-          { $type: "color", $value: rgbToHex(s.rgb) },
-        ])
+        ds.shades.map((s) => [String(s.step), { $type: "color", $value: rgbToHex(s.rgb) }]),
       ),
       typography: Object.fromEntries(
         ds.typography.map((t) => [
@@ -306,25 +469,22 @@ export function toJsonTokens(ds: DesignSystem): string {
             },
             $description: t.usage,
           },
-        ])
+        ]),
       ),
       spacing: Object.fromEntries(
         ds.spacing.map((s) => [
           s.name,
           { $type: "dimension", $value: s.value, $description: s.usage },
-        ])
+        ]),
       ),
       radius: Object.fromEntries(
         ds.radius.map((r) => [
           r.name,
           { $type: "dimension", $value: r.value, $description: r.usage },
-        ])
+        ]),
       ),
       shadow: Object.fromEntries(
-        ds.shadows.map((s) => [
-          s.name,
-          { $type: "shadow", $value: s.css, $description: s.usage },
-        ])
+        ds.shadows.map((s) => [s.name, { $type: "shadow", $value: s.css, $description: s.usage }]),
       ),
     },
   };
@@ -342,14 +502,16 @@ export function toReactNativeTheme(ds: DesignSystem): string {
     typography: Object.fromEntries(
       ds.typography.map((t) => [
         t.name.toLowerCase().replace(/\s+/g, "_"),
-        { fontSize: parseFloat(t.size) * 16, lineHeight: parseFloat(t.lineHeight) * parseFloat(t.size) * 16, fontWeight: String(t.fontWeight) },
-      ])
+        {
+          fontSize: parseFloat(t.size) * 16,
+          lineHeight: parseFloat(t.lineHeight) * parseFloat(t.size) * 16,
+          fontWeight: String(t.fontWeight),
+        },
+      ]),
     ),
-    spacing: Object.fromEntries(
-      ds.spacing.map((s) => [s.name, s.px])
-    ),
+    spacing: Object.fromEntries(ds.spacing.map((s) => [s.name, s.px])),
     borderRadius: Object.fromEntries(
-      ds.radius.map((r) => [r.name, r.value === "9999px" ? 9999 : parseFloat(r.value) * 16])
+      ds.radius.map((r) => [r.name, r.value === "9999px" ? 9999 : parseFloat(r.value) * 16]),
     ),
   };
 
@@ -403,10 +565,7 @@ export function toScssVariables(ds: DesignSystem): string {
 
 export type ExportFormat = "css" | "tailwind" | "json" | "react-native" | "scss";
 
-export function exportDesignSystem(
-  ds: DesignSystem,
-  format: ExportFormat,
-): string {
+export function exportDesignSystem(ds: DesignSystem, format: ExportFormat): string {
   switch (format) {
     case "css":
       return toCssVariables(ds);
@@ -630,7 +789,7 @@ export function generateBrandKit(
   const textLight = withLightness(primary, 12);
   const textDark = withLightness(primary, 95);
 
-  const luminance = (rgbToHsl(primary).l) / 100;
+  const luminance = rgbToHsl(primary).l / 100;
   const backgroundColor = luminance > 0.5 ? bgDark : bgLight;
   const textColor = luminance > 0.5 ? textDark : textLight;
 
@@ -651,7 +810,10 @@ export function generateBrandKit(
         { label: "Headline Font", value: profile.headlineFont },
         { label: "Body Font", value: profile.bodyFont },
         { label: "Monospace Font", value: profile.monoFont },
-        { label: "Primary Heading", value: `${profile.style.headingWeight === 800 ? "ExtraBold" : profile.style.headingWeight === 600 ? "Semibold" : "Bold"} ${profile.style.headingWeight}, ${profile.style.headingSize / 16}rem / 1.2` },
+        {
+          label: "Primary Heading",
+          value: `${profile.style.headingWeight === 800 ? "ExtraBold" : profile.style.headingWeight === 600 ? "Semibold" : "Bold"} ${profile.style.headingWeight}, ${profile.style.headingSize / 16}rem / 1.2`,
+        },
         { label: "Body Text", value: "Regular 400, 1rem / 1.6" },
       ],
     },
@@ -770,14 +932,18 @@ export function brandKitToHtml(kit: BrandKit): string {
     <div class="section">
       <h2>Color Palette</h2>
       <div class="color-grid">
-        ${kit.guidelines[0].items.map((item) => `
+        ${kit.guidelines[0].items
+          .map(
+            (item) => `
         <div class="color-card">
           <div class="color-swatch" style="background: ${item.hex}"></div>
           <div class="color-info">
             <div class="name">${item.label}</div>
             <div class="hex">${item.value}</div>
           </div>
-        </div>`).join("")}
+        </div>`,
+          )
+          .join("")}
       </div>
     </div>
     <div class="section">
@@ -801,13 +967,22 @@ export function brandKitToHtml(kit: BrandKit): string {
     </div>
     <div class="section">
       <h2>Brand Guidelines</h2>
-      ${kit.guidelines.slice(2).map((g) => `
+      ${kit.guidelines
+        .slice(2)
+        .map(
+          (g) => `
       <h3 style="margin: 24px 0 12px; font-size: 1.125rem;">${g.section}</h3>
-      ${g.items.map((item) => `
+      ${g.items
+        .map(
+          (item) => `
       <div class="guideline-item">
         <span class="label">${item.label}</span>
         <span class="value">${item.value}</span>
-      </div>`).join("")}`).join("")}
+      </div>`,
+        )
+        .join("")}`,
+        )
+        .join("")}
     </div>
   </div>
 </body>

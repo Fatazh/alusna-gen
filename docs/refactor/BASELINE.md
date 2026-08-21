@@ -18,13 +18,13 @@ Recorded on 2026-08-21 before architectural migration.
 
 ## Baseline validation
 
-| Check | Result |
-|---|---|
-| `npm test` | 87 tests passed across 7 files |
-| `npm run build` | Passed with Vite 8.2.0 |
-| `npm audit --omit=dev` | 0 production vulnerabilities |
-| Static route output | 11 nested tool pages plus root and `robots.txt` |
-| Git worktree before documentation | Clean after baseline commit |
+| Check                             | Result                                          |
+| --------------------------------- | ----------------------------------------------- |
+| `npm test`                        | 87 tests passed across 7 files                  |
+| `npm run build`                   | Passed with Vite 8.2.0                          |
+| `npm audit --omit=dev`            | 0 production vulnerabilities                    |
+| Static route output               | 11 nested tool pages plus root and `robots.txt` |
+| Git worktree before documentation | Clean after baseline commit                     |
 
 ## Missing safety tooling
 
@@ -38,11 +38,11 @@ These are known gaps. They will be introduced before high-risk module migration.
 
 ## High-complexity files
 
-| File | Approximate lines | Main concern |
-|---|---:|---|
-| `src/lib/designSystem.ts` | 755 | Design-system and Brand Kit domains plus multiple serializers |
-| `src/modules/font/FontModule.tsx` | 509 | UI, font loading, upload, preview, and export concerns |
-| `src/modules/brand/BrandKitModule.tsx` | 479 | Orchestration, local form state, import, save, and export |
-| `src/modules/brand/PaletteTab.tsx` | 477 | Large presentation component with brand-state behavior |
-| `src/modules/color/MatchingModule.tsx` | 456 | Feature UI and matching presentation |
-| `src/App.tsx` | 420 | App shell, navigation, URL state, SEO DOM updates, and composition |
+| File                                   | Approximate lines | Main concern                                                       |
+| -------------------------------------- | ----------------: | ------------------------------------------------------------------ |
+| `src/lib/designSystem.ts`              |               755 | Design-system and Brand Kit domains plus multiple serializers      |
+| `src/modules/font/FontModule.tsx`      |               509 | UI, font loading, upload, preview, and export concerns             |
+| `src/modules/brand/BrandKitModule.tsx` |               479 | Orchestration, local form state, import, save, and export          |
+| `src/modules/brand/PaletteTab.tsx`     |               477 | Large presentation component with brand-state behavior             |
+| `src/modules/color/MatchingModule.tsx` |               456 | Feature UI and matching presentation                               |
+| `src/App.tsx`                          |               420 | App shell, navigation, URL state, SEO DOM updates, and composition |

@@ -240,9 +240,7 @@ export type SearchResult = { name: string; hex: string; rgb: RGB };
 export function searchColorNames(query: string): SearchResult[] {
   const cache = getCache();
   const q = query.trim().toLowerCase();
-  const list = q
-    ? cache.filter(({ name }) => name.toLowerCase().includes(q))
-    : cache;
+  const list = q ? cache.filter(({ name }) => name.toLowerCase().includes(q)) : cache;
   return list.map(({ name, rgb }) => ({ name, hex: rgbToHex(rgb), rgb }));
 }
 

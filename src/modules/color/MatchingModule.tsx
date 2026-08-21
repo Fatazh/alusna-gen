@@ -8,17 +8,13 @@ import {
   bestTextOn,
 } from "../../lib/color";
 import { getColorName } from "../../lib/colorNames";
-import {
-  getSmartPairings,
-  ROLE_META,
-  type ColorPair,
-} from "../../lib/colorMatch";
+import { getSmartPairings, ROLE_META, type ColorPair } from "../../lib/colorMatch";
 import { useStudio } from "../../store/studio";
 import { Card, CardBody, CardHeader } from "../../components/Card";
 import { Swatch, ColorDetail } from "../../components/Swatch";
 import { ColorPicker } from "../../components/ColorPicker";
 import { cn } from "../../lib/cn";
-import { useToast } from "../../components/Toast";
+import { useToast } from "../../components/toastContext";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -53,10 +49,7 @@ export function MatchingModule() {
     pushColorHistory(rgb);
   };
 
-  const smartPairs = useMemo(
-    () => getSmartPairings(selectedColor),
-    [selectedColor],
-  );
+  const smartPairs = useMemo(() => getSmartPairings(selectedColor), [selectedColor]);
   const harmonyColors = useMemo(
     () => harmony(selectedColor, harmonyType),
     [selectedColor, harmonyType],
@@ -71,10 +64,7 @@ export function MatchingModule() {
           <ViewTab active={view === "smart"} onClick={() => setView("smart")}>
             Rekomendasi Cerdas
           </ViewTab>
-          <ViewTab
-            active={view === "classic"}
-            onClick={() => setView("classic")}
-          >
+          <ViewTab active={view === "classic"} onClick={() => setView("classic")}>
             Harmoni Klasik
           </ViewTab>
         </div>
@@ -103,10 +93,7 @@ export function MatchingModule() {
 
         {/* Color picker (shared by both views) */}
         <Card>
-          <CardHeader
-            title="Warna Primer"
-            subtitle="Pilih atau ketik nama warna"
-          />
+          <CardHeader title="Warna Primer" subtitle="Pilih atau ketik nama warna" />
           <CardBody>
             <ColorPicker
               rgb={selectedColor}
@@ -127,9 +114,7 @@ export function MatchingModule() {
           <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />
           <button
             type="button"
-            onClick={() =>
-              saveColor(selectedColor, getColorName(selectedColor).label)
-            }
+            onClick={() => saveColor(selectedColor, getColorName(selectedColor).label)}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
           >
             Simpan ke palet
@@ -165,12 +150,7 @@ function SmartView({
           {/* Ranked grid */}
           <div className="grid gap-3 sm:grid-cols-2">
             {pairs.map((pair) => (
-              <PairCard
-                key={pair.rank}
-                pair={pair}
-                onSelect={onSelect}
-                onSave={onSave}
-              />
+              <PairCard key={pair.rank} pair={pair} onSelect={onSelect} onSave={onSave} />
             ))}
           </div>
 
@@ -209,7 +189,10 @@ function PairCard({
   };
 
   return (
-    <div className="group flex items-stretch gap-0 overflow-hidden rounded-xl border transition" style={{ borderColor: "var(--border)" }}>
+    <div
+      className="group flex items-stretch gap-0 overflow-hidden rounded-xl border transition"
+      style={{ borderColor: "var(--border)" }}
+    >
       {/* Color swatch strip */}
       <div
         className="relative w-20 shrink-0 transition hover:w-24"
@@ -235,7 +218,10 @@ function PairCard({
       </div>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col justify-between gap-1 px-3 py-2.5" style={{ backgroundColor: "var(--chip-bg)" }}>
+      <div
+        className="flex flex-1 flex-col justify-between gap-1 px-3 py-2.5"
+        style={{ backgroundColor: "var(--chip-bg)" }}
+      >
         <div className="flex items-center justify-between gap-2">
           <span
             className={cn(
@@ -257,7 +243,10 @@ function PairCard({
           </button>
         </div>
         <div>
-          <p className="text-sm font-semibold leading-tight" style={{ color: "var(--text-primary)" }}>
+          <p
+            className="text-sm font-semibold leading-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
             {colorInfo.label}
           </p>
           <p className="mt-0.5 text-[10px] leading-tight" style={{ color: "var(--text-muted)" }}>
@@ -270,13 +259,7 @@ function PairCard({
 }
 
 // Mini UI preview showing the palette in action
-function PalettePreview({
-  primary,
-  pairs,
-}: {
-  primary: RGB;
-  pairs: ColorPair[];
-}) {
+function PalettePreview({ primary, pairs }: { primary: RGB; pairs: ColorPair[] }) {
   const dominan = pairs.find((p) => p.role === "dominan")?.rgb ?? primary;
   const aksen = pairs.find((p) => p.role === "aksen")?.rgb ?? primary;
   const netral = pairs.find((p) => p.role === "netral")?.rgb ?? primary;
@@ -290,17 +273,14 @@ function PalettePreview({
 
   const contrast = contrastRatio(primary, teks);
   const rating =
-    contrast >= 7
-      ? "AAA"
-      : contrast >= 4.5
-        ? "AA"
-        : contrast >= 3
-          ? "AA Large"
-          : "Fail";
+    contrast >= 7 ? "AAA" : contrast >= 4.5 ? "AA" : contrast >= 3 ? "AA Large" : "Fail";
 
   return (
     <div>
-      <p className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+      <p
+        className="mb-2 text-[11px] font-medium uppercase tracking-wider"
+        style={{ color: "var(--text-muted)" }}
+      >
         Preview Penggunaan
       </p>
       <div
@@ -309,15 +289,11 @@ function PalettePreview({
       >
         {/* Heading */}
         <div>
-          <p
-            className="text-xl font-bold leading-tight"
-            style={{ color: dominanHex }}
-          >
+          <p className="text-xl font-bold leading-tight" style={{ color: dominanHex }}>
             Judul Halaman
           </p>
           <p className="mt-1 text-sm" style={{ color: teksHex }}>
-            Ini adalah contoh teks paragraf menggunakan palet yang telah
-            dipilih.
+            Ini adalah contoh teks paragraf menggunakan palet yang telah dipilih.
           </p>
         </div>
 
@@ -354,10 +330,7 @@ function PalettePreview({
         </div>
 
         {/* Contrast info bar */}
-        <div
-          className="rounded-lg px-3 py-2"
-          style={{ backgroundColor: primaryHex }}
-        >
+        <div className="rounded-lg px-3 py-2" style={{ backgroundColor: primaryHex }}>
           <p className="text-[11px]" style={{ color: teksHex }}>
             Kontras teks pada primary: {contrast.toFixed(2)} ·{" "}
             <span className="font-semibold">{rating}</span>
@@ -410,7 +383,9 @@ function ClassicView({
                 <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
                   {h.label}
                 </div>
-                <div className="mt-0.5 text-[10px]" style={{ color: "var(--text-muted)" }}>{h.desc}</div>
+                <div className="mt-0.5 text-[10px]" style={{ color: "var(--text-muted)" }}>
+                  {h.desc}
+                </div>
               </button>
             ))}
           </div>
@@ -441,8 +416,7 @@ function ClassicContrastPreview({ colors }: { colors: RGB[] }) {
   const bg = colors[0];
   const fg = colors[1];
   const ratio = contrastRatio(bg, fg);
-  const rating =
-    ratio >= 7 ? "AAA" : ratio >= 4.5 ? "AA" : ratio >= 3 ? "AA Large" : "Fail";
+  const rating = ratio >= 7 ? "AAA" : ratio >= 4.5 ? "AA" : ratio >= 3 ? "AA Large" : "Fail";
 
   return (
     <div className="rounded-xl p-4" style={{ backgroundColor: rgbToHex(bg) }}>

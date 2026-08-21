@@ -2,7 +2,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { useStudio } from "./store/studio";
 import { rgbToHex, hexToRgb } from "./lib/color";
 import { CopyButton } from "./components/CopyButton";
-import { ToastProvider, useToast } from "./components/Toast";
+import { ToastProvider } from "./components/Toast";
+import { useToast } from "./components/toastContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SponsorSlot } from "./components/SponsorSlot";
 import {
@@ -20,7 +21,9 @@ const MatchingModule = lazy(() =>
   import("./modules/color/MatchingModule").then((module) => ({ default: module.MatchingModule })),
 );
 const ExperimentModule = lazy(() =>
-  import("./modules/color/ExperimentModule").then((module) => ({ default: module.ExperimentModule })),
+  import("./modules/color/ExperimentModule").then((module) => ({
+    default: module.ExperimentModule,
+  })),
 );
 const GradientModule = lazy(() =>
   import("./modules/color/GradientModule").then((module) => ({ default: module.GradientModule })),
@@ -32,7 +35,9 @@ const ImageModule = lazy(() =>
   import("./modules/color/ImageModule").then((module) => ({ default: module.ImageModule })),
 );
 const AccessibilityModule = lazy(() =>
-  import("./modules/color/AccessibilityModule").then((module) => ({ default: module.AccessibilityModule })),
+  import("./modules/color/AccessibilityModule").then((module) => ({
+    default: module.AccessibilityModule,
+  })),
 );
 const ContrastModule = lazy(() =>
   import("./modules/color/ContrastModule").then((module) => ({ default: module.ContrastModule })),
@@ -41,7 +46,9 @@ const FontModule = lazy(() =>
   import("./modules/font/FontModule").then((module) => ({ default: module.FontModule })),
 );
 const DesignSystemModule = lazy(() =>
-  import("./modules/design/DesignSystemModule").then((module) => ({ default: module.DesignSystemModule })),
+  import("./modules/design/DesignSystemModule").then((module) => ({
+    default: module.DesignSystemModule,
+  })),
 );
 const BrandKitModule = lazy(() =>
   import("./modules/brand/BrandKitModule").then((module) => ({ default: module.BrandKitModule })),
@@ -87,7 +94,10 @@ function applySeoMetadata(page: SeoPage) {
   document.title = page.title;
   upsertMeta('meta[name="description"]', { name: "description", content: page.description });
   upsertMeta('meta[property="og:title"]', { property: "og:title", content: page.title });
-  upsertMeta('meta[property="og:description"]', { property: "og:description", content: page.description });
+  upsertMeta('meta[property="og:description"]', {
+    property: "og:description",
+    content: page.description,
+  });
   upsertMeta('meta[property="og:url"]', { property: "og:url", content: canonicalUrl });
 
   let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
@@ -147,6 +157,9 @@ export default function App() {
     }
     if (window.location.pathname === "/" && m && ["color", "font", "design", "brand"].includes(m)) {
       const legacyModule = m as TopModule;
+      // This one-time compatibility update translates the legacy `?m=` URL.
+      // Routing extraction in Phase 5 will move it out of a React effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTopTab(legacyModule);
       if (m === "color" || m === "font") setActiveModule(m);
       updateBrowserPath(findPageForModule(legacyModule).path, true);
@@ -183,23 +196,23 @@ export default function App() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
-      if (
-        t &&
-        (t.tagName === "INPUT" ||
-          t.tagName === "TEXTAREA" ||
-          t.isContentEditable)
-      )
-        return;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.toLowerCase();
       if (k === "c") {
-        setTopTab("color"); setActiveModule("color"); updateBrowserPath(findPageForModule("color", colorTab).path);
+        setTopTab("color");
+        setActiveModule("color");
+        updateBrowserPath(findPageForModule("color", colorTab).path);
       } else if (k === "f") {
-        setTopTab("font"); setActiveModule("font"); updateBrowserPath(findPageForModule("font").path);
+        setTopTab("font");
+        setActiveModule("font");
+        updateBrowserPath(findPageForModule("font").path);
       } else if (k === "d") {
-        setTopTab("design"); updateBrowserPath(findPageForModule("design").path);
+        setTopTab("design");
+        updateBrowserPath(findPageForModule("design").path);
       } else if (k === "b") {
-        setTopTab("brand"); updateBrowserPath(findPageForModule("brand").path);
+        setTopTab("brand");
+        updateBrowserPath(findPageForModule("brand").path);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -228,162 +241,198 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <ToastProvider>
-      <StorageWarningListener />
-      <div
-        className="min-h-screen"
-        style={{ background: "var(--app-bg)" }}
-      >
-        {/* Header */}
-        <header
-          className="sticky top-0 z-30 border-b border-white/5 backdrop-blur"
-          style={{ backgroundColor: "var(--chrome-bg)" }}
-        >
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-2.5">
-              <div className="grid h-9 w-9 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-lg">
-                <span className="bg-rose-500" />
-                <span className="bg-sky-500" />
-                <span className="bg-emerald-500" />
-                <span className="bg-amber-500" />
+      <ToastProvider>
+        <StorageWarningListener />
+        <div className="min-h-screen" style={{ background: "var(--app-bg)" }}>
+          {/* Header */}
+          <header
+            className="sticky top-0 z-30 border-b border-white/5 backdrop-blur"
+            style={{ backgroundColor: "var(--chrome-bg)" }}
+          >
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+              <div className="flex items-center gap-2.5">
+                <div className="grid h-9 w-9 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-lg">
+                  <span className="bg-rose-500" />
+                  <span className="bg-sky-500" />
+                  <span className="bg-emerald-500" />
+                  <span className="bg-amber-500" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold" style={{ color: "var(--chrome-text)" }}>
+                    CIKP Studio
+                  </div>
+                  <p className="text-[11px]" style={{ color: "var(--chrome-sub)" }}>
+                    Design System & Brand Kit Generator
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1
-                  className="text-sm font-semibold"
-                  style={{ color: "var(--chrome-text)" }}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="hidden rounded-md border px-2.5 py-1 text-xs font-medium transition sm:inline-flex"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                  title="Ganti tema"
                 >
-                  CIKP Studio
-                </h1>
-                <p
-                  className="text-[11px]"
-                  style={{ color: "var(--chrome-sub)" }}
+                  {theme === "dark" ? "☀ Terang" : "🌙 Gelap"}
+                </button>
+                <CopyButton
+                  value={shareUrl}
+                  label="Salin tautan"
+                  className="hidden sm:inline-flex"
+                />
+
+                {/* Top-level navigation */}
+                <nav
+                  className="flex gap-0.5 rounded-full p-1"
+                  style={{
+                    borderColor: "var(--border)",
+                    backgroundColor: "var(--chip-bg)",
+                    border: "1px solid var(--border)",
+                  }}
+                  role="tablist"
+                  aria-label="Modul studio"
                 >
-                  Design System & Brand Kit Generator
+                  {TOP_TABS.map((tab) => (
+                    <a
+                      key={tab.id}
+                      href={findPageForModule(tab.id, colorTab).path}
+                      role="tab"
+                      aria-selected={topTab === tab.id}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        switchTopTab(tab.id);
+                      }}
+                      title={tab.desc}
+                      className="rounded-full px-3 py-1.5 text-xs font-medium transition"
+                      style={
+                        topTab === tab.id
+                          ? {
+                              backgroundColor: "var(--surface)",
+                              color: "var(--text-primary)",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                            }
+                          : { color: "var(--text-secondary)" }
+                      }
+                    >
+                      <span className="hidden sm:inline">{tab.icon} </span>
+                      {tab.label}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </header>
+
+          <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+            <section
+              aria-labelledby="tool-page-title"
+              className="mb-5 rounded-2xl border px-5 py-4"
+              style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h1
+                    id="tool-page-title"
+                    className="text-xl font-semibold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {currentPage.heading}
+                  </h1>
+                  <p
+                    className="mt-1 max-w-3xl text-sm leading-relaxed"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {currentPage.description}
+                  </p>
+                </div>
+                <p className="shrink-0 text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Gratis · Tanpa akun · Diproses di browser
                 </p>
               </div>
-            </div>
+            </section>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="hidden rounded-md border px-2.5 py-1 text-xs font-medium transition sm:inline-flex"
-                style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-                title="Ganti tema"
-              >
-                {theme === "dark" ? "☀ Terang" : "🌙 Gelap"}
-              </button>
-              <CopyButton value={shareUrl} label="Salin tautan" className="hidden sm:inline-flex" />
+            <SponsorSlot />
 
-              {/* Top-level navigation */}
-              <nav
-                className="flex gap-0.5 rounded-full p-1"
-                style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)", border: "1px solid var(--border)" }}
-                role="tablist"
-                aria-label="Modul studio"
-              >
-                {TOP_TABS.map((tab) => (
-                  <a
-                    key={tab.id}
-                    href={findPageForModule(tab.id, colorTab).path}
-                    role="tab"
-                    aria-selected={topTab === tab.id}
-                    onClick={(event) => { event.preventDefault(); switchTopTab(tab.id); }}
-                    title={tab.desc}
-                    className="rounded-full px-3 py-1.5 text-xs font-medium transition"
-                    style={topTab === tab.id
-                      ? { backgroundColor: "var(--surface)", color: "var(--text-primary)", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
-                      : { color: "var(--text-secondary)" }
-                    }
+            <Suspense fallback={<ModuleLoading />}>
+              {/* ── Color Module ── */}
+              {topTab === "color" && (
+                <div className="space-y-6 animate-fade-in">
+                  {/* Color sub-tabs */}
+                  <div
+                    className="flex flex-wrap items-center gap-2"
+                    role="tablist"
+                    aria-label="Alat warna"
                   >
-                    <span className="hidden sm:inline">{tab.icon} </span>
-                    {tab.label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </div>
-        </header>
+                    {COLOR_TABS.map((t) => (
+                      <a
+                        key={t.id}
+                        href={findPageForModule("color", t.id).path}
+                        role="tab"
+                        aria-selected={colorTab === t.id}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          switchColorTab(t.id);
+                        }}
+                        className="group rounded-xl border px-4 py-2.5 text-left transition"
+                        style={
+                          colorTab === t.id
+                            ? {
+                                borderColor: "var(--border)",
+                                backgroundColor: "var(--chip-active-bg)",
+                              }
+                            : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }
+                        }
+                      >
+                        <div
+                          className="text-sm font-semibold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {t.label}
+                        </div>
+                        <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                          {t.desc}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <section aria-labelledby="tool-page-title" className="mb-5 rounded-2xl border px-5 py-4" style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 id="tool-page-title" className="text-xl font-semibold" style={{ color: "var(--text-primary)" }}>{currentPage.heading}</h2>
-                <p className="mt-1 max-w-3xl text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>{currentPage.description}</p>
-              </div>
-              <p className="shrink-0 text-[11px]" style={{ color: "var(--text-muted)" }}>Gratis · Tanpa akun · Diproses di browser</p>
-            </div>
-          </section>
+                  {colorTab === "pattern" && <PatternModule />}
+                  {colorTab === "matching" && <MatchingModule />}
+                  {colorTab === "experiment" && <ExperimentModule />}
+                  {colorTab === "gradient" && <GradientModule />}
+                  {colorTab === "shades" && <ShadeModule />}
+                  {colorTab === "image" && <ImageModule />}
+                  {colorTab === "a11y" && <AccessibilityModule />}
+                  {colorTab === "contrast" && <ContrastModule />}
+                </div>
+              )}
 
-          <SponsorSlot />
+              {/* ── Font Module ── */}
+              {topTab === "font" && <FontModule />}
 
-          <Suspense fallback={<ModuleLoading />}>
-          {/* ── Color Module ── */}
-          {topTab === "color" && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Color sub-tabs */}
-              <div
-                className="flex flex-wrap items-center gap-2"
-                role="tablist"
-                aria-label="Alat warna"
-              >
-                {COLOR_TABS.map((t) => (
-                  <a
-                    key={t.id}
-                    href={findPageForModule("color", t.id).path}
-                    role="tab"
-                    aria-selected={colorTab === t.id}
-                    onClick={(event) => { event.preventDefault(); switchColorTab(t.id); }}
-                    className="group rounded-xl border px-4 py-2.5 text-left transition"
-                    style={colorTab === t.id
-                      ? { borderColor: "var(--border)", backgroundColor: "var(--chip-active-bg)" }
-                      : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }
-                    }
-                  >
-                    <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {t.label}
-                    </div>
-                    <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>{t.desc}</div>
-                  </a>
-                ))}
-              </div>
+              {/* ── Design System Module ── */}
+              {topTab === "design" && <DesignSystemModule />}
 
-              {colorTab === "pattern" && <PatternModule />}
-              {colorTab === "matching" && <MatchingModule />}
-              {colorTab === "experiment" && <ExperimentModule />}
-              {colorTab === "gradient" && <GradientModule />}
-              {colorTab === "shades" && <ShadeModule />}
-              {colorTab === "image" && <ImageModule />}
-              {colorTab === "a11y" && <AccessibilityModule />}
-              {colorTab === "contrast" && <ContrastModule />}
-            </div>
+              {/* ── Brand Kit Module ── */}
+              {topTab === "brand" && <BrandKitModule />}
+            </Suspense>
+          </main>
+
+          {/* Recent colors bar */}
+          {colorHistory.length > 0 && (
+            <HistoryBar
+              colors={colorHistory}
+              onPick={(rgb) => {
+                setSelectedColor(rgb);
+                pushColorHistory(rgb);
+              }}
+              activeHex={rgbToHex(selectedColor)}
+            />
           )}
-
-          {/* ── Font Module ── */}
-          {topTab === "font" && <FontModule />}
-
-          {/* ── Design System Module ── */}
-          {topTab === "design" && <DesignSystemModule />}
-
-          {/* ── Brand Kit Module ── */}
-          {topTab === "brand" && <BrandKitModule />}
-          </Suspense>
-        </main>
-
-        {/* Recent colors bar */}
-        {colorHistory.length > 0 && (
-          <HistoryBar
-            colors={colorHistory}
-            onPick={(rgb) => {
-              setSelectedColor(rgb);
-              pushColorHistory(rgb);
-            }}
-            activeHex={rgbToHex(selectedColor)}
-          />
-        )}
-      </div>
-    </ToastProvider>
+        </div>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }
@@ -424,9 +473,15 @@ function HistoryBar({
   activeHex: string;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 border-t backdrop-blur" style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}>
+    <div
+      className="sticky bottom-0 z-20 border-t backdrop-blur"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+    >
       <div className="mx-auto flex max-w-7xl items-center gap-3 overflow-x-auto px-4 py-3 sm:px-6">
-        <span className="shrink-0 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+        <span
+          className="shrink-0 text-[11px] font-medium uppercase tracking-wider"
+          style={{ color: "var(--text-muted)" }}
+        >
           Riwayat
         </span>
         <div className="flex gap-2">
