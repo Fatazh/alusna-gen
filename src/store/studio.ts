@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { hexToRgb, rgbToHex, type RGB } from "../lib/color";
+import { hexToRgb, rgbToHex, type RGB } from "../features/color/domain";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   ALUSNA_STUDIO_STORAGE_VERSION,

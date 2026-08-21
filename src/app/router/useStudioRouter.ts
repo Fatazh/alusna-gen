@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { hexToRgb } from "../../features/color";
+import { hexToRgb } from "../../features/color/domain";
 import { useStudio } from "../../store/studio";
 import { resolveInitialPage, updateBrowserPath } from "./browserNavigation";
 import {

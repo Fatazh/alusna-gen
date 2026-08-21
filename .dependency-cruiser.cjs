@@ -49,10 +49,16 @@ module.exports = {
       to: { path: "^src/(app|features)/.+/(ui|components)" },
     },
     {
+      name: "store-uses-feature-domain-api",
+      severity: "error",
+      from: { path: "^src/store" },
+      to: { path: "^src/features/[^/]+/(?!(domain|index)\\.ts$)" },
+    },
+    {
       name: "app-uses-feature-public-api",
       severity: "error",
       from: { path: "^src/app" },
-      to: { path: "^src/features/[^/]+/(?!index\\.ts$)" },
+      to: { path: "^src/features/[^/]+/(?!(domain|index|loaders)\\.ts$)" },
     },
   ],
   options: {

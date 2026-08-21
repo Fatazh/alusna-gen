@@ -1,4 +1,4 @@
-import { rgbToHex, type RGB } from "../../features/color";
+import { rgbToHex, type RGB } from "../../features/color/domain";
 
 type HistoryBarProps = {
   colors: RGB[];

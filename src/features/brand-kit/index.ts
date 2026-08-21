@@ -6,6 +6,3 @@ export {
   brandKitToTailwindConfig,
   type ImportedBrandKit,
 } from "./services/interop";
-
-export const loadBrandKitModule = () =>
-  import("./ui/BrandKitModule").then((module) => ({ default: module.BrandKitModule }));

@@ -1,4 +1,4 @@
-import { type RGB } from "../lib/color";
+import { type RGB } from "../features/color/domain";
 
 export type SavedColor = { id: string; rgb: RGB; name: string };
 

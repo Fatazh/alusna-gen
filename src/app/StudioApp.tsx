@@ -8,6 +8,7 @@ import { AppProviders } from "./providers/AppProviders";
 import { AdvertisingSlot } from "./monetization/AdvertisingSlot";
 import { useStudioRouter } from "./router/useStudioRouter";
 import { usePageSeo } from "./seo/usePageSeo";
+import { rgbToHex } from "../features/color/domain";
 import {
   loadAccessibilityModule,
   loadContrastModule,
@@ -17,8 +18,10 @@ import {
   loadMatchingModule,
   loadPatternModule,
   loadShadeModule,
-  rgbToHex,
-} from "../features/color";
+} from "../features/color/loaders";
+import { loadFontModule } from "../features/typography/loaders";
+import { loadDesignSystemModule } from "../features/design-system/loaders";
+import { loadBrandKitModule } from "../features/brand-kit/loaders";
 import { useStudio } from "../store/studio";
 import { findPageForModule, isToolPage, type ColorTab } from "./router/routes";
 
@@ -30,18 +33,9 @@ const ShadeModule = lazy(loadShadeModule);
 const ImageModule = lazy(loadImageModule);
 const AccessibilityModule = lazy(loadAccessibilityModule);
 const ContrastModule = lazy(loadContrastModule);
-const FontModule = lazy(async () => {
-  const feature = await import("../features/typography");
-  return feature.loadFontModule();
-});
-const DesignSystemModule = lazy(async () => {
-  const feature = await import("../features/design-system");
-  return feature.loadDesignSystemModule();
-});
-const BrandKitModule = lazy(async () => {
-  const feature = await import("../features/brand-kit");
-  return feature.loadBrandKitModule();
-});
+const FontModule = lazy(loadFontModule);
+const DesignSystemModule = lazy(loadDesignSystemModule);
+const BrandKitModule = lazy(loadBrandKitModule);
 const TrustPageView = lazy(() =>
   import("./trust/TrustPageView").then((module) => ({ default: module.TrustPageView })),
 );

@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import StudioApp from "./app/StudioApp";
 import "./index.css";
 
 const rootEl = document.getElementById("root");
@@ -10,7 +10,7 @@ if (!rootEl) {
   try {
     createRoot(rootEl).render(
       <StrictMode>
-        <App />
+        <StudioApp />
       </StrictMode>,
     );
     window.__hideBootLoading?.();

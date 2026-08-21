@@ -1,5 +1,5 @@
-import { rgbToHex, type RGB } from "../../lib/color";
-import { isSafeFontDataUrl, sanitizeFontFamily } from "../../lib/font";
+import { rgbToHex, type RGB } from "../../features/color/domain";
+import { isSafeFontDataUrl, sanitizeFontFamily } from "../../features/typography/domain";
 import { STUDIO_LIMITS, STUDIO_LOGO_DATA_URL_LIMIT, STUDIO_TEXT_LIMIT } from "../studio.constants";
 import { type SavedBrandKit, type SavedColor, type StudioState } from "../studio.types";
 
