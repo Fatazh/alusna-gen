@@ -1,10 +1,11 @@
 # Refactor Status
 
-Last updated: 2026-08-21
+Last updated: 2026-08-22
 
 ## Current objective
 
-Phase 5 is verified. App shell, routing, SEO, trust pages, and transparent sponsor placement are separated and tested.
+Phase 6 is verified. The architectural refactor track is complete with public feature entries,
+expanded hardening coverage, baseline bundle comparison, adapter removal, and maintenance guidance.
 
 ## Completed
 
@@ -59,20 +60,38 @@ Phase 5 is verified. App shell, routing, SEO, trust pages, and transparent spons
 - Unit and contract suite expanded to 111 passing tests across 14 files.
 - Browser coverage expanded to 20 required scenarios plus one opt-in configured-sponsor scenario.
 - Phase 5 validation completed.
+- Feature domain APIs and UI lazy loaders now have separate public entries, preventing store-to-UI
+  dependency cycles.
+- Root `App.tsx` and the final `lib/color.ts` and `lib/font.ts` compatibility adapters were removed.
+- Responsive E2E covers representative mobile, tablet, and desktop routes with horizontal-overflow
+  assertions.
+- Tool-route E2E now verifies one `h1` and the canonical URL; Brand Kit E2E covers its export preview.
+- Mobile color-copy controls and footer links meet a 24 CSS pixel minimum target in the audited flow;
+  palette add controls remain visible on touch-sized layouts.
+- The production entry chunk is 58.16 kB gzip versus 58.89 kB at the pre-refactor baseline.
+- Unit and contract coverage remains 111 passing tests across 14 files.
+- Browser coverage is 22 required passing scenarios plus one optional sponsor-configured scenario.
+- Fifteen nested static public pages are emitted: eleven tools and four trust pages.
+- The full local quality gate and production dependency audit pass with 0 vulnerabilities.
+- Phase 6 validation completed; the six-phase architectural refactor is verified.
 
 ## In progress
 
-- No implementation task. The next authorized work begins Phase 6 hardening.
+- No refactor implementation task remains.
 
 ## Known risks
 
-- E2E covers route rendering and primary navigation, but not every editing and export workflow.
+- E2E covers route rendering, primary navigation, representative responsive layouts, canonical URLs,
+  and the Brand Kit export preview, but not every editor combination, download, or clipboard failure.
 - The ALUSNA domain and final production origin are not configured yet.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
-- Store persistence still uses narrow `lib/color.ts` and `lib/font.ts` compatibility facades to avoid a store-to-feature-UI cycle; state slicing/public domain entry design should resolve this later.
+- `studio.ts` remains a shared persisted Zustand store; introduce slices only when a product change
+  needs independently owned state lifecycles.
 - The production contact email is not active until `VITE_CONTACT_EMAIL` is configured.
 - No third-party ad network or revenue account is active; adding one requires CSP, privacy, consent, and provider-specific review.
 
 ## Next task
 
-Phase 6 should compare bundles and behavior against baseline, broaden accessibility/responsive/export checks, and remove only the remaining adapters that can be retired safely.
+Prepare production launch: configure the final origin and contact channel, verify nested URLs and
+indexing on the real host, then select an advertising provider and review its CSP, consent, privacy,
+and regional requirements before activation.

@@ -65,9 +65,9 @@ Status: **verified**
 
 ## Phase 6: Final hardening
 
-Status: **planned**
+Status: **verified**
 
-- [ ] Run unit, E2E, build, audit, accessibility, responsive, and SEO checks.
-- [ ] Compare bundle and behavior against baseline.
-- [ ] Remove temporary adapters only after their consumers are migrated.
-- [ ] Finalize maintenance documentation.
+- [x] Run unit, E2E, build, audit, accessibility, responsive, and SEO checks.
+- [x] Compare bundle and behavior against baseline.
+- [x] Remove temporary adapters only after their consumers are migrated.
+- [x] Finalize maintenance documentation.
