@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 4 is in progress. Color and typography are migrated; design-system separation is next.
+Phase 4 is in progress. Color, typography, and design-system are migrated; Brand Kit is next.
 
 ## Completed
 
@@ -38,10 +38,12 @@ Phase 4 is in progress. Color and typography are migrated; design-system separat
 - Thin legacy facades preserve current `App.tsx` lazy imports and remaining store/feature imports until their owning migration steps.
 - Typography catalog and validation moved to a pure model, while Google Font, upload, and restore browser operations moved to a dedicated service.
 - `features/typography/index.ts` now defines the supported typography API; the old font module and utility paths are thin compatibility facades.
+- Design-system generation and five export serializers now live in separate pure modules behind `features/design-system/index.ts`.
+- Legacy `lib/designSystem.ts` temporarily owns only Brand Kit behavior and re-exports the new design-system API until the Brand Kit migration is complete.
 
 ## In progress
 
-- Split design-system generation from serializers and migrate both behind `features/design-system/index.ts`.
+- Migrate Brand Kit as the final Phase 4 integration feature.
 
 ## Known risks
 
@@ -56,4 +58,4 @@ Phase 4 is in progress. Color and typography are migrated; design-system separat
 
 ## Next task
 
-Phase 4 should split and migrate design-system generation/serializers next, then migrate Brand Kit last.
+Phase 4 should migrate Brand Kit last, then run the complete phase verification gate.
