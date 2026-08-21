@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { SEO_PAGES, TRUST_PAGES } from "../src/app/router/routes";
+import { HOME_PAGE, SEO_PAGES, TRUST_PAGES } from "../src/app/router/routes";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   LEGACY_STUDIO_STORAGE_KEY,
@@ -18,8 +18,59 @@ test.describe("public tool routes", () => {
         new RegExp(`${route.path}/?$`),
       );
       await expect(page.locator("#boot-error")).toBeHidden();
+      await expect(page.locator(`[data-evergreen-content="${route.path}"]`)).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: `Cara menggunakan ${route.heading}` }),
+      ).toBeVisible();
     });
   }
+});
+
+test("homepage introduces ALUSNA and links visibly to every tool", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveTitle(HOME_PAGE.title);
+  await expect(page.getByRole("heading", { name: HOME_PAGE.heading, level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Semua alat ALUSNA" })).toBeVisible();
+  await expect(page.locator("h1")).toHaveCount(1);
+
+  for (const route of SEO_PAGES) {
+    await expect(page.locator(`a[href="${route.path}"]`).first()).toBeVisible();
+  }
+
+  const structuredData = JSON.parse(
+    String(await page.locator("#alusna-structured-data").textContent()),
+  );
+  expect(structuredData["@type"]).toBe("WebSite");
+});
+
+test("homepage starts a tool workflow without a full reload", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Mulai dari palet warna" }).click();
+
+  await expect(page).toHaveURL(/\/color-palette-generator\/?$/);
+  await expect(
+    page.getByRole("heading", { name: "Color Palette Generator Gratis", level: 1, exact: true }),
+  ).toBeVisible();
+});
+
+test("built pages expose useful content without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: HOME_PAGE.heading, level: 1 })).toBeVisible();
+  for (const route of SEO_PAGES) {
+    await expect(page.getByRole("link", { name: route.heading, exact: true })).toBeVisible();
+  }
+
+  await page.goto(`${SEO_PAGES[0].path}/`);
+  await expect(
+    page.getByRole("heading", { name: `Cara menggunakan ${SEO_PAGES[0].heading}` }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Alat terkait" })).toBeVisible();
+
+  await context.close();
 });
 
 test.describe("trust and legal routes", () => {
@@ -72,7 +123,11 @@ test("top-level navigation updates the URL and supports browser history", async 
   await page.getByRole("tab", { name: /Font/ }).click();
   await expect(page).toHaveURL(/\/font-pairing\/?$/);
   await expect(
-    page.getByRole("heading", { name: "Font Pairing dan Typography Preview" }),
+    page.getByRole("heading", {
+      name: "Font Pairing dan Typography Preview",
+      level: 1,
+      exact: true,
+    }),
   ).toBeVisible();
 
   await page.getByRole("tab", { name: /Design System/ }).click();
@@ -102,13 +157,20 @@ test("color tool navigation preserves the selected color in the share URL", asyn
 
   await page.getByRole("tab", { name: /Contrast/ }).click();
   await expect(page).toHaveURL(/\/contrast-checker\/?\?c=%23FF0000$/);
-  await expect(page.getByRole("heading", { name: "WCAG Color Contrast Checker" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "WCAG Color Contrast Checker",
+      level: 1,
+      exact: true,
+    }),
+  ).toBeVisible();
 });
 
 test("representative tools do not overflow at mobile, tablet, or desktop widths", async ({
   page,
 }) => {
   const cases = [
+    { width: 390, height: 844, path: "/" },
     { width: 390, height: 844, path: "/color-palette-generator/" },
     { width: 1024, height: 768, path: "/brand-kit-generator/" },
     { width: 1440, height: 900, path: "/design-token-generator/" },
@@ -125,7 +187,7 @@ test("representative tools do not overflow at mobile, tablet, or desktop widths"
     }));
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 
-    if (current.width === 390) {
+    if (current.path === "/color-palette-generator/") {
       const hexTarget = page.getByRole("button", { name: "Salin #FF6B6B" });
       const privacyTarget = page.getByRole("link", { name: "Privasi", exact: true });
       expect((await hexTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);

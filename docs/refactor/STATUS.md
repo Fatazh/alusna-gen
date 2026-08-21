@@ -4,8 +4,9 @@ Last updated: 2026-08-22
 
 ## Current objective
 
-Phase 6 is verified. The architectural refactor track is complete with public feature entries,
-expanded hardening coverage, baseline bundle comparison, adapter removal, and maintenance guidance.
+Phase 7 is verified. ALUSNA now has a dedicated homepage, unique evergreen guidance for every tool,
+visible contextual internal links, crawlable built HTML, and a privacy-first analytics boundary that
+stays network-inactive until a provider is explicitly selected.
 
 ## Completed
 
@@ -74,10 +75,20 @@ expanded hardening coverage, baseline bundle comparison, adapter removal, and ma
 - Fifteen nested static public pages are emitted: eleven tools and four trust pages.
 - The full local quality gate and production dependency audit pass with 0 vulnerabilities.
 - Phase 6 validation completed; the six-phase architectural refactor is verified.
+- `/` is a dedicated crawlable homepage with visible entry points to all eleven tools.
+- All eleven tool routes include typed, unique usage guidance and three contextual related-tool links.
+- Homepage and tool guidance are emitted into built HTML and verified with JavaScript disabled.
+- Anonymous page-view measurement is provider-neutral, allowlisted, network-free, and disabled by
+  default.
+- Sitemap generation covers 16 public URLs when the production origin is configured.
+- Unit and contract coverage expanded to 118 passing tests across 17 files.
+- Browser coverage expanded to 25 required passing scenarios plus one optional sponsor scenario.
+- The production entry chunk remains below baseline at 58.59 kB gzip.
+- Phase 7 validation completed; the organic-growth foundation is verified.
 
 ## In progress
 
-- No refactor implementation task remains.
+- No repository refactor phase is currently in progress.
 
 ## Known risks
 
@@ -89,6 +100,8 @@ expanded hardening coverage, baseline bundle comparison, adapter removal, and ma
   needs independently owned state lifecycles.
 - The production contact email is not active until `VITE_CONTACT_EMAIL` is configured.
 - No third-party ad network or revenue account is active; adding one requires CSP, privacy, consent, and provider-specific review.
+- Search ranking, ad approval, and revenue are external outcomes and are not guaranteed by technical SEO.
+- Evergreen guidance still requires review when tool behavior or relevant web standards change.
 
 ## Next task
 

@@ -7,10 +7,10 @@ describe("resolveInitialPage", () => {
     expect(resolveInitialPage("/", "?m=brand").path).toBe("/brand-kit-generator");
   });
 
-  it("resolves a public tool path and falls back safely", () => {
+  it("resolves a public tool path and falls back to the homepage safely", () => {
     const contrast = resolveInitialPage("/contrast-checker/", "");
     expect(isToolPage(contrast) && contrast.colorTab).toBe("contrast");
-    expect(resolveInitialPage("/unknown", "").path).toBe("/color-palette-generator");
+    expect(resolveInitialPage("/unknown", "").path).toBe("/");
   });
 });
 

@@ -3,11 +3,12 @@ import { hexToRgb } from "../../features/color/domain";
 import { useStudio } from "../../store/studio";
 import { resolveInitialPage, updateBrowserPath } from "./browserNavigation";
 import {
-  DEFAULT_SEO_PAGE,
+  DEFAULT_TOOL_PAGE,
   findPageForModule,
   findSeoPage,
   isToolPage,
   type ColorTab,
+  type HomePage,
   type TopModule,
   type TrustPage,
 } from "./routes";
@@ -16,11 +17,11 @@ const SAFE_FONT_PATTERN = /^[a-zA-Z0-9\s\-_]+$/;
 
 export function useStudioRouter() {
   const initialPage = resolveInitialPage(window.location.pathname, window.location.search);
-  const initialToolPage = isToolPage(initialPage) ? initialPage : DEFAULT_SEO_PAGE;
+  const initialToolPage = isToolPage(initialPage) ? initialPage : DEFAULT_TOOL_PAGE;
   const [colorTab, setColorTab] = useState<ColorTab>(initialToolPage.colorTab ?? "pattern");
   const [topTab, setTopTab] = useState<TopModule>(initialToolPage.topTab);
-  const [trustPage, setTrustPage] = useState<TrustPage | null>(
-    initialPage.kind === "trust" ? initialPage : null,
+  const [contentPage, setContentPage] = useState<HomePage | TrustPage | null>(
+    isToolPage(initialPage) ? null : initialPage,
   );
 
   const setActiveModule = useStudio((state) => state.setActiveModule);
@@ -28,7 +29,7 @@ export function useStudioRouter() {
   const pushColorHistory = useStudio((state) => state.pushColorHistory);
   const setActiveFontFamily = useStudio((state) => state.setActiveFontFamily);
 
-  const currentPage = trustPage ?? findPageForModule(topTab, colorTab);
+  const currentPage = contentPage ?? findPageForModule(topTab, colorTab);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,10 +52,10 @@ export function useStudioRouter() {
     const onPopState = () => {
       const page = findSeoPage(window.location.pathname);
       if (!isToolPage(page)) {
-        setTrustPage(page);
+        setContentPage(page);
         return;
       }
-      setTrustPage(null);
+      setContentPage(null);
       setTopTab(page.topTab);
       if (page.colorTab) setColorTab(page.colorTab);
       if (page.topTab === "color" || page.topTab === "font") setActiveModule(page.topTab);
@@ -82,7 +83,7 @@ export function useStudioRouter() {
       const tab = shortcut[event.key.toLowerCase()];
       if (!tab) return;
 
-      setTrustPage(null);
+      setContentPage(null);
       setTopTab(tab);
       if (tab === "color" || tab === "font") setActiveModule(tab);
       updateBrowserPath(findPageForModule(tab, colorTab).path);
@@ -92,14 +93,14 @@ export function useStudioRouter() {
   }, [colorTab, setActiveModule]);
 
   const switchTopTab = (tab: TopModule) => {
-    setTrustPage(null);
+    setContentPage(null);
     setTopTab(tab);
     if (tab === "color" || tab === "font") setActiveModule(tab);
     updateBrowserPath(findPageForModule(tab, colorTab).path);
   };
 
   const switchColorTab = (tab: ColorTab) => {
-    setTrustPage(null);
+    setContentPage(null);
     setColorTab(tab);
     setTopTab("color");
     setActiveModule("color");
@@ -109,11 +110,11 @@ export function useStudioRouter() {
   const navigateToPath = (path: string) => {
     const page = findSeoPage(path);
     if (isToolPage(page)) {
-      setTrustPage(null);
+      setContentPage(null);
       setTopTab(page.topTab);
       if (page.colorTab) setColorTab(page.colorTab);
     } else {
-      setTrustPage(page);
+      setContentPage(page);
     }
     updateBrowserPath(page.path);
   };

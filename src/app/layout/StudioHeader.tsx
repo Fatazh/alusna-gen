@@ -15,7 +15,9 @@ type StudioHeaderProps = {
   theme: "dark" | "light";
   shareUrl: string;
   onSwitchTab: (tab: TopModule) => void;
+  onNavigateHome: () => void;
   onToggleTheme: () => void;
+  toolNavigationActive: boolean;
 };
 
 export function StudioHeader({
@@ -24,7 +26,9 @@ export function StudioHeader({
   theme,
   shareUrl,
   onSwitchTab,
+  onNavigateHome,
   onToggleTheme,
+  toolNavigationActive,
 }: StudioHeaderProps) {
   return (
     <header
@@ -32,7 +36,15 @@ export function StudioHeader({
       style={{ backgroundColor: "var(--chrome-bg)" }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-2.5">
+        <a
+          href="/"
+          aria-label="Beranda ALUSNA"
+          onClick={(event) => {
+            event.preventDefault();
+            onNavigateHome();
+          }}
+          className="flex items-center gap-2.5 rounded-xl"
+        >
           <div
             className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 text-sm font-black text-white shadow-sm"
             aria-hidden="true"
@@ -48,7 +60,7 @@ export function StudioHeader({
               {APP_BRAND.slogan}
             </p>
           </div>
-        </div>
+        </a>
 
         <div className="flex items-center gap-2">
           <button
@@ -77,7 +89,7 @@ export function StudioHeader({
                 key={tab.id}
                 href={findPageForModule(tab.id, colorTab).path}
                 role="tab"
-                aria-selected={topTab === tab.id}
+                aria-selected={toolNavigationActive && topTab === tab.id}
                 onClick={(event) => {
                   event.preventDefault();
                   onSwitchTab(tab.id);
@@ -85,7 +97,7 @@ export function StudioHeader({
                 title={tab.desc}
                 className="rounded-full px-3 py-1.5 text-xs font-medium transition"
                 style={
-                  topTab === tab.id
+                  toolNavigationActive && topTab === tab.id
                     ? {
                         backgroundColor: "var(--surface)",
                         color: "var(--text-primary)",

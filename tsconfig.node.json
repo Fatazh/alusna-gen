@@ -13,5 +13,11 @@
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["vite.config.ts", "src/app/router/routes.ts", "src/shared/config/brand.ts"]
+  "include": [
+    "vite.config.ts",
+    "src/app/content/toolGuides.ts",
+    "src/app/router/routes.ts",
+    "src/app/seo/staticPageContent.ts",
+    "src/shared/config/brand.ts"
+  ]
 }

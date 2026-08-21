@@ -13,7 +13,7 @@ main.tsx
             -> feature UI
        -> feature domain.ts entries
        -> shared UI/config
-       -> app router/SEO/trust/monetization
+       -> app home/content/router/SEO/trust/analytics/monetization
        -> studio.ts
 
 feature UI
@@ -36,6 +36,8 @@ Current strengths:
 - Persistence input is sanitized.
 - Domain utilities, serializers, and migration contracts have unit-test coverage.
 - Static SEO pages are produced at build time.
+- Homepage and tool guidance are included in built HTML as a crawlable no-JavaScript fallback.
+- Analytics is an opt-in, provider-neutral app boundary with no default network transmission.
 - Dependency-cruiser enforces cross-feature public API access.
 
 Current pressure points:
@@ -51,7 +53,10 @@ Current pressure points:
 ```text
 src/
   app/
+    analytics/
+    content/
     config/
+    home/
     layout/
     providers/
     router/
@@ -107,6 +112,8 @@ This is a feature-based modular architecture, not a multi-layer enterprise rewri
    but never feature UI or loaders.
 6. Browser APIs are isolated behind app, persistence, or service modules.
 7. Pure calculations and serializers do not depend on React or Zustand.
+8. External analytics and advertising providers must stay outside tool domain logic and require a
+   separate privacy, CSP, consent, and regional review.
 
 ## Completed migration order
 
@@ -120,4 +127,5 @@ This is a feature-based modular architecture, not a multi-layer enterprise rewri
 Brand Kit moves last because it consumes color, typography, design-system, storage, import, and export behavior.
 
 Maintenance procedures are documented in [maintenance.md](maintenance.md). Public-entry details are
-recorded in [ADR 007](../decisions/007-feature-public-entry-points.md).
+recorded in [ADR 007](../decisions/007-feature-public-entry-points.md). The organic-growth and
+measurement boundary is recorded in [ADR 008](../decisions/008-organic-growth-foundation.md).

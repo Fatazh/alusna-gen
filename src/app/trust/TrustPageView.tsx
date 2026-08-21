@@ -97,10 +97,11 @@ function PrivacyContent() {
       </Section>
       <Section title="Iklan dan pengukuran">
         <p>
-          Build standar tidak mengaktifkan script jaringan iklan pihak ketiga. Jika layanan iklan
-          atau analitik yang menggunakan cookie maupun identifier ditambahkan, kebijakan ini dan
-          mekanisme persetujuan akan diperbarui sebelum aktivasi sesuai kebutuhan hukum dan
-          penyedia.
+          Build standar tidak mengaktifkan script jaringan iklan atau analitik pihak ketiga. ALUSNA
+          hanya menyediakan event halaman anonim yang nonaktif secara default dan tidak mengirim
+          data ke jaringan. Jika layanan yang menggunakan cookie, identifier, atau transmisi
+          eksternal ditambahkan, kebijakan ini dan mekanisme persetujuan akan diperbarui sebelum
+          aktivasi sesuai kebutuhan hukum dan penyedia.
         </p>
       </Section>
       <ContactSection />

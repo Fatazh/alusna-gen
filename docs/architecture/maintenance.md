@@ -8,6 +8,8 @@
 | Tool presentation and local form state          | `src/features/<feature>/ui`                  |
 | Route catalog and browser history               | `src/app/router`                             |
 | Runtime metadata and structured data            | `src/app/seo`                                |
+| Homepage and evergreen guidance                 | `src/app/home` and `src/app/content`         |
+| Anonymous measurement boundary                  | `src/app/analytics`                          |
 | Header, footer, loading, and app-wide providers | `src/app/layout` and `providers`             |
 | Durable cross-tool state and migration          | `src/store`                                  |
 | Generic UI or helpers with no product ownership | `src/shared`                                 |
@@ -39,6 +41,9 @@ components.
 - Keep sponsor placement optional and visibly labeled. Do not add a third-party advertising script
   until its CSP, consent, privacy, and regional requirements are reviewed.
 - Configure a real `VITE_CONTACT_EMAIL` before public launch.
+- Keep `VITE_ANALYTICS_ENABLED` unset unless an approved consumer is intentionally connected. An
+  external consumer requires a privacy, CSP, consent, and regional review before activation.
+- When guidance changes, keep its static HTML contract and no-JavaScript E2E coverage passing.
 
 ## Validation
 

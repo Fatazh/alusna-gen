@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { PUBLIC_PAGES } from "./src/app/router/routes.ts";
+import { createStaticPageContent } from "./src/app/seo/staticPageContent.ts";
 import { APP_BRAND } from "./src/shared/config/brand.ts";
 
 const escapeHtml = (value: string) =>
@@ -16,7 +17,7 @@ function staticSeoPages(siteUrl: string): Plugin {
       if (!index || index.type !== "asset") return;
       const source = String(index.source);
 
-      for (const page of PUBLIC_PAGES) {
+      const renderPage = (page: (typeof PUBLIC_PAGES)[number]) => {
         const canonical = origin ? `${origin}${page.path}` : "";
         const socialMeta = [
           `<meta property="og:type" content="website">`,
@@ -29,17 +30,24 @@ function staticSeoPages(siteUrl: string): Plugin {
         ]
           .filter(Boolean)
           .join("\n        ");
-        const html = source
+        return source
           .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(page.title)}</title>`)
           .replace(
             /<meta name="description"[^>]*>/,
             `<meta name="description" content="${escapeHtml(page.description)}">`,
           )
+          .replace('<div id="root"></div>', `<div id="root">${createStaticPageContent(page)}</div>`)
           .replace("<!-- SEO_PAGE_META -->", socialMeta);
+      };
+
+      const homepage = PUBLIC_PAGES.find((page) => page.path === "/");
+      if (homepage) index.source = renderPage(homepage);
+
+      for (const page of PUBLIC_PAGES.filter((candidate) => candidate.path !== "/")) {
         this.emitFile({
           type: "asset",
           fileName: `${page.path.slice(1)}/index.html`,
-          source: html,
+          source: renderPage(page),
         });
       }
 

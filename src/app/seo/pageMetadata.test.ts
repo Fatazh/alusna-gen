@@ -25,4 +25,12 @@ describe("page metadata", () => {
 
     expect(data["@type"]).toBe("WebPage");
   });
+
+  it("uses WebSite structured data for the homepage", () => {
+    const home = findSeoPage("/");
+    const data = createStructuredData(home, "https://alusna.id/");
+
+    expect(data["@type"]).toBe("WebSite");
+    expect(data.name).toBe("ALUSNA");
+  });
 });

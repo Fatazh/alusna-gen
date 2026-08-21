@@ -71,3 +71,13 @@ Status: **verified**
 - [x] Compare bundle and behavior against baseline.
 - [x] Remove temporary adapters only after their consumers are migrated.
 - [x] Finalize maintenance documentation.
+
+## Phase 7: Launch and organic growth foundation
+
+Status: **verified**
+
+- [x] Add a dedicated homepage with visible links to every public tool.
+- [x] Add unique evergreen guidance and contextual related-tool links.
+- [x] Add a privacy-first analytics boundary with no default network transmission.
+- [x] Expand route, SEO, content, responsive, and browser coverage.
+- [x] Document remaining external launch work for domain, hosting, Search Console, and ads.

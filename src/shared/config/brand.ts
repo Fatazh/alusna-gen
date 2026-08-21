@@ -12,6 +12,7 @@ export const APP_BRAND = {
 
 export const APP_EVENTS = {
   storageError: "alusna:storage-error",
+  analytics: "alusna:analytics",
 } as const;
 
 export function withBrandTitle(title: string): string {

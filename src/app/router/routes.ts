@@ -13,6 +13,14 @@ export type ToolPage = {
   description: string;
 };
 
+export type HomePage = {
+  kind: "home";
+  path: "/";
+  title: string;
+  heading: string;
+  description: string;
+};
+
 export type TrustPageId = "about" | "privacy" | "terms" | "advertising";
 
 export type TrustPage = {
@@ -24,7 +32,16 @@ export type TrustPage = {
   description: string;
 };
 
-export type SeoPage = ToolPage | TrustPage;
+export type SeoPage = HomePage | ToolPage | TrustPage;
+
+export const HOME_PAGE: HomePage = {
+  kind: "home",
+  path: "/",
+  title: withBrandTitle("Alat Warna, Tipografi & Brand Kit Gratis"),
+  heading: "Bagusnya dimulai di sini.",
+  description:
+    "Toolkit desain gratis untuk membuat palet warna, memilih tipografi, menyusun design token, dan membangun brand kit langsung di browser.",
+};
 
 export const SEO_PAGES: ToolPage[] = [
   {
@@ -175,9 +192,10 @@ export const TRUST_PAGES: TrustPage[] = [
   },
 ];
 
-export const PUBLIC_PAGES: SeoPage[] = [...SEO_PAGES, ...TRUST_PAGES];
+export const PUBLIC_PAGES: SeoPage[] = [HOME_PAGE, ...SEO_PAGES, ...TRUST_PAGES];
 
-export const DEFAULT_SEO_PAGE = SEO_PAGES[0];
+export const DEFAULT_TOOL_PAGE = SEO_PAGES[0];
+export const DEFAULT_SEO_PAGE = HOME_PAGE;
 
 export function findSeoPage(pathname: string): SeoPage {
   const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
@@ -188,11 +206,15 @@ export function findPageForModule(topTab: TopModule, colorTab: ColorTab = "patte
   return (
     SEO_PAGES.find(
       (page) => page.topTab === topTab && (topTab !== "color" || page.colorTab === colorTab),
-    ) ?? DEFAULT_SEO_PAGE
+    ) ?? DEFAULT_TOOL_PAGE
   );
 }
 
 export function isToolPage(page: SeoPage): page is ToolPage {
   return page.kind === "tool";
+}
+
+export function isHomePage(page: SeoPage): page is HomePage {
+  return page.kind === "home";
 }
 import { withBrandTitle } from "../../shared/config/brand.ts";

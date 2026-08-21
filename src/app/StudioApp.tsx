@@ -8,6 +8,7 @@ import { AppProviders } from "./providers/AppProviders";
 import { AdvertisingSlot } from "./monetization/AdvertisingSlot";
 import { useStudioRouter } from "./router/useStudioRouter";
 import { usePageSeo } from "./seo/usePageSeo";
+import { usePageAnalytics } from "./analytics/usePageAnalytics";
 import { rgbToHex } from "../features/color/domain";
 import {
   loadAccessibilityModule,
@@ -23,7 +24,7 @@ import { loadFontModule } from "../features/typography/loaders";
 import { loadDesignSystemModule } from "../features/design-system/loaders";
 import { loadBrandKitModule } from "../features/brand-kit/loaders";
 import { useStudio } from "../store/studio";
-import { findPageForModule, isToolPage, type ColorTab } from "./router/routes";
+import { findPageForModule, isHomePage, isToolPage, type ColorTab } from "./router/routes";
 
 const PatternModule = lazy(loadPatternModule);
 const MatchingModule = lazy(loadMatchingModule);
@@ -38,6 +39,12 @@ const DesignSystemModule = lazy(loadDesignSystemModule);
 const BrandKitModule = lazy(loadBrandKitModule);
 const TrustPageView = lazy(() =>
   import("./trust/TrustPageView").then((module) => ({ default: module.TrustPageView })),
+);
+const HomePageView = lazy(() =>
+  import("./home/HomePageView").then((module) => ({ default: module.HomePageView })),
+);
+const ToolGuideView = lazy(() =>
+  import("./content/ToolGuideView").then((module) => ({ default: module.ToolGuideView })),
 );
 
 const COLOR_TABS: { id: ColorTab; label: string; desc: string }[] = [
@@ -63,8 +70,10 @@ export default function App() {
   const { colorTab, topTab, currentPage, switchTopTab, switchColorTab, navigateToPath } =
     useStudioRouter();
   const showingTool = isToolPage(currentPage);
+  const showingHome = isHomePage(currentPage);
 
   usePageSeo(currentPage);
+  usePageAnalytics(currentPage);
 
   const shareUrl = (() => {
     const p = new URLSearchParams();
@@ -82,7 +91,9 @@ export default function App() {
           theme={theme}
           shareUrl={shareUrl}
           onSwitchTab={switchTopTab}
+          onNavigateHome={() => navigateToPath("/")}
           onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+          toolNavigationActive={showingTool}
         />
 
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
@@ -153,7 +164,14 @@ export default function App() {
                 {/* ── Brand Kit Module ── */}
                 {topTab === "brand" && <BrandKitModule />}
               </Suspense>
+              <Suspense fallback={null}>
+                <ToolGuideView page={currentPage} onNavigate={navigateToPath} />
+              </Suspense>
             </>
+          ) : showingHome ? (
+            <Suspense fallback={<ModuleLoading />}>
+              <HomePageView onNavigate={navigateToPath} />
+            </Suspense>
           ) : (
             <Suspense fallback={<ModuleLoading />}>
               <TrustPageView page={currentPage} />

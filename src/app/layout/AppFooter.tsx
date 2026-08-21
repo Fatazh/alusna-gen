@@ -9,6 +9,17 @@ export function AppFooter({ onNavigate }: { onNavigate: (path: string) => void }
           © {new Date().getFullYear()} {APP_BRAND.name} · {APP_BRAND.slogan}
         </p>
         <nav aria-label="Informasi dan kebijakan" className="flex flex-wrap gap-x-4 gap-y-2">
+          <a
+            href="/"
+            onClick={(event) => {
+              event.preventDefault();
+              onNavigate("/");
+            }}
+            className="inline-flex min-h-6 items-center transition hover:underline"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Beranda
+          </a>
           {TRUST_PAGES.map((page) => (
             <a
               key={page.id}

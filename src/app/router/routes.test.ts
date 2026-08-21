@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { PUBLIC_PAGES, SEO_PAGES, findPageForModule, findSeoPage, isToolPage } from "./routes";
+import {
+  HOME_PAGE,
+  PUBLIC_PAGES,
+  SEO_PAGES,
+  findPageForModule,
+  findSeoPage,
+  isHomePage,
+  isToolPage,
+} from "./routes";
 
 describe("SEO page routing", () => {
   it("uses a unique, crawlable path for every tool", () => {
@@ -24,5 +32,11 @@ describe("SEO page routing", () => {
     const paths = PUBLIC_PAGES.map((page) => page.path);
     expect(new Set(paths).size).toBe(paths.length);
     expect(findSeoPage("/privasi").kind).toBe("trust");
+  });
+
+  it("uses a dedicated homepage as the root and unknown-path fallback", () => {
+    expect(HOME_PAGE.path).toBe("/");
+    expect(isHomePage(findSeoPage("/"))).toBe(true);
+    expect(findSeoPage("/unknown").path).toBe("/");
   });
 });
