@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 3 is verified. Await authorization to begin Phase 4 incremental feature migration.
+Phase 4 is in progress. The color feature migration is complete; typography is next.
 
 ## Completed
 
@@ -33,10 +33,13 @@ Phase 3 is verified. Await authorization to begin Phase 4 incremental feature mi
 - Unit and contract suite expanded to 101 passing tests across 9 files.
 - Browser E2E expanded to 15 passing tests, including identity, structured data, and real legacy-storage migration.
 - Phase 3 validation completed.
+- Color domain logic, image palette service, reusable color UI, and all eight color tools moved under `features/color`.
+- `features/color/index.ts` now defines the supported color API.
+- Thin legacy facades preserve current `App.tsx` lazy imports and remaining store/feature imports until their owning migration steps.
 
 ## In progress
 
-- No implementation task. The next authorized work begins Phase 4.
+- Migrate typography domain and UI behind `features/typography/index.ts`.
 
 ## Known risks
 
@@ -47,7 +50,8 @@ Phase 3 is verified. Await authorization to begin Phase 4 incremental feature mi
 - The ALUSNA domain and final production origin are not configured yet.
 - The legacy `?m=` route compatibility effect has one documented lint exception until routing extraction.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
+- Color facades under `lib`, `components`, and `modules/color` remain temporary compatibility boundaries; removal depends on later Phase 4 consumers and the Phase 5 app-shell migration.
 
 ## Next task
 
-Phase 4 should migrate the color feature first, expose a public `features/color/index.ts` API, and retain adapters until all legacy consumers move.
+Phase 4 should migrate typography next, then design-system generation/serializers, and Brand Kit last.
