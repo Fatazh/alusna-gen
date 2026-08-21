@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 4 is verified. All four product features now have explicit ownership and public APIs.
+Phase 5 is in progress. App providers are extracted; layout/routing separation is next.
 
 ## Completed
 
@@ -46,10 +46,11 @@ Phase 4 is verified. All four product features now have explicit ownership and p
 - Unit and contract suite expanded to 102 passing tests across 11 files.
 - All 15 browser E2E checks, production build, static gates, and production dependency audit pass after Phase 4.
 - Phase 4 validation completed.
+- App-level error, toast, theme, and storage-warning effects moved into `app/providers`.
 
 ## In progress
 
-- No implementation task. The next authorized work begins Phase 5.
+- Extract layout and browser routing while preserving current tool navigation.
 
 ## Known risks
 

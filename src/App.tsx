@@ -1,12 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { HistoryBar } from "./app/layout/HistoryBar";
+import { ModuleLoading } from "./app/layout/ModuleLoading";
+import { StudioHeader } from "./app/layout/StudioHeader";
+import { ToolPageIntro } from "./app/layout/ToolPageIntro";
+import { AppProviders } from "./app/providers/AppProviders";
 import { useStudio } from "./store/studio";
 import { rgbToHex, hexToRgb } from "./lib/color";
-import { CopyButton } from "./shared/ui/CopyButton";
-import { ToastProvider } from "./shared/ui/Toast";
-import { useToast } from "./shared/ui/toastContext";
-import { ErrorBoundary } from "./shared/ui/ErrorBoundary";
 import { SponsorSlot } from "./shared/ui/SponsorSlot";
-import { APP_BRAND, APP_EVENTS } from "./shared/config/brand";
+import { APP_BRAND } from "./shared/config/brand";
 import {
   findPageForModule,
   findSeoPage,
@@ -64,13 +65,6 @@ const COLOR_TABS: { id: ColorTab; label: string; desc: string }[] = [
   { id: "image", label: "Image", desc: "Ekstrak gambar" },
   { id: "a11y", label: "Akses", desc: "Buta warna" },
   { id: "contrast", label: "Contrast", desc: "WCAG checker" },
-];
-
-const TOP_TABS: { id: TopModule; label: string; icon: string; desc: string }[] = [
-  { id: "color", label: "Warna", icon: "🎨", desc: "Color Playground" },
-  { id: "font", label: "Font", icon: "🔤", desc: "Typography Preview" },
-  { id: "design", label: "Design System", icon: "🏗", desc: "Token Generator" },
-  { id: "brand", label: "Brand Kit", icon: "🏷", desc: "Brand Identity" },
 ];
 
 function updateBrowserPath(path: string, replace = false) {
@@ -198,11 +192,6 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, [setActiveModule]);
 
-  // Apply theme class to <html>.
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
   // Global keyboard shortcuts (ignore while typing in inputs).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -251,272 +240,99 @@ export default function App() {
   };
 
   return (
-    <ErrorBoundary>
-      <ToastProvider>
-        <StorageWarningListener />
-        <div className="min-h-screen" style={{ background: "var(--app-bg)" }}>
-          {/* Header */}
-          <header
-            className="sticky top-0 z-30 border-b border-white/5 backdrop-blur"
-            style={{ backgroundColor: "var(--chrome-bg)" }}
-          >
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-              <div className="flex items-center gap-2.5">
+    <AppProviders>
+      <div className="min-h-screen" style={{ background: "var(--app-bg)" }}>
+        <StudioHeader
+          topTab={topTab}
+          colorTab={colorTab}
+          theme={theme}
+          shareUrl={shareUrl}
+          onSwitchTab={switchTopTab}
+          onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+        />
+
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <ToolPageIntro page={currentPage} />
+
+          <SponsorSlot />
+
+          <Suspense fallback={<ModuleLoading />}>
+            {/* ── Color Module ── */}
+            {topTab === "color" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Color sub-tabs */}
                 <div
-                  className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 text-sm font-black text-white shadow-sm"
-                  aria-hidden="true"
-                >
-                  A
-                  <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-amber-300" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold" style={{ color: "var(--chrome-text)" }}>
-                    {APP_BRAND.name}
-                  </div>
-                  <p className="text-[11px]" style={{ color: "var(--chrome-sub)" }}>
-                    {APP_BRAND.slogan}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="hidden rounded-md border px-2.5 py-1 text-xs font-medium transition sm:inline-flex"
-                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-                  title="Ganti tema"
-                >
-                  {theme === "dark" ? "☀ Terang" : "🌙 Gelap"}
-                </button>
-                <CopyButton
-                  value={shareUrl}
-                  label="Salin tautan"
-                  className="hidden sm:inline-flex"
-                />
-
-                {/* Top-level navigation */}
-                <nav
-                  className="flex gap-0.5 rounded-full p-1"
-                  style={{
-                    borderColor: "var(--border)",
-                    backgroundColor: "var(--chip-bg)",
-                    border: "1px solid var(--border)",
-                  }}
+                  className="flex flex-wrap items-center gap-2"
                   role="tablist"
-                  aria-label="Modul studio"
+                  aria-label="Alat warna"
                 >
-                  {TOP_TABS.map((tab) => (
+                  {COLOR_TABS.map((t) => (
                     <a
-                      key={tab.id}
-                      href={findPageForModule(tab.id, colorTab).path}
+                      key={t.id}
+                      href={findPageForModule("color", t.id).path}
                       role="tab"
-                      aria-selected={topTab === tab.id}
+                      aria-selected={colorTab === t.id}
                       onClick={(event) => {
                         event.preventDefault();
-                        switchTopTab(tab.id);
+                        switchColorTab(t.id);
                       }}
-                      title={tab.desc}
-                      className="rounded-full px-3 py-1.5 text-xs font-medium transition"
+                      className="group rounded-xl border px-4 py-2.5 text-left transition"
                       style={
-                        topTab === tab.id
+                        colorTab === t.id
                           ? {
-                              backgroundColor: "var(--surface)",
-                              color: "var(--text-primary)",
-                              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                              borderColor: "var(--border)",
+                              backgroundColor: "var(--chip-active-bg)",
                             }
-                          : { color: "var(--text-secondary)" }
+                          : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }
                       }
                     >
-                      <span className="hidden sm:inline">{tab.icon} </span>
-                      {tab.label}
+                      <div
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {t.label}
+                      </div>
+                      <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                        {t.desc}
+                      </div>
                     </a>
                   ))}
-                </nav>
-              </div>
-            </div>
-          </header>
-
-          <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-            <section
-              aria-labelledby="tool-page-title"
-              className="mb-5 rounded-2xl border px-5 py-4"
-              style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
-            >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h1
-                    id="tool-page-title"
-                    className="text-xl font-semibold"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {currentPage.heading}
-                  </h1>
-                  <p
-                    className="mt-1 max-w-3xl text-sm leading-relaxed"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {currentPage.description}
-                  </p>
                 </div>
-                <p className="shrink-0 text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Gratis · Tanpa akun · Diproses di browser
-                </p>
+
+                {colorTab === "pattern" && <PatternModule />}
+                {colorTab === "matching" && <MatchingModule />}
+                {colorTab === "experiment" && <ExperimentModule />}
+                {colorTab === "gradient" && <GradientModule />}
+                {colorTab === "shades" && <ShadeModule />}
+                {colorTab === "image" && <ImageModule />}
+                {colorTab === "a11y" && <AccessibilityModule />}
+                {colorTab === "contrast" && <ContrastModule />}
               </div>
-            </section>
+            )}
 
-            <SponsorSlot />
+            {/* ── Font Module ── */}
+            {topTab === "font" && <FontModule />}
 
-            <Suspense fallback={<ModuleLoading />}>
-              {/* ── Color Module ── */}
-              {topTab === "color" && (
-                <div className="space-y-6 animate-fade-in">
-                  {/* Color sub-tabs */}
-                  <div
-                    className="flex flex-wrap items-center gap-2"
-                    role="tablist"
-                    aria-label="Alat warna"
-                  >
-                    {COLOR_TABS.map((t) => (
-                      <a
-                        key={t.id}
-                        href={findPageForModule("color", t.id).path}
-                        role="tab"
-                        aria-selected={colorTab === t.id}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          switchColorTab(t.id);
-                        }}
-                        className="group rounded-xl border px-4 py-2.5 text-left transition"
-                        style={
-                          colorTab === t.id
-                            ? {
-                                borderColor: "var(--border)",
-                                backgroundColor: "var(--chip-active-bg)",
-                              }
-                            : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }
-                        }
-                      >
-                        <div
-                          className="text-sm font-semibold"
-                          style={{ color: "var(--text-primary)" }}
-                        >
-                          {t.label}
-                        </div>
-                        <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                          {t.desc}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
+            {/* ── Design System Module ── */}
+            {topTab === "design" && <DesignSystemModule />}
 
-                  {colorTab === "pattern" && <PatternModule />}
-                  {colorTab === "matching" && <MatchingModule />}
-                  {colorTab === "experiment" && <ExperimentModule />}
-                  {colorTab === "gradient" && <GradientModule />}
-                  {colorTab === "shades" && <ShadeModule />}
-                  {colorTab === "image" && <ImageModule />}
-                  {colorTab === "a11y" && <AccessibilityModule />}
-                  {colorTab === "contrast" && <ContrastModule />}
-                </div>
-              )}
+            {/* ── Brand Kit Module ── */}
+            {topTab === "brand" && <BrandKitModule />}
+          </Suspense>
+        </main>
 
-              {/* ── Font Module ── */}
-              {topTab === "font" && <FontModule />}
-
-              {/* ── Design System Module ── */}
-              {topTab === "design" && <DesignSystemModule />}
-
-              {/* ── Brand Kit Module ── */}
-              {topTab === "brand" && <BrandKitModule />}
-            </Suspense>
-          </main>
-
-          {/* Recent colors bar */}
-          {colorHistory.length > 0 && (
-            <HistoryBar
-              colors={colorHistory}
-              onPick={(rgb) => {
-                setSelectedColor(rgb);
-                pushColorHistory(rgb);
-              }}
-              activeHex={rgbToHex(selectedColor)}
-            />
-          )}
-        </div>
-      </ToastProvider>
-    </ErrorBoundary>
-  );
-}
-
-function StorageWarningListener() {
-  const { show } = useToast();
-
-  useEffect(() => {
-    const onStorageError = () =>
-      show("Penyimpanan browser penuh. Perubahan baru hanya tersimpan sementara.");
-    window.addEventListener(APP_EVENTS.storageError, onStorageError);
-    return () => window.removeEventListener(APP_EVENTS.storageError, onStorageError);
-  }, [show]);
-
-  return null;
-}
-
-function ModuleLoading() {
-  return (
-    <div
-      className="flex min-h-48 items-center justify-center rounded-2xl border text-sm"
-      style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-      role="status"
-      aria-live="polite"
-    >
-      Memuat modul…
-    </div>
-  );
-}
-
-function HistoryBar({
-  colors,
-  onPick,
-  activeHex,
-}: {
-  colors: { r: number; g: number; b: number }[];
-  onPick: (rgb: { r: number; g: number; b: number }) => void;
-  activeHex: string;
-}) {
-  return (
-    <div
-      className="sticky bottom-0 z-20 border-t backdrop-blur"
-      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
-    >
-      <div className="mx-auto flex max-w-7xl items-center gap-3 overflow-x-auto px-4 py-3 sm:px-6">
-        <span
-          className="shrink-0 text-[11px] font-medium uppercase tracking-wider"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Riwayat
-        </span>
-        <div className="flex gap-2">
-          {colors.map((c, i) => {
-            const hex = rgbToHex(c);
-            const isActive = hex === activeHex;
-            return (
-              <button
-                key={`${hex}-${i}`}
-                type="button"
-                onClick={() => onPick(c)}
-                title={hex}
-                className="h-9 w-9 rounded-lg border transition"
-                style={{
-                  backgroundColor: hex,
-                  borderColor: isActive ? "var(--text-primary)" : "var(--border)",
-                  boxShadow: isActive ? "0 0 0 2px rgba(99,102,241,0.3)" : undefined,
-                }}
-              />
-            );
-          })}
-        </div>
+        {/* Recent colors bar */}
+        {colorHistory.length > 0 && (
+          <HistoryBar
+            colors={colorHistory}
+            onPick={(rgb) => {
+              setSelectedColor(rgb);
+              pushColorHistory(rgb);
+            }}
+            activeHex={rgbToHex(selectedColor)}
+          />
+        )}
       </div>
-    </div>
+    </AppProviders>
   );
 }

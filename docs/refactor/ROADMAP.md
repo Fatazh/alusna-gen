@@ -55,9 +55,9 @@ Status: **verified**
 
 ## Phase 5: App shell, routing, SEO, and monetization
 
-Status: **planned**
+Status: **in-progress**
 
-- [ ] Extract app providers and layout.
+- [x] Extract app providers and layout.
 - [ ] Extract browser routing/history.
 - [ ] Extract SEO lifecycle and retain all public paths.
 - [ ] Add required trust/legal pages before third-party ad scripts.
