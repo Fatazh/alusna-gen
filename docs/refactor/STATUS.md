@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 4 is in progress. The color feature migration is complete; typography is next.
+Phase 4 is in progress. Color and typography are migrated; design-system separation is next.
 
 ## Completed
 
@@ -36,10 +36,12 @@ Phase 4 is in progress. The color feature migration is complete; typography is n
 - Color domain logic, image palette service, reusable color UI, and all eight color tools moved under `features/color`.
 - `features/color/index.ts` now defines the supported color API.
 - Thin legacy facades preserve current `App.tsx` lazy imports and remaining store/feature imports until their owning migration steps.
+- Typography catalog and validation moved to a pure model, while Google Font, upload, and restore browser operations moved to a dedicated service.
+- `features/typography/index.ts` now defines the supported typography API; the old font module and utility paths are thin compatibility facades.
 
 ## In progress
 
-- Migrate typography domain and UI behind `features/typography/index.ts`.
+- Split design-system generation from serializers and migrate both behind `features/design-system/index.ts`.
 
 ## Known risks
 
@@ -54,4 +56,4 @@ Phase 4 is in progress. The color feature migration is complete; typography is n
 
 ## Next task
 
-Phase 4 should migrate typography next, then design-system generation/serializers, and Brand Kit last.
+Phase 4 should split and migrate design-system generation/serializers next, then migrate Brand Kit last.

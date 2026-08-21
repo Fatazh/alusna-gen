@@ -49,7 +49,7 @@ Status: **verified**
 Status: **in-progress**
 
 - [x] Migrate color feature and public API.
-- [ ] Migrate typography feature and public API.
+- [x] Migrate typography feature and public API.
 - [ ] Split design-system generation from serializers and migrate it.
 - [ ] Migrate Brand Kit last as an integration feature.
 
