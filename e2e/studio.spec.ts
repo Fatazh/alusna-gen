@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { SEO_PAGES } from "../src/app/router/routes";
+import { SEO_PAGES, TRUST_PAGES } from "../src/app/router/routes";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   LEGACY_STUDIO_STORAGE_KEY,
@@ -15,6 +15,50 @@ test.describe("public tool routes", () => {
       await expect(page.locator("#boot-error")).toBeHidden();
     });
   }
+});
+
+test.describe("trust and legal routes", () => {
+  for (const route of TRUST_PAGES) {
+    test(`${route.path} renders crawlable policy content`, async ({ page }) => {
+      await page.goto(`${route.path}/`);
+
+      await expect(page).toHaveTitle(route.title);
+      await expect(page.getByRole("heading", { name: route.heading, level: 1 })).toBeVisible();
+      const structuredData = JSON.parse(
+        String(await page.locator("#alusna-structured-data").textContent()),
+      );
+      expect(structuredData["@type"]).toBe("WebPage");
+    });
+  }
+});
+
+test("footer navigates between a tool and privacy information", async ({ page }) => {
+  await page.goto("/contrast-checker/");
+  await page.getByRole("link", { name: "Privasi", exact: true }).click();
+  await expect(page).toHaveURL(/\/privasi\/?$/);
+  await expect(page.getByRole("heading", { name: "Kebijakan Privasi", level: 1 })).toBeVisible();
+
+  await page.getByRole("tab", { name: /Warna/ }).click();
+  await expect(page).toHaveURL(/\/contrast-checker\/?$/);
+});
+
+test("configured sponsor placement is explicit and links to disclosure", async ({ page }) => {
+  test.skip(
+    !process.env.VITE_SPONSOR_URL || !process.env.VITE_SPONSOR_TITLE,
+    "Sponsor configuration is optional.",
+  );
+
+  await page.goto("/color-palette-generator/");
+  const placement = page.locator('[data-ad-placement="tool-top"]');
+  await expect(placement).toBeVisible();
+  await expect(placement.getByText("Iklan / Sponsor", { exact: true })).toBeVisible();
+  await expect(placement.getByRole("link", { name: "Kunjungi sponsor" })).toHaveAttribute(
+    "rel",
+    /sponsored/,
+  );
+  await expect(
+    placement.getByRole("link", { name: "Cara ALUSNA menangani iklan dan afiliasi" }),
+  ).toHaveAttribute("href", "/kebijakan-iklan");
 });
 
 test("top-level navigation updates the URL and supports browser history", async ({ page }) => {

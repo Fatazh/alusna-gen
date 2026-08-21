@@ -1,6 +1,6 @@
-import { type SeoPage } from "../router/routes";
+import { type ToolPage } from "../router/routes";
 
-export function ToolPageIntro({ page }: { page: SeoPage }) {
+export function ToolPageIntro({ page }: { page: ToolPage }) {
   return (
     <section
       aria-labelledby="tool-page-title"

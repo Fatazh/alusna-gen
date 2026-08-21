@@ -4,8 +4,9 @@
 
 ```text
 URL path/query
-  -> App.tsx resolves SEO page and active module
-  -> lazy-loaded feature UI
+  -> app/router resolves tool or trust page
+  -> app/seo applies metadata and structured data
+  -> app/StudioApp composes lazy feature UI or trust content
   -> useStudio selectors/actions
   -> Zustand persist middleware
   -> versioned persistence adapter
@@ -35,6 +36,7 @@ router
 - File parsing and downloads belong to feature services.
 - Canvas/image pixel processing belongs to the color feature and remains local.
 - Google Fonts network loading belongs to the typography service.
+- Optional direct sponsor configuration and disclosure belong to `app/monetization`.
 
 ## Persistence migration contract
 

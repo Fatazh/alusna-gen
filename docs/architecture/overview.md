@@ -8,11 +8,12 @@ Make ALUSNA easy to maintain through explicit module ownership, stable public AP
 
 ```text
 main.tsx
-  -> App.tsx
-       -> lazy compatibility facades
+  -> App.tsx compatibility entry
+       -> app/StudioApp.tsx
+       -> feature public lazy loaders
             -> feature UI
        -> shared UI/config
-       -> seoPages.ts
+       -> app router/SEO/trust/monetization
        -> studio.ts
 
 feature UI
@@ -40,7 +41,6 @@ Current pressure points:
 
 - `App.tsx` owns composition, navigation, browser history, metadata, structured data, layout, and keyboard shortcuts.
 - `studio.ts` combines navigation, color, palette, font, theme, and Brand Kit state.
-- Thin legacy module facades still bridge `App.tsx` to feature UI until app composition moves.
 - Store persistence still uses narrow color/font compatibility facades until state boundaries are refined.
 - Several large React tools remain candidates for UI-only decomposition, but no longer own domain serialization.
 

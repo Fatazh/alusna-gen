@@ -4,6 +4,7 @@ export {};
 declare global {
   interface ImportMetaEnv {
     readonly VITE_SITE_URL?: string;
+    readonly VITE_CONTACT_EMAIL?: string;
     readonly VITE_SPONSOR_URL?: string;
     readonly VITE_SPONSOR_TITLE?: string;
     readonly VITE_SPONSOR_TEXT?: string;

@@ -4,7 +4,7 @@ Last updated: 2026-08-21
 
 ## Current objective
 
-Phase 5 is in progress. App shell, routing, and SEO are extracted; trust/legal pages are next.
+Phase 5 is verified. App shell, routing, SEO, trust pages, and transparent sponsor placement are separated and tested.
 
 ## Completed
 
@@ -52,20 +52,27 @@ Phase 5 is in progress. App shell, routing, and SEO are extracted; trust/legal p
 - Router contract coverage added; unit and contract suite expanded to 105 tests across 12 files.
 - Runtime title, canonical, Open Graph, and JSON-LD lifecycle moved into `app/seo` with pure metadata builders.
 - SEO contract coverage added; unit and contract suite expanded to 107 tests across 13 files.
+- About, Privacy, Terms, and Advertising Policy are crawlable static routes with `WebPage` structured data.
+- Direct sponsor configuration moved into `app/monetization`; invalid or incomplete configuration fails closed.
+- Commercial placement is labeled `Iklan / Sponsor`, uses `rel="sponsored"`, and links to the advertising disclosure.
+- App composition now imports lazy feature loaders through each feature's public `index.ts`; obsolete `modules/*` facades were removed.
+- Unit and contract suite expanded to 111 passing tests across 14 files.
+- Browser coverage expanded to 20 required scenarios plus one opt-in configured-sponsor scenario.
+- Phase 5 validation completed.
 
 ## In progress
 
-- Add trust/legal pages before expanding advertising integration.
+- No implementation task. The next authorized work begins Phase 6 hardening.
 
 ## Known risks
 
-- `App.tsx` currently couples routing, SEO, and layout; moving all three at once would create a broad regression surface.
 - E2E covers route rendering and primary navigation, but not every editing and export workflow.
 - The ALUSNA domain and final production origin are not configured yet.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
-- `App.tsx` still reaches feature UI through thin legacy module facades; these remain until routing and app composition move in Phase 5.
 - Store persistence still uses narrow `lib/color.ts` and `lib/font.ts` compatibility facades to avoid a store-to-feature-UI cycle; state slicing/public domain entry design should resolve this later.
+- The production contact email is not active until `VITE_CONTACT_EMAIL` is configured.
+- No third-party ad network or revenue account is active; adding one requires CSP, privacy, consent, and provider-specific review.
 
 ## Next task
 
-Phase 5 should extract providers/layout first, then routing and SEO lifecycle, before adding trust/legal pages and transparent advertising integration.
+Phase 6 should compare bundles and behavior against baseline, broaden accessibility/responsive/export checks, and remove only the remaining adapters that can be retired safely.

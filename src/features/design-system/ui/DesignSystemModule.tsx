@@ -3,13 +3,8 @@ import { useStudio } from "../../../store/studio";
 import { rgbToHex } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
 import { CopyButton } from "../../../shared/ui/CopyButton";
-import {
-  generateDesignSystem,
-  exportDesignSystem,
-  sanitizeTokenName,
-  type DesignSystem,
-  type ExportFormat,
-} from "../index";
+import { generateDesignSystem, sanitizeTokenName, type DesignSystem } from "../model/designSystem";
+import { exportDesignSystem, type ExportFormat } from "../services/serializers";
 
 const EXPORT_FORMATS: { id: ExportFormat; label: string; icon: string }[] = [
   { id: "css", label: "CSS Variables", icon: "🎨" },

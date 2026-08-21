@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { SEO_PAGES } from "./src/app/router/routes.ts";
+import { PUBLIC_PAGES } from "./src/app/router/routes.ts";
 import { APP_BRAND } from "./src/shared/config/brand.ts";
 
 const escapeHtml = (value: string) =>
@@ -16,7 +16,7 @@ function staticSeoPages(siteUrl: string): Plugin {
       if (!index || index.type !== "asset") return;
       const source = String(index.source);
 
-      for (const page of SEO_PAGES) {
+      for (const page of PUBLIC_PAGES) {
         const canonical = origin ? `${origin}${page.path}` : "";
         const socialMeta = [
           `<meta property="og:type" content="website">`,
@@ -50,7 +50,7 @@ function staticSeoPages(siteUrl: string): Plugin {
         source: `User-agent: *\nAllow: /${sitemapLine}\n`,
       });
       if (origin) {
-        const urls = SEO_PAGES.map(
+        const urls = PUBLIC_PAGES.map(
           (page) => `  <url><loc>${escapeHtml(`${origin}${page.path}`)}</loc></url>`,
         ).join("\n");
         this.emitFile({

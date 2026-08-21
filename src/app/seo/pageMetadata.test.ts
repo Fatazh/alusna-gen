@@ -16,6 +16,13 @@ describe("page metadata", () => {
 
     expect(data["@type"]).toBe("WebApplication");
     expect(data.brand).toEqual({ "@type": "Brand", name: "ALUSNA" });
-    expect(data.isAccessibleForFree).toBe(true);
+    expect("isAccessibleForFree" in data && data.isAccessibleForFree).toBe(true);
+  });
+
+  it("uses WebPage structured data for trust pages", () => {
+    const privacy = findSeoPage("/privasi");
+    const data = createStructuredData(privacy, "https://alusna.id/privasi");
+
+    expect(data["@type"]).toBe("WebPage");
   });
 });

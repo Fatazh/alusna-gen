@@ -13,13 +13,8 @@ import { TypographyTab } from "./TypographyTab";
 import { GuidelinesTab } from "./GuidelinesTab";
 import { AccessibilityTab } from "./AccessibilityTab";
 import { ExportTab } from "./ExportTab";
-import {
-  generateBrandKit,
-  brandKitToHtml,
-  TONE_PROFILES,
-  type BrandKit,
-  type BrandTone,
-} from "../index";
+import { generateBrandKit, TONE_PROFILES, type BrandKit, type BrandTone } from "../model/brandKit";
+import { brandKitToHtml } from "../services/htmlSerializer";
 
 const TONE_OPTIONS = (["modern", "classic", "playful", "minimal", "bold"] as const).map(
   (id) => TONE_PROFILES[id],

@@ -11,6 +11,18 @@ export function buildCanonicalUrl(
 }
 
 export function createStructuredData(page: SeoPage, canonicalUrl: string) {
+  if (page.kind === "trust") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${page.heading} — ${APP_BRAND.name}`,
+      description: page.description,
+      url: canonicalUrl,
+      inLanguage: "id-ID",
+      isPartOf: { "@type": "WebSite", name: APP_BRAND.name },
+    };
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",

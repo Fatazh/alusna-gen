@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildNavigationUrl, resolveInitialPage } from "./browserNavigation";
+import { isToolPage } from "./routes";
 
 describe("resolveInitialPage", () => {
   it("keeps legacy module query links compatible", () => {
@@ -7,7 +8,8 @@ describe("resolveInitialPage", () => {
   });
 
   it("resolves a public tool path and falls back safely", () => {
-    expect(resolveInitialPage("/contrast-checker/", "").colorTab).toBe("contrast");
+    const contrast = resolveInitialPage("/contrast-checker/", "");
+    expect(isToolPage(contrast) && contrast.colorTab).toBe("contrast");
     expect(resolveInitialPage("/unknown", "").path).toBe("/color-palette-generator");
   });
 });
