@@ -1,167 +1,370 @@
-import { useState } from "react";
-import { PALETTES, hexToRgb, rgbToHex, type RGB } from "../../model/color";
+import { useMemo, useState } from "react";
+import { ArrowRight } from "@phosphor-icons/react/ArrowRight";
+import { LockSimple } from "@phosphor-icons/react/LockSimple";
+import { LockSimpleOpen } from "@phosphor-icons/react/LockSimpleOpen";
+import { Plus } from "@phosphor-icons/react/Plus";
+import { Sparkle } from "@phosphor-icons/react/Sparkle";
+import { PALETTES, bestTextOn, hexToRgb, rgbToHex, type RGB } from "../../model/color";
 import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
-import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
-import { Swatch, ColorDetail } from "../Swatch";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
+import { ColorDetail } from "../Swatch";
+
+const WORKSPACE_PALETTES = [
+  { name: "ALUSNA", colors: ["#1E40AF", "#D81B60", "#F2B705", "#F2F4F7", "#111111"] },
+  ...PALETTES,
+];
 
 export function PatternModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const setSelectedAlpha = useStudio((s) => s.setSelectedAlpha);
   const selectedColor = useStudio((s) => s.selectedColor);
   const selectedAlpha = useStudio((s) => s.selectedAlpha);
+  const savedColors = useStudio((s) => s.savedColors);
   const saveColor = useStudio((s) => s.saveColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
 
-  const [activePalette, setActivePalette] = useState(PALETTES[0].name);
-  const palette = PALETTES.find((p) => p.name === activePalette)!;
-  const paletteRgbs: RGB[] = palette.colors.map((h) => hexToRgb(h)).filter(Boolean) as RGB[];
+  const [activePalette, setActivePalette] = useState(WORKSPACE_PALETTES[0].name);
+  const [displayColors, setDisplayColors] = useState<string[]>([...WORKSPACE_PALETTES[0].colors]);
+  const [locked, setLocked] = useState<Set<number>>(() => new Set());
 
-  const exportCss = () => {
-    const css = `:root {\n${palette.colors
-      .map((c, i) => `  --color-${i + 1}: ${c};`)
-      .join("\n")}\n}`;
-    return css;
+  const paletteRgbs = useMemo(
+    () => displayColors.map((hex) => hexToRgb(hex)).filter(Boolean) as RGB[],
+    [displayColors],
+  );
+
+  const applyPalette = (name: string) => {
+    const next =
+      WORKSPACE_PALETTES.find((palette) => palette.name === name) ?? WORKSPACE_PALETTES[0];
+    setActivePalette(next.name);
+    setDisplayColors((current) =>
+      next.colors.map((color, index) => (locked.has(index) ? current[index] : color)),
+    );
   };
 
-  const exportJson = () => JSON.stringify({ name: palette.name, colors: palette.colors }, null, 2);
+  const generatePalette = () => {
+    const candidates = WORKSPACE_PALETTES.filter((palette) => palette.name !== activePalette);
+    const next = candidates[Math.floor(Math.random() * candidates.length)] ?? WORKSPACE_PALETTES[0];
+    applyPalette(next.name);
+  };
+
+  const selectColor = (rgb: RGB) => {
+    setSelectedColor(rgb);
+    setSelectedAlpha(1);
+    pushColorHistory(rgb);
+  };
+
+  const toggleLock = (index: number) => {
+    setLocked((current) => {
+      const next = new Set(current);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const exportCss = () =>
+    `:root {\n${displayColors.map((color, index) => `  --color-${index + 1}: ${color};`).join("\n")}\n}`;
+
+  const exportJson = () => JSON.stringify({ name: activePalette, colors: displayColors }, null, 2);
 
   const exportTailwind = () => {
-    const obj = palette.colors
-      .map((c, i) => `        "${palette.name.toLowerCase()}-${i + 1}": "${c}",`)
+    const values = displayColors
+      .map((color, index) => `        "${activePalette.toLowerCase()}-${index + 1}": "${color}",`)
       .join("\n");
-    return `// tailwind.config.js\nexport default {\n  theme: {\n    extend: {\n      colors: {\n${obj}\n      },\n    },\n  },\n};`;
+    return `// tailwind.config.js\nexport default {\n  theme: {\n    extend: {\n      colors: {\n${values}\n      },\n    },\n  },\n};`;
   };
 
   const downloadPng = () => {
-    const w = 500;
-    const h = 120;
+    const width = 1000;
+    const height = 280;
     const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const sw = w / palette.colors.length;
-    palette.colors.forEach((hex, i) => {
-      ctx.fillStyle = hex;
-      ctx.fillRect(i * sw, 0, sw, h);
-      ctx.fillStyle = "#000";
-      ctx.font = "12px sans-serif";
-      ctx.fillText(hex, i * sw + 6, h - 8);
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const swatchWidth = width / displayColors.length;
+    displayColors.forEach((hex, index) => {
+      context.fillStyle = hex;
+      context.fillRect(index * swatchWidth, 0, swatchWidth, height);
+      const rgb = hexToRgb(hex);
+      context.fillStyle = rgb ? bestTextOn(rgb) : "#111111";
+      context.font = "500 18px IBM Plex Mono, monospace";
+      context.fillText(hex, index * swatchWidth + 18, height - 24);
     });
     const link = document.createElement("a");
-    link.download = `${palette.name}-palette.png`;
+    link.download = `${activePalette}-palette.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
 
-  const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
-  const getChipStyle = (active: boolean): React.CSSProperties =>
-    active
-      ? {
-          borderColor: "rgba(99,102,241,0.5)",
-          backgroundColor: "rgba(99,102,241,0.15)",
-          color: "#6366f1",
-        }
-      : { borderColor: "var(--border)", color: "var(--text-secondary)" };
-
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="space-y-6">
-        <Card>
-          <CardHeader
-            title="Color Pattern"
-            subtitle="Pilih palet kurasi sebagai inspirasi desain"
-          />
-          <CardBody className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {PALETTES.map((p) => (
+    <section
+      aria-label="Workspace Color Palette Generator"
+      className="overflow-hidden rounded-xl border"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+    >
+      <div className="grid lg:grid-cols-[290px_minmax(0,1fr)]">
+        <aside
+          className="border-b p-5 sm:p-6 lg:border-b-0 lg:border-r"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <p
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Palette method
+          </p>
+          <div
+            className="mt-4 max-h-[330px] divide-y overflow-y-auto pr-2"
+            style={{ borderColor: "var(--border)" }}
+          >
+            {WORKSPACE_PALETTES.map((palette) => {
+              const active = palette.name === activePalette;
+              return (
                 <button
-                  key={p.name}
+                  key={palette.name}
                   type="button"
-                  onClick={() => setActivePalette(p.name)}
-                  className={chipClass}
-                  style={getChipStyle(activePalette === p.name)}
+                  onClick={() => applyPalette(palette.name)}
+                  className="flex w-full items-center gap-3 py-3 text-left transition"
+                  style={{ borderColor: "var(--border)" }}
                 >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-              {paletteRgbs.map((rgb, i) => {
-                const colorInfo = getColorName(rgb);
-                return (
-                  <div key={rgbToHex(rgb)} className="space-y-1">
-                    <Swatch
-                      rgb={rgb}
-                      size="lg"
-                      label={`${palette.name} ${i + 1}`}
-                      selected={rgbToHex(rgb) === rgbToHex(selectedColor)}
-                      onClick={() => {
-                        setSelectedColor(rgb);
-                        setSelectedAlpha(1);
-                        pushColorHistory(rgb);
-                      }}
-                      onAdd={() => saveColor(rgb, colorInfo.label)}
-                    />
-                    <p
-                      className="truncate text-center text-[10px]"
+                  <span
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border"
+                    style={{ borderColor: active ? "var(--accent)" : "var(--border)" }}
+                  >
+                    <span className="flex -space-x-1">
+                      {palette.colors.slice(0, 3).map((color) => (
+                        <span
+                          key={color}
+                          className="h-2.5 w-2.5 rounded-full border border-white/70"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </span>
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <strong
+                      className="block truncate text-xs"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {palette.name}
+                    </strong>
+                    <span
+                      className="mt-0.5 block text-[10px]"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      {colorInfo.label}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+                      {palette.colors.length} warna terkurasi
+                    </span>
+                  </span>
+                  <span
+                    className="h-4 w-4 rounded-full border p-[3px]"
+                    style={{ borderColor: active ? "var(--accent)" : "var(--input-border)" }}
+                  >
+                    {active && (
+                      <span
+                        className="block h-full w-full rounded-full"
+                        style={{ backgroundColor: "var(--accent)" }}
+                      />
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-            <div
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3"
-              style={{ backgroundColor: "var(--chip-bg)" }}
+          <div className="mt-6 border-t pt-5" style={{ borderColor: "var(--border)" }}>
+            <div className="flex items-center justify-between text-xs">
+              <span style={{ color: "var(--text-secondary)" }}>Color count</span>
+              <span className="font-mono font-medium" style={{ color: "var(--text-primary)" }}>
+                {displayColors.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={generatePalette}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 text-xs font-bold transition"
+              style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
             >
-              <div>
-                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                  Ekspor CSS variables
-                </p>
-                <code
-                  className="mt-1 block max-w-full overflow-x-auto text-[11px]"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {palette.colors.join(" · ")}
-                </code>
-              </div>
-              <CopyButton value={exportCss()} label="Salin CSS" />
-              <CopyButton value={exportJson()} label="Salin JSON" />
-              <CopyButton value={exportTailwind()} label="Salin Tailwind" />
-              <button
-                type="button"
-                onClick={downloadPng}
-                className="rounded-md px-2 py-1 text-xs font-medium transition"
-                style={{ backgroundColor: "var(--chip-bg)", color: "var(--text-secondary)" }}
-              >
-                PNG
-              </button>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+              <Sparkle size={16} weight="fill" aria-hidden="true" />
+              Generate palette
+            </button>
+            <p
+              className="mt-3 text-center text-[10px] leading-4"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Warna yang dikunci tetap dipertahankan.
+            </p>
+          </div>
+        </aside>
 
-      <Card className="h-fit">
-        <CardHeader title="Detail Warna Aktif" subtitle="Kode warna yang sedang dipilih" />
-        <CardBody className="space-y-4">
-          <Swatch rgb={selectedColor} size="lg" showCode={false} />
-          <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />
-          <button
-            type="button"
-            onClick={() => saveColor(selectedColor)}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+        <div className="min-w-0 p-4 sm:p-6">
+          <div
+            className="grid overflow-hidden rounded-lg border sm:grid-cols-5"
+            style={{ borderColor: "var(--border)" }}
           >
-            Simpan ke palet
-          </button>
-        </CardBody>
-      </Card>
-    </div>
+            {paletteRgbs.map((rgb, index) => {
+              const hex = rgbToHex(rgb);
+              const info = getColorName(rgb);
+              const selected = hex === rgbToHex(selectedColor);
+              const textColor = bestTextOn(rgb);
+              return (
+                <article
+                  key={`${hex}-${index}`}
+                  className="group min-w-0 border-b last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => selectColor(rgb)}
+                    className="relative block h-44 w-full text-left transition sm:h-64 lg:h-[330px]"
+                    style={{
+                      backgroundColor: hex,
+                      boxShadow: selected ? "inset 0 0 0 3px var(--accent)" : undefined,
+                    }}
+                    aria-label={`Pilih ${info.label} ${hex}`}
+                  >
+                    <span
+                      className="absolute left-4 top-4 font-mono text-[10px] font-semibold"
+                      style={{ color: textColor }}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className="absolute bottom-4 left-4 font-mono text-xs font-semibold"
+                      style={{ color: textColor }}
+                    >
+                      {hex}
+                    </span>
+                  </button>
+                  <div className="p-4">
+                    <strong
+                      className="block truncate text-sm"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {info.name}
+                    </strong>
+                    <p
+                      className="mt-1 truncate font-mono text-[10px]"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      RGB {rgb.r}, {rgb.g}, {rgb.b}
+                    </p>
+                    <div className="mt-4 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleLock(index)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition"
+                        style={{
+                          borderColor: locked.has(index) ? "var(--accent)" : "var(--border)",
+                          color: locked.has(index) ? "var(--accent)" : "var(--text-secondary)",
+                        }}
+                        aria-label={locked.has(index) ? `Buka kunci ${hex}` : `Kunci ${hex}`}
+                      >
+                        {locked.has(index) ? (
+                          <LockSimple size={15} weight="fill" />
+                        ) : (
+                          <LockSimpleOpen size={15} />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => saveColor(rgb, info.label)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition"
+                        style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                        aria-label={`Simpan ${hex}`}
+                      >
+                        <Plus size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div
+            className="mt-6 grid gap-5 border-t pt-6 xl:grid-cols-[minmax(0,1fr)_340px]"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <section aria-labelledby="saved-colors-title">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h3
+                    id="saved-colors-title"
+                    className="text-base font-bold tracking-tight"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    Saved colors
+                  </h3>
+                  <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
+                    Klik warna untuk memuatnya ke inspector.
+                  </p>
+                </div>
+                <span
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold"
+                  style={{ color: "var(--accent)" }}
+                >
+                  {savedColors.length} tersimpan <ArrowRight size={13} />
+                </span>
+              </div>
+              <div
+                className="mt-4 flex min-h-20 overflow-hidden rounded-md border"
+                style={{ borderColor: "var(--border)" }}
+              >
+                {savedColors.map((color) => (
+                  <button
+                    key={color.id}
+                    type="button"
+                    onClick={() => selectColor(color.rgb)}
+                    className="group relative min-w-16 flex-1"
+                    style={{ backgroundColor: rgbToHex(color.rgb) }}
+                    aria-label={`Pilih warna tersimpan ${color.name}`}
+                  >
+                    <span className="absolute inset-x-0 bottom-0 truncate bg-black/45 px-2 py-1 font-mono text-[9px] text-white opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
+                      {rgbToHex(color.rgb)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <CopyButton value={exportCss()} label="CSS" className="border px-3 py-2" />
+                <CopyButton value={exportJson()} label="JSON" className="border px-3 py-2" />
+                <CopyButton
+                  value={exportTailwind()}
+                  label="Tailwind"
+                  className="border px-3 py-2"
+                />
+                <button
+                  type="button"
+                  onClick={downloadPng}
+                  className="rounded-md border px-3 py-2 text-xs font-semibold transition"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                >
+                  PNG
+                </button>
+              </div>
+            </section>
+
+            <section
+              aria-labelledby="active-color-title"
+              className="border-t pt-5 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <h3
+                id="active-color-title"
+                className="text-base font-bold tracking-tight"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Inspector warna aktif
+              </h3>
+              <div className="mt-4">
+                <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

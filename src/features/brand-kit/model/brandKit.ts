@@ -34,7 +34,6 @@ export type BrandTone = "modern" | "classic" | "playful" | "minimal" | "bold";
 export type BrandToneProfile = {
   id: BrandTone;
   label: string;
-  icon: string;
   desc: string;
   voice: {
     tone: string;
@@ -65,7 +64,6 @@ export const TONE_PROFILES: Record<BrandTone, BrandToneProfile> = {
   modern: {
     id: "modern",
     label: "Modern",
-    icon: "✨",
     desc: "Clean, sleek, contemporary",
     voice: {
       tone: "Clean, sleek, contemporary",
@@ -90,7 +88,6 @@ export const TONE_PROFILES: Record<BrandTone, BrandToneProfile> = {
   classic: {
     id: "classic",
     label: "Classic",
-    icon: "🏛",
     desc: "Timeless, elegant, refined",
     voice: {
       tone: "Timeless, elegant, refined",
@@ -115,7 +112,6 @@ export const TONE_PROFILES: Record<BrandTone, BrandToneProfile> = {
   playful: {
     id: "playful",
     label: "Playful",
-    icon: "🎨",
     desc: "Fun, vibrant, energetic",
     voice: {
       tone: "Fun, vibrant, energetic",
@@ -140,7 +136,6 @@ export const TONE_PROFILES: Record<BrandTone, BrandToneProfile> = {
   minimal: {
     id: "minimal",
     label: "Minimal",
-    icon: "🧘",
     desc: "Simple, focused, zen",
     voice: {
       tone: "Simple, focused, zen",
@@ -165,7 +160,6 @@ export const TONE_PROFILES: Record<BrandTone, BrandToneProfile> = {
   bold: {
     id: "bold",
     label: "Bold",
-    icon: "💪",
     desc: "Strong, impactful, confident",
     voice: {
       tone: "Strong, impactful, confident",

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Check } from "@phosphor-icons/react/Check";
+import { Copy } from "@phosphor-icons/react/Copy";
 import { cn } from "../lib/cn";
 import { useToast } from "./toastContext";
 
@@ -16,7 +18,7 @@ export function CopyButton({ value, className, label }: CopyButtonProps) {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      show(`✓ "${value}" berhasil disalin!`);
+      show(`"${value}" berhasil disalin!`);
       setTimeout(() => setCopied(false), 1200);
     } catch {
       // Clipboard may be unavailable; fail silently.
@@ -37,7 +39,12 @@ export function CopyButton({ value, className, label }: CopyButtonProps) {
       style={!copied ? { color: "var(--text-secondary)" } : undefined}
       title="Salin ke clipboard"
     >
-      {copied ? "✓ Tersalin" : (label ?? "Salin")}
+      {copied ? (
+        <Check size={14} weight="bold" aria-hidden="true" />
+      ) : (
+        <Copy size={14} aria-hidden="true" />
+      )}
+      {copied ? "Tersalin" : (label ?? "Salin")}
     </button>
   );
 }

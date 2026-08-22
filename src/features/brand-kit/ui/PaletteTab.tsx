@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { Check } from "@phosphor-icons/react/Check";
+import { ArrowsClockwise } from "@phosphor-icons/react/ArrowsClockwise";
+import { LockSimple } from "@phosphor-icons/react/LockSimple";
+import { Palette } from "@phosphor-icons/react/Palette";
+import { PencilSimple } from "@phosphor-icons/react/PencilSimple";
 import { useStudio } from "../../../store/studio";
 import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
@@ -155,7 +160,7 @@ export function PaletteTab({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-sm">
-                🔄
+                <ArrowsClockwise size={16} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -231,7 +236,7 @@ export function PaletteTab({
                     {/* Edit indicator */}
                     {item.editable && (
                       <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[8px] text-white opacity-0 group-hover:opacity-100 transition z-10">
-                        ✏️
+                        <PencilSimple size={13} aria-hidden="true" />
                       </div>
                     )}
                   </div>
@@ -257,7 +262,8 @@ export function PaletteTab({
                         htmlFor={colorInputId}
                         className="cursor-pointer rounded-md border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium text-indigo-700 transition hover:bg-indigo-500/20 dark:text-indigo-300"
                       >
-                        🎨 Pilih Warna
+                        <Palette size={13} className="mr-1 inline" aria-hidden="true" />
+                        Pilih Warna
                       </label>
                       <input
                         type="color"
@@ -281,7 +287,8 @@ export function PaletteTab({
                         className="rounded-md px-2 py-0.5 text-[9px]"
                         style={{ color: "var(--text-muted)" }}
                       >
-                        {autoAdjust ? "🔒 Otomatis" : "🔒 Manual"}
+                        <LockSimple size={11} className="mr-1 inline" aria-hidden="true" />
+                        {autoAdjust ? "Otomatis" : "Manual"}
                       </span>
                     </div>
                   )}
@@ -296,7 +303,7 @@ export function PaletteTab({
       {savedColors.length > 0 && (
         <Card>
           <CardHeader
-            title="🎨 Pilih dari Palet Tersimpan"
+            title="Pilih dari Palet Tersimpan"
             subtitle="Klik untuk mengganti warna Primary"
           />
           <CardBody>
@@ -325,7 +332,7 @@ export function PaletteTab({
                     </span>
                     {isActive && (
                       <div className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-500 text-[8px] text-white">
-                        ✓
+                        <Check size={10} weight="bold" aria-hidden="true" />
                       </div>
                     )}
                   </button>

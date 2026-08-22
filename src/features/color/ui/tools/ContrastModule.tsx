@@ -1,4 +1,8 @@
 import { useMemo, useState } from "react";
+import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
+import { ArrowDown } from "@phosphor-icons/react/ArrowDown";
+import { Swap } from "@phosphor-icons/react/Swap";
+import { XCircle } from "@phosphor-icons/react/XCircle";
 import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "../../model/color";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
@@ -101,7 +105,8 @@ export function ContrastModule() {
                   className="rounded-lg border px-4 py-2 text-sm font-medium transition"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
-                  → ke Foreground
+                  <ArrowDown size={13} className="mr-1 inline" aria-hidden="true" />
+                  ke Foreground
                 </button>
                 <button
                   type="button"
@@ -111,7 +116,8 @@ export function ContrastModule() {
                   className="rounded-lg border px-4 py-2 text-sm font-medium transition"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
-                  → ke Background
+                  <ArrowDown size={13} className="mr-1 inline" aria-hidden="true" />
+                  ke Background
                 </button>
               </div>
             </div>
@@ -311,9 +317,11 @@ export function ContrastModule() {
                       >
                         {req.min}:1
                       </span>
-                      <span className={cn("text-lg", pass ? "text-emerald-500" : "text-rose-500")}>
-                        {pass ? "✓" : "✗"}
-                      </span>
+                      {pass ? (
+                        <CheckCircle size={18} className="text-emerald-500" aria-label="Lulus" />
+                      ) : (
+                        <XCircle size={18} className="text-rose-500" aria-label="Tidak lulus" />
+                      )}
                     </div>
                   </div>
                 );
@@ -331,7 +339,8 @@ export function ContrastModule() {
               className="w-full rounded-lg border px-3 py-2 text-xs font-medium transition"
               style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
             >
-              ↕ Tukar Foreground & Background
+              <Swap size={15} className="mr-1 inline" aria-hidden="true" />
+              Tukar Foreground & Background
             </button>
 
             {/* Copy CSS */}

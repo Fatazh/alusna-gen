@@ -96,54 +96,51 @@ export default function App() {
           toolNavigationActive={showingTool}
         />
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <main className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           {showingTool ? (
             <>
+              {topTab === "color" && (
+                <nav
+                  className="-mx-4 flex items-stretch gap-1 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+                  style={{ borderColor: "var(--border)" }}
+                  role="tablist"
+                  aria-label="Alat warna"
+                >
+                  {COLOR_TABS.map((t) => {
+                    const active = colorTab === t.id;
+                    return (
+                      <a
+                        key={t.id}
+                        href={findPageForModule("color", t.id).path}
+                        role="tab"
+                        aria-selected={active}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          switchColorTab(t.id);
+                        }}
+                        className="relative shrink-0 px-3 py-4 text-left text-xs font-semibold transition sm:px-4"
+                        style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+                        title={t.desc}
+                      >
+                        {t.label}
+                        {active && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-x-3 bottom-0 h-0.5 sm:inset-x-4"
+                            style={{ backgroundColor: "var(--accent)" }}
+                          />
+                        )}
+                      </a>
+                    );
+                  })}
+                </nav>
+              )}
               <ToolPageIntro page={currentPage} />
               <AdvertisingSlot />
               <Suspense fallback={<ModuleLoading />}>
                 {/* ── Color Module ── */}
                 {topTab === "color" && (
                   <div className="space-y-6 animate-fade-in">
-                    {/* Color sub-tabs */}
-                    <div
-                      className="flex flex-wrap items-center gap-2"
-                      role="tablist"
-                      aria-label="Alat warna"
-                    >
-                      {COLOR_TABS.map((t) => (
-                        <a
-                          key={t.id}
-                          href={findPageForModule("color", t.id).path}
-                          role="tab"
-                          aria-selected={colorTab === t.id}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            switchColorTab(t.id);
-                          }}
-                          className="group rounded-xl border px-4 py-2.5 text-left transition"
-                          style={
-                            colorTab === t.id
-                              ? {
-                                  borderColor: "var(--border)",
-                                  backgroundColor: "var(--chip-active-bg)",
-                                }
-                              : { borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }
-                          }
-                        >
-                          <div
-                            className="text-sm font-semibold"
-                            style={{ color: "var(--text-primary)" }}
-                          >
-                            {t.label}
-                          </div>
-                          <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                            {t.desc}
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-
                     {colorTab === "pattern" && <PatternModule />}
                     {colorTab === "matching" && <MatchingModule />}
                     {colorTab === "experiment" && <ExperimentModule />}
@@ -169,13 +166,17 @@ export default function App() {
               </Suspense>
             </>
           ) : showingHome ? (
-            <Suspense fallback={<ModuleLoading />}>
-              <HomePageView onNavigate={navigateToPath} />
-            </Suspense>
+            <div className="py-8 sm:py-10">
+              <Suspense fallback={<ModuleLoading />}>
+                <HomePageView onNavigate={navigateToPath} />
+              </Suspense>
+            </div>
           ) : (
-            <Suspense fallback={<ModuleLoading />}>
-              <TrustPageView page={currentPage} />
-            </Suspense>
+            <div className="py-8 sm:py-10">
+              <Suspense fallback={<ModuleLoading />}>
+                <TrustPageView page={currentPage} />
+              </Suspense>
+            </div>
           )}
         </main>
 

@@ -1,12 +1,19 @@
+import { Briefcase } from "@phosphor-icons/react/Briefcase";
+import { GridFour } from "@phosphor-icons/react/GridFour";
+import { Moon } from "@phosphor-icons/react/Moon";
+import { Palette } from "@phosphor-icons/react/Palette";
+import { Sun } from "@phosphor-icons/react/Sun";
+import { TextAa } from "@phosphor-icons/react/TextAa";
+import { type Icon } from "@phosphor-icons/react/lib";
 import { CopyButton } from "../../shared/ui/CopyButton";
 import { APP_BRAND } from "../../shared/config/brand";
 import { findPageForModule, type ColorTab, type TopModule } from "../router/routes";
 
-const TOP_TABS: { id: TopModule; label: string; icon: string; desc: string }[] = [
-  { id: "color", label: "Warna", icon: "🎨", desc: "Color Playground" },
-  { id: "font", label: "Font", icon: "🔤", desc: "Typography Preview" },
-  { id: "design", label: "Design System", icon: "🏗", desc: "Token Generator" },
-  { id: "brand", label: "Brand Kit", icon: "🏷", desc: "Brand Identity" },
+const TOP_TABS: { id: TopModule; label: string; icon: Icon; desc: string }[] = [
+  { id: "color", label: "Warna", icon: Palette, desc: "Color Playground" },
+  { id: "font", label: "Font", icon: TextAa, desc: "Typography Preview" },
+  { id: "design", label: "Design System", icon: GridFour, desc: "Token Generator" },
+  { id: "brand", label: "Brand Kit", icon: Briefcase, desc: "Brand Identity" },
 ];
 
 type StudioHeaderProps = {
@@ -32,10 +39,10 @@ export function StudioHeader({
 }: StudioHeaderProps) {
   return (
     <header
-      className="sticky top-0 z-30 border-b border-white/5 backdrop-blur"
+      className="sticky top-0 z-30 border-b backdrop-blur-xl"
       style={{ backgroundColor: "var(--chrome-bg)" }}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <a
           href="/"
           aria-label="Beranda ALUSNA"
@@ -43,74 +50,81 @@ export function StudioHeader({
             event.preventDefault();
             onNavigateHome();
           }}
-          className="flex items-center gap-2.5 rounded-xl"
+          className="flex min-h-16 items-center gap-3 rounded-lg"
         >
           <div
-            className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 text-sm font-black text-white shadow-sm"
+            className="relative flex h-9 w-9 items-center justify-center rounded-md text-base font-extrabold text-white"
+            style={{ backgroundColor: "var(--accent)" }}
             aria-hidden="true"
           >
             A
-            <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-amber-300" />
           </div>
-          <div>
-            <div className="text-sm font-semibold" style={{ color: "var(--chrome-text)" }}>
+          <div className="flex items-baseline gap-4">
+            <div
+              className="text-lg font-extrabold tracking-[-0.035em]"
+              style={{ color: "var(--chrome-text)" }}
+            >
               {APP_BRAND.name}
             </div>
-            <p className="text-[11px]" style={{ color: "var(--chrome-sub)" }}>
+            <p className="hidden text-xs lg:block" style={{ color: "var(--chrome-sub)" }}>
               {APP_BRAND.slogan}
             </p>
           </div>
         </a>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onToggleTheme}
-            className="hidden rounded-md border px-2.5 py-1 text-xs font-medium transition sm:inline-flex"
-            style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-            title="Ganti tema"
-          >
-            {theme === "dark" ? "☀ Terang" : "🌙 Gelap"}
-          </button>
-          <CopyButton value={shareUrl} label="Salin tautan" className="hidden sm:inline-flex" />
-
+        <div className="flex min-w-0 items-center gap-1 sm:gap-3">
           <nav
-            className="flex gap-0.5 rounded-full p-1"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "var(--chip-bg)",
-              border: "1px solid var(--border)",
-            }}
+            className="flex min-w-0 items-stretch overflow-x-auto"
             role="tablist"
             aria-label="Modul studio"
           >
-            {TOP_TABS.map((tab) => (
-              <a
-                key={tab.id}
-                href={findPageForModule(tab.id, colorTab).path}
-                role="tab"
-                aria-selected={toolNavigationActive && topTab === tab.id}
-                onClick={(event) => {
-                  event.preventDefault();
-                  onSwitchTab(tab.id);
-                }}
-                title={tab.desc}
-                className="rounded-full px-3 py-1.5 text-xs font-medium transition"
-                style={
-                  toolNavigationActive && topTab === tab.id
-                    ? {
-                        backgroundColor: "var(--surface)",
-                        color: "var(--text-primary)",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                      }
-                    : { color: "var(--text-secondary)" }
-                }
-              >
-                <span className="hidden sm:inline">{tab.icon} </span>
-                {tab.label}
-              </a>
-            ))}
+            {TOP_TABS.map((tab) => {
+              const TabIcon = tab.icon;
+              const active = toolNavigationActive && topTab === tab.id;
+              return (
+                <a
+                  key={tab.id}
+                  href={findPageForModule(tab.id, colorTab).path}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    onSwitchTab(tab.id);
+                  }}
+                  title={tab.desc}
+                  className="relative inline-flex min-h-16 shrink-0 items-center gap-2 px-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+                  style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+                >
+                  <TabIcon size={18} weight={active ? "fill" : "regular"} aria-hidden="true" />
+                  <span className={tab.id === "design" ? "hidden sm:inline" : "inline"}>
+                    {tab.label}
+                  </span>
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-2 bottom-0 h-0.5"
+                      style={{ backgroundColor: "var(--accent)" }}
+                    />
+                  )}
+                </a>
+              );
+            })}
           </nav>
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="hidden h-9 w-9 items-center justify-center rounded-md border transition md:inline-flex"
+            style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+            title="Ganti tema"
+            aria-label={theme === "dark" ? "Gunakan tema terang" : "Gunakan tema gelap"}
+          >
+            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+          <CopyButton
+            value={shareUrl}
+            label="Salin tautan"
+            className="hidden border px-3 py-2 md:inline-flex"
+          />
         </div>
       </div>
     </header>

@@ -1,4 +1,18 @@
 import { useState, useMemo, useCallback, useRef } from "react";
+import { BracketsCurly } from "@phosphor-icons/react/BracketsCurly";
+import { Buildings } from "@phosphor-icons/react/Buildings";
+import { Camera } from "@phosphor-icons/react/Camera";
+import { Circle } from "@phosphor-icons/react/Circle";
+import { FileText } from "@phosphor-icons/react/FileText";
+import { Lightning } from "@phosphor-icons/react/Lightning";
+import { Palette } from "@phosphor-icons/react/Palette";
+import { Smiley } from "@phosphor-icons/react/Smiley";
+import { Sparkle } from "@phosphor-icons/react/Sparkle";
+import { FloppyDisk } from "@phosphor-icons/react/FloppyDisk";
+import { TextAa } from "@phosphor-icons/react/TextAa";
+import { UploadSimple } from "@phosphor-icons/react/UploadSimple";
+import { Wheelchair } from "@phosphor-icons/react/Wheelchair";
+import { type Icon } from "@phosphor-icons/react/lib";
 import { useStudio } from "../../../store/studio";
 import { type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
 import {
@@ -19,6 +33,14 @@ import { brandKitToHtml } from "../services/htmlSerializer";
 const TONE_OPTIONS = (["modern", "classic", "playful", "minimal", "bold"] as const).map(
   (id) => TONE_PROFILES[id],
 );
+
+const TONE_ICONS: Record<BrandTone, Icon> = {
+  modern: Sparkle,
+  classic: Buildings,
+  playful: Smiley,
+  minimal: Circle,
+  bold: Lightning,
+};
 
 export function BrandKitModule() {
   const selectedColor = useStudio((s) => s.selectedColor);
@@ -284,7 +306,11 @@ export function BrandKitModule() {
                 <img src={logoDataUrl} alt="Logo" className="h-full w-full object-contain" />
               ) : (
                 <div className="text-center">
-                  <div className="text-2xl">{isDragging ? "📥" : "📸"}</div>
+                  {isDragging ? (
+                    <UploadSimple size={28} aria-hidden="true" />
+                  ) : (
+                    <Camera size={28} aria-hidden="true" />
+                  )}
                   <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>
                     {isDragging ? "Drop" : "Upload"}
                   </div>
@@ -373,7 +399,10 @@ export function BrandKitModule() {
                         : "border-transparent hover:bg-black/5 dark:hover:bg-white/5")
                     }
                   >
-                    <span className="text-sm">{t.icon}</span>
+                    {(() => {
+                      const ToneIcon = TONE_ICONS[t.id];
+                      return <ToneIcon size={16} aria-hidden="true" />;
+                    })()}
                     <span className="min-w-0 flex-1">
                       <span
                         className={
@@ -419,7 +448,8 @@ export function BrandKitModule() {
                   onClick={handleSaveBrandKit}
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-3 py-2 text-xs font-medium text-indigo-700 transition hover:bg-indigo-500/25 dark:text-indigo-300"
                 >
-                  💾 Save Brand Kit
+                  <FloppyDisk size={16} className="mr-1 inline" aria-hidden="true" />
+                  Save Brand Kit
                 </button>
               </div>
             </div>
@@ -429,40 +459,47 @@ export function BrandKitModule() {
 
       {/* Tab Navigation */}
       <div
-        className="flex gap-1 rounded-xl border p-1"
+        className="flex gap-1 overflow-x-auto rounded-xl border p-1"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
       >
-        {[
-          { id: "palette" as const, label: "🎨 Palet Warna" },
-          { id: "typography" as const, label: "📝 Tipografi" },
-          { id: "guidelines" as const, label: "📋 Panduan" },
-          { id: "export" as const, label: "📦 Export" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className="flex-1 rounded-lg px-3 py-2 text-xs font-medium transition"
-            style={
-              activeTab === tab.id
-                ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-                : { color: "var(--text-muted)" }
-            }
-          >
-            {tab.label}
-          </button>
-        ))}
+        {(
+          [
+            { id: "palette" as const, label: "Palet", icon: Palette },
+            { id: "typography" as const, label: "Tipografi", icon: TextAa },
+            { id: "guidelines" as const, label: "Panduan", icon: FileText },
+            { id: "export" as const, label: "Export", icon: BracketsCurly },
+          ] satisfies { id: typeof activeTab; label: string; icon: Icon }[]
+        ).map((tab) => {
+          const TabIcon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className="flex min-w-20 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition"
+              style={
+                activeTab === tab.id
+                  ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
+                  : { color: "var(--text-muted)" }
+              }
+            >
+              <TabIcon size={15} aria-hidden="true" />
+              {tab.label}
+            </button>
+          );
+        })}
         <button
           type="button"
           onClick={() => setActiveTab("accessibility")}
-          className="flex-1 rounded-lg px-3 py-2 text-xs font-medium transition"
+          className="flex min-w-24 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition"
           style={
             activeTab === "accessibility"
               ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
               : { color: "var(--text-muted)" }
           }
         >
-          ♿ Aksesibilitas
+          <Wheelchair size={15} aria-hidden="true" />
+          Aksesibilitas
         </button>
       </div>
 

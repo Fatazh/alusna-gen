@@ -4,7 +4,7 @@ import { TRUST_PAGES } from "../router/routes";
 export function AppFooter({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
     <footer className="border-t" style={{ borderColor: "var(--border)" }}>
-      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-7 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p style={{ color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} {APP_BRAND.name} · {APP_BRAND.slogan}
         </p>

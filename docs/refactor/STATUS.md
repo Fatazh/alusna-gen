@@ -4,9 +4,8 @@ Last updated: 2026-08-22
 
 ## Current objective
 
-Phase 7 is verified. ALUSNA now has a dedicated homepage, unique evergreen guidance for every tool,
-visible contextual internal links, crawlable built HTML, and a privacy-first analytics boundary that
-stays network-inactive until a provider is explicitly selected.
+The post-Phase 7 Swiss Modular visual-system refresh is complete and verified. Production launch
+configuration remains the next objective.
 
 ## Completed
 
@@ -85,10 +84,23 @@ stays network-inactive until a provider is explicitly selected.
 - Browser coverage expanded to 25 required passing scenarios plus one optional sponsor scenario.
 - The production entry chunk remains below baseline at 58.59 kB gzip.
 - Phase 7 validation completed; the organic-growth foundation is verified.
+- Swiss Modular visual tokens now use a neutral canvas, cobalt-led actions, restrained magenta and
+  amber accents, Manrope interface typography, and IBM Plex Mono utility typography.
+- The app shell, homepage, shared surfaces, and Color Palette Generator now use flatter grid-based
+  layouts aligned with the selected UI-designer reference.
+- Visible emoji and text-glyph substitutes in representative feature controls were replaced with
+  direct Phosphor icon imports and accessible labels.
+- New users start in light mode while persisted users retain their existing theme preference.
+- Desktop reference comparison and mobile, tablet, and desktop browser checks passed with no
+  document-level horizontal overflow or unnamed buttons in representative routes.
+- Visual QA passed with no unresolved P0, P1, or P2 findings; see `design-qa.md`.
+- The final local gate passes with 118 unit and contract tests, 25 required browser scenarios,
+  one intentionally skipped sponsor scenario, a production build, and 0 production dependency
+  vulnerabilities.
 
 ## In progress
 
-- No repository refactor phase is currently in progress.
+- None.
 
 ## Known risks
 
@@ -102,6 +114,10 @@ stays network-inactive until a provider is explicitly selected.
 - No third-party ad network or revenue account is active; adding one requires CSP, privacy, consent, and provider-specific review.
 - Search ranking, ad approval, and revenue are external outcomes and are not guaranteed by technical SEO.
 - Evergreen guidance still requires review when tool behavior or relevant web standards change.
+- The production entry chunk is 66.16 kB gzip, 7.57 kB above the Phase 7 value after adding the
+  shared icon runtime and redesigned shell.
+- Manrope and IBM Plex Mono load from Google Fonts; self-hosting remains an option for stricter CSP,
+  privacy, and offline resilience.
 
 ## Next task
 

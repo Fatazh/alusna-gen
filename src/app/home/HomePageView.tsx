@@ -1,3 +1,5 @@
+import { ArrowRight } from "@phosphor-icons/react/ArrowRight";
+import { ArrowUpRight } from "@phosphor-icons/react/ArrowUpRight";
 import { APP_BRAND } from "../../shared/config/brand";
 import { SEO_PAGES } from "../router/routes";
 
@@ -42,157 +44,192 @@ const TOOL_LABELS: Record<string, { eyebrow: string; label: string }> = {
   "/brand-kit-generator": { eyebrow: "Identitas", label: "Susun brand kit" },
 };
 
+const FEATURE_COLORS = ["#1E40AF", "#D81B60", "#F2B705", "#F2F4F7", "#111111"];
+
 export function HomePageView({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
-    <div className="space-y-8 animate-fade-in">
-      <section
-        className="relative overflow-hidden rounded-3xl border px-5 py-10 sm:px-10 sm:py-14"
-        style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
-      >
-        <div
-          aria-hidden="true"
-          className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-indigo-500/15 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -bottom-32 left-1/4 h-64 w-64 rounded-full bg-fuchsia-500/10 blur-3xl"
-        />
-        <div className="relative max-w-4xl">
+    <div className="space-y-16 animate-fade-in sm:space-y-20">
+      <section className="grid gap-10 border-b pb-12 lg:grid-cols-12 lg:gap-8 lg:pb-16">
+        <div className="lg:col-span-7">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.22em]"
-            style={{ color: "var(--text-muted)" }}
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            style={{ color: "var(--accent)" }}
           >
-            Color, typography &amp; brand toolkit
+            Color · Typography · Brand systems
           </p>
           <h1
-            className="mt-4 text-4xl font-bold tracking-tight sm:text-6xl"
+            className="mt-5 max-w-4xl text-5xl font-extrabold leading-[0.98] tracking-[-0.055em] sm:text-7xl lg:text-[88px]"
             style={{ color: "var(--text-primary)" }}
           >
             {APP_BRAND.slogan}
           </h1>
           <p
-            className="mt-5 max-w-2xl text-base leading-8 sm:text-lg"
+            className="mt-7 max-w-2xl text-base leading-8 sm:text-lg"
             style={{ color: "var(--text-secondary)" }}
           >
-            Dari eksplorasi warna sampai brand kit siap pakai, ALUSNA membantu memperbagus keputusan
-            desain tanpa akun dan tanpa memindahkan file kerja Anda ke server kami.
+            Toolkit untuk desainer UI yang ingin bergerak dari eksplorasi visual menuju sistem yang
+            siap dipakai—langsung di browser, tanpa akun.
           </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <PageLink
               path="/color-palette-generator"
               onNavigate={onNavigate}
-              className="bg-indigo-600 text-white hover:bg-indigo-500"
+              className="inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-bold"
+              style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
             >
-              Mulai dari palet warna
+              Mulai dari palet warna <ArrowRight size={17} />
             </PageLink>
             <PageLink
               path="/brand-kit-generator"
               onNavigate={onNavigate}
-              className="border hover:bg-black/5 dark:hover:bg-white/5"
+              className="inline-flex items-center justify-center rounded-md border px-5 py-3 text-sm font-bold"
             >
               Susun Brand Kit
             </PageLink>
           </div>
-          <dl className="mt-9 grid max-w-2xl grid-cols-1 gap-3 text-sm sm:grid-cols-3">
-            {[
-              ["11 alat", "Satu alur desain"],
-              ["Tanpa akun", "Langsung digunakan"],
-              ["Browser-local", "File tetap di perangkat"],
-            ].map(([value, label]) => (
-              <div
-                key={value}
-                className="rounded-xl border px-4 py-3"
-                style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
-              >
-                <dt className="font-semibold" style={{ color: "var(--text-primary)" }}>
-                  {value}
-                </dt>
-                <dd className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-                  {label}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
+
+        <div
+          className="flex min-h-[360px] overflow-hidden rounded-lg border lg:col-span-5"
+          style={{ borderColor: "var(--border)" }}
+        >
+          {FEATURE_COLORS.map((color, index) => (
+            <a
+              key={color}
+              href="/color-palette-generator"
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate("/color-palette-generator");
+              }}
+              className="group relative flex-1 transition hover:flex-[1.35]"
+              style={{ backgroundColor: color }}
+              aria-label={`Buka palet warna dari swatch ${index + 1}`}
+            >
+              <span
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 -rotate-90 whitespace-nowrap font-mono text-[9px] font-semibold opacity-0 transition group-hover:opacity-100 group-focus:opacity-100"
+                style={{ color: index === 2 || index === 3 ? "#111111" : "#ffffff" }}
+              >
+                {color}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <dl className="grid gap-0 border-t pt-5 sm:grid-cols-3 lg:col-span-12">
+          {[
+            ["11 alat", "Satu alur desain"],
+            ["Tanpa akun", "Langsung digunakan"],
+            ["Browser-local", "File tetap di perangkat"],
+          ].map(([value, label]) => (
+            <div
+              key={value}
+              className="border-b py-4 sm:border-b-0 sm:border-r sm:px-5 sm:first:pl-0 sm:last:border-r-0"
+            >
+              <dt className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                {value}
+              </dt>
+              <dd className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
+                {label}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <section aria-labelledby="home-tools-title">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
-            Pilih sesuai kebutuhan
-          </p>
-          <h2
-            id="home-tools-title"
-            className="mt-2 text-2xl font-semibold"
-            style={{ color: "var(--text-primary)" }}
+        <div className="grid gap-5 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p
+              className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
+              style={{ color: "var(--magenta)" }}
+            >
+              Toolkit
+            </p>
+            <h2
+              id="home-tools-title"
+              className="mt-3 text-3xl font-extrabold tracking-[-0.04em] sm:text-4xl"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Semua alat ALUSNA
+            </h2>
+          </div>
+          <p
+            className="max-w-2xl text-sm leading-7 lg:col-span-6 lg:col-start-7"
+            style={{ color: "var(--text-secondary)" }}
           >
-            Semua alat ALUSNA
-          </h2>
-          <p className="mt-2 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
             Gunakan satu alat untuk pekerjaan cepat atau lanjutkan dari warna, tipografi, design
             token, hingga panduan brand yang konsisten.
           </p>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {SEO_PAGES.map((tool) => {
+
+        <div className="mt-8 grid border-t sm:grid-cols-2">
+          {SEO_PAGES.map((tool, index) => {
             const copy = TOOL_LABELS[tool.path];
             return (
               <PageLink
                 key={tool.path}
                 path={tool.path}
                 onNavigate={onNavigate}
-                className="group min-h-32 border p-5 hover:-translate-y-0.5 hover:shadow-lg"
+                className={`group flex min-h-40 items-start justify-between gap-5 border-b p-5 sm:p-6 ${index % 2 === 0 ? "sm:border-r" : ""}`}
               >
-                <span
-                  className="text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {copy.eyebrow}
+                <span>
+                  <span
+                    className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {String(index + 1).padStart(2, "0")} / {copy.eyebrow}
+                  </span>
+                  <strong
+                    className="mt-4 block text-lg font-bold tracking-tight"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {copy.label}
+                  </strong>
+                  <span
+                    className="mt-2 block max-w-md text-xs leading-6"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {tool.description}
+                  </span>
                 </span>
-                <strong className="mt-2 block text-base" style={{ color: "var(--text-primary)" }}>
-                  {copy.label}
-                </strong>
-                <span
-                  className="mt-2 block text-xs leading-5"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {tool.description}
-                </span>
-                <span className="mt-4 block text-xs font-semibold text-indigo-500">
-                  Buka alat <span aria-hidden="true">→</span>
-                </span>
+                <ArrowUpRight
+                  size={20}
+                  className="shrink-0 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+                  style={{ color: "var(--accent)" }}
+                />
               </PageLink>
             );
           })}
         </div>
       </section>
 
-      <section
-        aria-labelledby="home-workflow-title"
-        className="rounded-3xl border px-5 py-7 sm:px-8"
-        style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
-      >
+      <section aria-labelledby="home-workflow-title" className="border-t pt-8">
         <h2
           id="home-workflow-title"
-          className="text-2xl font-semibold"
+          className="text-3xl font-extrabold tracking-[-0.04em]"
           style={{ color: "var(--text-primary)" }}
         >
           Satu alur dari ide ke sistem
         </h2>
-        <div className="mt-5 grid gap-3 md:grid-cols-4">
+        <div className="mt-7 grid border-t md:grid-cols-4">
           {WORKFLOW.map((item) => (
             <PageLink
               key={item.step}
               path={item.path}
               onNavigate={onNavigate}
-              className="border p-4 hover:bg-black/5 dark:hover:bg-white/5"
+              className="border-b p-5 transition md:border-b-0 md:border-r md:last:border-r-0"
             >
-              <span className="text-xs font-bold text-indigo-500">{item.step}</span>
-              <strong className="mt-2 block text-sm" style={{ color: "var(--text-primary)" }}>
+              <span className="font-mono text-[10px] font-bold" style={{ color: "var(--accent)" }}>
+                {item.step}
+              </span>
+              <strong
+                className="mt-8 block text-sm font-bold"
+                style={{ color: "var(--text-primary)" }}
+              >
                 {item.title}
               </strong>
               <span
-                className="mt-1.5 block text-xs leading-5"
+                className="mt-2 block text-xs leading-5"
                 style={{ color: "var(--text-secondary)" }}
               >
                 {item.text}
@@ -209,11 +246,13 @@ function PageLink({
   path,
   onNavigate,
   className,
+  style,
   children,
 }: {
   path: string;
   onNavigate: (path: string) => void;
   className: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
   return (
@@ -223,7 +262,8 @@ function PageLink({
         event.preventDefault();
         onNavigate(path);
       }}
-      className={`rounded-2xl transition ${className}`}
+      className={`transition ${className}`}
+      style={{ borderColor: "var(--border)", color: "var(--text-primary)", ...style }}
     >
       {children}
     </a>

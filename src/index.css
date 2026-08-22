@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,51 +7,67 @@
 /* ── Default = Light mode ── */
 :root {
   color-scheme: light;
-  --app-bg: linear-gradient(to bottom, #fafafa 0%, #e5e7eb 100%);
-  --chrome-bg: rgba(255, 255, 255, 0.85);
-  --chrome-text: #18181b;
-  --chrome-sub: #52525b;
-  --border: rgba(0, 0, 0, 0.08);
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: rgba(0, 0, 0, 0.08);
-  --text-primary: #18181b;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
+  --app-bg: #f4f5f7;
+  --chrome-bg: rgba(247, 248, 250, 0.96);
+  --chrome-text: #111111;
+  --chrome-sub: #5d626c;
+  --border: #dfe2e7;
+  --card-bg: #ffffff;
+  --card-border: #dfe2e7;
+  --text-primary: #111111;
+  --text-secondary: #4f5560;
+  --text-muted: #737985;
   --surface: #ffffff;
-  --surface-hover: rgba(0, 0, 0, 0.03);
+  --surface-soft: #f7f8fa;
+  --surface-hover: #f0f2f5;
   --input-bg: #ffffff;
-  --input-border: rgba(0, 0, 0, 0.15);
-  --input-text: #18181b;
-  --chip-bg: rgba(0, 0, 0, 0.04);
-  --chip-active-bg: rgba(0, 0, 0, 0.08);
-  --scrollbar-thumb: #d4d4d8;
-  --scrollbar-hover: #a1a1aa;
-  --tab-indicator: #18181b;
+  --input-border: #cfd3da;
+  --input-text: #111111;
+  --chip-bg: #f1f3f6;
+  --chip-active-bg: #e7edff;
+  --scrollbar-thumb: #c8ccd4;
+  --scrollbar-hover: #9ca3af;
+  --tab-indicator: #1546d8;
+  --accent: #1546d8;
+  --accent-hover: #1039b8;
+  --accent-soft: #eaf0ff;
+  --accent-contrast: #ffffff;
+  --magenta: #d81b60;
+  --amber: #f2b705;
+  --focus-ring: rgba(21, 70, 216, 0.32);
 }
 
 /* ── Dark mode ── */
 .dark {
   color-scheme: dark;
-  --app-bg: linear-gradient(to bottom, #09090b 0%, #09090b 0%, #000 100%);
-  --chrome-bg: rgba(9, 9, 11, 0.8);
-  --chrome-text: #f4f4f5;
-  --chrome-sub: #a1a1aa;
-  --border: rgba(255, 255, 255, 0.08);
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #8b8b95;
-  --surface: #18181b;
-  --surface-hover: rgba(255, 255, 255, 0.05);
-  --input-bg: rgba(255, 255, 255, 0.05);
-  --input-border: rgba(255, 255, 255, 0.1);
-  --input-text: #fafafa;
-  --chip-bg: rgba(255, 255, 255, 0.05);
-  --chip-active-bg: rgba(255, 255, 255, 0.1);
-  --scrollbar-thumb: #27272a;
-  --scrollbar-hover: #3f3f46;
-  --tab-indicator: #ffffff;
+  --app-bg: #0d0f13;
+  --chrome-bg: rgba(13, 15, 19, 0.96);
+  --chrome-text: #f7f8fa;
+  --chrome-sub: #9ca3af;
+  --border: #292d35;
+  --card-bg: #15181e;
+  --card-border: #292d35;
+  --text-primary: #f7f8fa;
+  --text-secondary: #b5bbc5;
+  --text-muted: #858c98;
+  --surface: #15181e;
+  --surface-soft: #111319;
+  --surface-hover: #1d2129;
+  --input-bg: #111319;
+  --input-border: #343944;
+  --input-text: #f7f8fa;
+  --chip-bg: #1b1f27;
+  --chip-active-bg: #202b4d;
+  --scrollbar-thumb: #303641;
+  --scrollbar-hover: #454c59;
+  --tab-indicator: #6f8fff;
+  --accent: #6f8fff;
+  --accent-hover: #8ba4ff;
+  --accent-soft: #1d294d;
+  --accent-contrast: #081027;
+  --magenta: #ff5c96;
+  --amber: #f5c84c;
+  --focus-ring: rgba(111, 143, 255, 0.38);
 }
 
 html,
@@ -63,7 +79,7 @@ body,
 body {
   margin: 0;
   font-family:
-    Inter,
+    Manrope,
     system-ui,
     -apple-system,
     sans-serif;
@@ -71,6 +87,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--surface);
   color: var(--text-primary);
+  font-size: 15px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+code,
+.font-mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 /* ── Utility classes using CSS variables ── */
@@ -334,7 +363,7 @@ input[type="color"]::-moz-color-swatch {
 
 /* Focus ring */
 *:focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 

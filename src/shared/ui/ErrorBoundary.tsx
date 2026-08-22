@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from "react";
+import { WarningCircle } from "@phosphor-icons/react/WarningCircle";
 
 interface Props {
   children: ReactNode;
@@ -34,7 +35,12 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
           <div className="max-w-md text-center">
-            <div className="mb-4 text-6xl">⚠️</div>
+            <WarningCircle
+              size={56}
+              weight="duotone"
+              className="mx-auto mb-4 text-amber-500"
+              aria-hidden="true"
+            />
             <h2 className="mb-2 text-xl font-semibold" style={{ color: "var(--text-primary)" }}>
               Terjadi Kesalahan
             </h2>

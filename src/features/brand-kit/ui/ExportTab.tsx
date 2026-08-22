@@ -1,4 +1,12 @@
 import { useMemo } from "react";
+import { BracketsCurly } from "@phosphor-icons/react/BracketsCurly";
+import { CodeBlock } from "@phosphor-icons/react/CodeBlock";
+import { Copy } from "@phosphor-icons/react/Copy";
+import { DeviceMobile } from "@phosphor-icons/react/DeviceMobile";
+import { FileCss } from "@phosphor-icons/react/FileCss";
+import { FileHtml } from "@phosphor-icons/react/FileHtml";
+import { Palette } from "@phosphor-icons/react/Palette";
+import { Wind } from "@phosphor-icons/react/Wind";
 import { rgbToHex } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
 import { useToast } from "../../../shared/ui/toastContext";
@@ -110,7 +118,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/15 text-xl">
-                📄
+                <FileHtml size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -128,7 +136,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-xl">
-                📦
+                <BracketsCurly size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -145,8 +153,8 @@ export type BrandTheme = typeof brandTheme;`;
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-xs font-bold">
-                W3C
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15">
+                <CodeBlock size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -163,8 +171,8 @@ export type BrandTheme = typeof brandTheme;`;
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-indigo-500/50"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xs font-bold">
-                TW
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15">
+                <Wind size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -185,7 +193,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-xl">
-                📋
+                <Copy size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -207,7 +215,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/15 text-xl">
-                🎨
+                <Palette size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -228,7 +236,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500/15 text-xl">
-                💅
+                <FileCss size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -249,7 +257,7 @@ export type BrandTheme = typeof brandTheme;`;
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-xl">
-                📱
+                <DeviceMobile size={24} aria-hidden="true" />
               </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>

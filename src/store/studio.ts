@@ -47,7 +47,7 @@ export const useStudio = create<StudioState>()(
             : { colorHistory: [rgb, ...s.colorHistory].slice(0, HISTORY_CAP) },
         ),
 
-      theme: "dark" as Theme,
+      theme: "light" as Theme,
       setTheme: (t) => set({ theme: t }),
 
       savedBrandKits: [],

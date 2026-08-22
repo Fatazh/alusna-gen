@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
+import { Warning } from "@phosphor-icons/react/Warning";
 import { rgbToHex, contrastRatio } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
 import { CopyButton } from "../../../shared/ui/CopyButton";
@@ -165,7 +167,11 @@ export function AccessibilityTab({ kit }: { kit: BrandKit }) {
                   key={pair.name}
                   className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3"
                 >
-                  <span className="text-amber-700 dark:text-amber-400">⚠️</span>
+                  <Warning
+                    size={17}
+                    className="shrink-0 text-amber-700 dark:text-amber-400"
+                    aria-hidden="true"
+                  />
                   <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     <strong>{pair.name}</strong> has insufficient contrast (
                     {contrastRatio(pair.fg, pair.bg).toFixed(2)}:1). Consider adjusting the{" "}
@@ -175,7 +181,11 @@ export function AccessibilityTab({ kit }: { kit: BrandKit }) {
               ))}
             {colorPairs.every((pair) => contrastRatio(pair.fg, pair.bg) >= 4.5) && (
               <div className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-                <span className="text-emerald-700 dark:text-emerald-400">✓</span>
+                <CheckCircle
+                  size={17}
+                  className="shrink-0 text-emerald-700 dark:text-emerald-400"
+                  aria-hidden="true"
+                />
                 <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   All color combinations meet WCAG AA standards. Great job!
                 </div>

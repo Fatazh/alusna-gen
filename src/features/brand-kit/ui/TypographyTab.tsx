@@ -1,4 +1,5 @@
 import { useEffect, useMemo, type ReactNode } from "react";
+import { Check } from "@phosphor-icons/react/Check";
 import { useStudio } from "../../../store/studio";
 import { bestTextOn, rgbToHex } from "../../color";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
@@ -267,7 +268,7 @@ function FontSection({
                   </span>
                   {active && (
                     <span className="ml-auto font-semibold text-indigo-600 dark:text-indigo-300">
-                      Aktif ✓
+                      Aktif <Check size={12} className="ml-1 inline" aria-hidden="true" />
                     </span>
                   )}
                 </span>

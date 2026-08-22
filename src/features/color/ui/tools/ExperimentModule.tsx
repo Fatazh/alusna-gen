@@ -1,4 +1,7 @@
 import { useMemo, useRef, useState } from "react";
+import { Warning } from "@phosphor-icons/react/Warning";
+import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
+import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "../../model/color";
 import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
@@ -118,7 +121,8 @@ export function ExperimentModule() {
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                   title="Urungkan (undo)"
                 >
-                  ↶ Undo
+                  <ArrowCounterClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+                  Undo
                 </button>
                 <button
                   type="button"
@@ -128,7 +132,8 @@ export function ExperimentModule() {
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                   title="Ulangi (redo)"
                 >
-                  ↷ Redo
+                  <ArrowClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+                  Redo
                 </button>
               </div>
             </div>
@@ -136,7 +141,11 @@ export function ExperimentModule() {
             {/* Warning: Average ignores weights */}
             {mode === "average" && hasCustomWeights && (
               <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
-                <span className="mt-0.5 text-amber-500 dark:text-amber-400">⚠</span>
+                <Warning
+                  size={16}
+                  className="mt-0.5 shrink-0 text-amber-500 dark:text-amber-400"
+                  aria-hidden="true"
+                />
                 <p className="text-[11px] text-amber-700 dark:text-amber-300/90">
                   Mode <span className="font-semibold">Average</span> menggunakan rata-rata sama
                   rata — bobot yang kamu atur diabaikan. Gunakan mode{" "}

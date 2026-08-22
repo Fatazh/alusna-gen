@@ -141,7 +141,7 @@ test("top-level navigation updates the URL and supports browser history", async 
 test("ALUSNA identity and structured data are present", async ({ page }) => {
   await page.goto("/color-palette-generator/");
 
-  await expect(page.getByText("ALUSNA", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Beranda ALUSNA" })).toBeVisible();
   await expect(page.getByText("Bagusnya dimulai di sini.", { exact: true })).toBeVisible();
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/favicon.svg");
 
@@ -188,9 +188,11 @@ test("representative tools do not overflow at mobile, tablet, or desktop widths"
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 
     if (current.path === "/color-palette-generator/") {
-      const hexTarget = page.getByRole("button", { name: "Salin #FF6B6B" });
+      const savedColorTarget = page.getByRole("button", {
+        name: "Pilih warna tersimpan Indigo",
+      });
       const privacyTarget = page.getByRole("link", { name: "Privasi", exact: true });
-      expect((await hexTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);
+      expect((await savedColorTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);
       expect((await privacyTarget.boundingBox())?.height).toBeGreaterThanOrEqual(24);
     }
   }
@@ -198,7 +200,7 @@ test("representative tools do not overflow at mobile, tablet, or desktop widths"
 
 test("Brand Kit exposes usable export previews", async ({ page }) => {
   await page.goto("/brand-kit-generator/");
-  await page.getByRole("button", { name: "📦 Export" }).click();
+  await page.getByRole("button", { name: "Export" }).click();
 
   await expect(page.getByRole("heading", { name: "Export Options" })).toBeVisible();
   await expect(page.getByRole("button", { name: /HTML Guidelines/ })).toBeEnabled();

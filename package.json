@@ -16,6 +16,7 @@
     "check": "npm run lint && npm run format:check && npm run check:boundaries && npm test && npm run build"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zustand": "^4.5.5"

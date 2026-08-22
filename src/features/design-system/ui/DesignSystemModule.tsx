@@ -6,12 +6,12 @@ import { CopyButton } from "../../../shared/ui/CopyButton";
 import { generateDesignSystem, sanitizeTokenName, type DesignSystem } from "../model/designSystem";
 import { exportDesignSystem, type ExportFormat } from "../services/serializers";
 
-const EXPORT_FORMATS: { id: ExportFormat; label: string; icon: string }[] = [
-  { id: "css", label: "CSS Variables", icon: "🎨" },
-  { id: "tailwind", label: "Tailwind Config", icon: "🌊" },
-  { id: "json", label: "Design Tokens (JSON)", icon: "📦" },
-  { id: "react-native", label: "React Native Theme", icon: "📱" },
-  { id: "scss", label: "SCSS Variables", icon: "💎" },
+const EXPORT_FORMATS: { id: ExportFormat; label: string }[] = [
+  { id: "css", label: "CSS Variables" },
+  { id: "tailwind", label: "Tailwind Config" },
+  { id: "json", label: "Design Tokens (JSON)" },
+  { id: "react-native", label: "React Native Theme" },
+  { id: "scss", label: "SCSS Variables" },
 ];
 
 export function DesignSystemModule() {
@@ -84,7 +84,7 @@ export function DesignSystemModule() {
         <div className="space-y-4 xl:col-span-2">
           {/* Colors */}
           <CollapsibleSection
-            title="🎨 Color Roles"
+            title="Color Roles"
             subtitle={`${ds.colors.length} semantic colors`}
             isOpen={expandedSection === "colors"}
             onToggle={() => toggleSection("colors")}
@@ -121,7 +121,7 @@ export function DesignSystemModule() {
 
           {/* Shade Scale */}
           <CollapsibleSection
-            title="🌈 Shade Scale"
+            title="Shade Scale"
             subtitle={`${ds.shades.length} steps (50–950)`}
             isOpen={expandedSection === "shades"}
             onToggle={() => toggleSection("shades")}
@@ -154,7 +154,7 @@ export function DesignSystemModule() {
 
           {/* Typography */}
           <CollapsibleSection
-            title="📝 Typography Scale"
+            title="Typography Scale"
             subtitle={`${ds.typography.length} type styles`}
             isOpen={expandedSection === "typography"}
             onToggle={() => toggleSection("typography")}
@@ -201,7 +201,7 @@ export function DesignSystemModule() {
 
           {/* Spacing */}
           <CollapsibleSection
-            title="📏 Spacing Scale"
+            title="Spacing Scale"
             subtitle={`${ds.spacing.length} spacing tokens`}
             isOpen={expandedSection === "spacing"}
             onToggle={() => toggleSection("spacing")}
@@ -226,7 +226,7 @@ export function DesignSystemModule() {
 
           {/* Radius */}
           <CollapsibleSection
-            title="⭕ Border Radius"
+            title="Border Radius"
             subtitle={`${ds.radius.length} radius tokens`}
             isOpen={expandedSection === "radius"}
             onToggle={() => toggleSection("radius")}
@@ -251,7 +251,7 @@ export function DesignSystemModule() {
 
           {/* Shadows */}
           <CollapsibleSection
-            title="🌑 Shadows"
+            title="Shadows"
             subtitle={`${ds.shadows.length} shadow tokens`}
             isOpen={expandedSection === "shadows"}
             onToggle={() => toggleSection("shadows")}
@@ -313,7 +313,6 @@ export function DesignSystemModule() {
                             }
                       }
                     >
-                      <span>{f.icon}</span>
                       {f.label}
                     </button>
                   ))}
