@@ -291,16 +291,28 @@ export function mixColors(
   mode: MixMode = "average",
 ): RGB {
   if (colors.length === 0) return { r: 0, g: 0, b: 0 };
-  if (colors.length === 1 && mode !== "subtractive") return colors[0].color;
+  if (colors.length === 1 && mode !== "additive" && mode !== "subtractive") {
+    return colors[0].color;
+  }
 
   const totalWeight = colors.reduce((acc, c) => acc + (c.weight ?? 1), 0) || 1;
 
   switch (mode) {
     case "additive":
+      // Model independent RGB light intensity. A weight of 0–5 maps to
+      // 0–100% intensity; unlike a blend ratio, channels do not need to total 100%.
+      const additiveChannel = (channel: keyof RGB) =>
+        clamp(
+          colors.reduce((sum, entry) => {
+            const intensity =
+              entry.weight === undefined ? 1 : clamp01(Math.max(0, entry.weight) / 5);
+            return sum + entry.color[channel] * intensity;
+          }, 0),
+        );
       return {
-        r: clamp((colors.reduce((a, c) => a + c.color.r * (c.weight ?? 1), 0) / totalWeight) * 2),
-        g: clamp((colors.reduce((a, c) => a + c.color.g * (c.weight ?? 1), 0) / totalWeight) * 2),
-        b: clamp((colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) / totalWeight) * 2),
+        r: round(additiveChannel("r")),
+        g: round(additiveChannel("g")),
+        b: round(additiveChannel("b")),
       };
     case "subtractive":
       // Approximate ideal CMYK-style ink coverage over a white substrate.

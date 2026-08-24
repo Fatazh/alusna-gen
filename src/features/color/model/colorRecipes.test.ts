@@ -6,11 +6,34 @@ describe("findColorRecipes", () => {
     const [recipe] = findColorRecipes({ r: 255, g: 255, b: 0 }, "additive", 1);
 
     expect(recipe.ingredients.map((ingredient) => ingredient.name)).toEqual(["Merah", "Hijau"]);
-    expect(recipe.ingredients.map((ingredient) => ingredient.ratio)).toEqual([50, 50]);
+    expect(recipe.ingredients.map((ingredient) => ingredient.ratio)).toEqual([100, 100]);
     expect(recipe.resultHex).toBe("#FFFF00");
     expect(recipe.similarity).toBe(100);
     expect(recipe.quality).toBe("exact");
-    expect(recipe.measurement).toBe("ratio");
+    expect(recipe.measurement).toBe("intensity");
+  });
+
+  it("derives independent RGB intensities for an almost pure blue target", () => {
+    const [recipe] = findColorRecipes({ r: 0, g: 8, b: 255 }, "additive", 4);
+
+    expect(recipe.ingredients.map(({ name, ratio }) => ({ name, ratio }))).toEqual([
+      { name: "Hijau", ratio: 3 },
+      { name: "Biru", ratio: 100 },
+    ]);
+    expect(recipe.resultHex).toBe("#0008FF");
+    expect(recipe.similarity).toBe(100);
+  });
+
+  it("uses all required RGB channels without forcing them to total 100%", () => {
+    const [recipe] = findColorRecipes({ r: 12, g: 123, b: 192 }, "additive", 4);
+
+    expect(recipe.ingredients.map(({ name, ratio }) => ({ name, ratio }))).toEqual([
+      { name: "Merah", ratio: 5 },
+      { name: "Hijau", ratio: 48 },
+      { name: "Biru", ratio: 75 },
+    ]);
+    expect(recipe.resultHex).toBe("#0D7ABF");
+    expect(recipe.similarity).toBe(99);
   });
 
   it("finds magenta and yellow pigment as an exact red recipe", () => {
@@ -45,14 +68,13 @@ describe("findColorRecipes", () => {
     expect(recipe.quality).toBe("close");
   });
 
-  it("returns one ranked recipe per pair and respects the requested limit", () => {
-    const recipes = findColorRecipes({ r: 120, g: 80, b: 200 }, "additive", 3);
+  it("represents black as zero emitted light", () => {
+    const [recipe] = findColorRecipes({ r: 0, g: 0, b: 0 }, "additive", 1);
 
-    expect(recipes).toHaveLength(3);
-    expect(recipes[0].distance).toBeLessThanOrEqual(recipes[1].distance);
-    expect(recipes[1].distance).toBeLessThanOrEqual(recipes[2].distance);
-    expect(
-      new Set(recipes.map((recipe) => recipe.ingredients.map(({ name }) => name).join("+"))).size,
-    ).toBe(3);
+    expect(recipe.ingredients).toEqual([
+      { name: "Tanpa cahaya", color: { r: 0, g: 0, b: 0 }, ratio: 0 },
+    ]);
+    expect(recipe.resultHex).toBe("#000000");
+    expect(recipe.similarity).toBe(100);
   });
 });

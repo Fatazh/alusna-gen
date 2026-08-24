@@ -210,11 +210,11 @@ test("Brand Kit exposes usable export previews", async ({ page }) => {
   await expect(page.getByText('"brandName": "My Brand"', { exact: false })).toBeVisible();
 });
 
-test("Experiment applies a yellow light recipe and derives a CMYK target", async ({ page }) => {
+test("Experiment applies RGB intensities and derives a CMYK target", async ({ page }) => {
   await page.goto("/color-mixer/");
 
   await expect(page.getByRole("heading", { name: "Cari Resep Warna" })).toBeVisible();
-  await expect(page.getByText("Merah + Hijau", { exact: true })).toBeVisible();
+  await expect(page.getByText("Merah 100% · Hijau 100%", { exact: true })).toBeVisible();
   await expect(page.getByText("100% mirip", { exact: true }).first()).toBeVisible();
 
   await page.getByRole("button", { name: "Gunakan resep 1: Merah dan Hijau" }).click();
@@ -223,6 +223,13 @@ test("Experiment applies a yellow light recipe and derives a CMYK target", async
     "true",
   );
   await expect(page.getByText("#FFFF00", { exact: true }).last()).toBeVisible();
+
+  await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#0008FF");
+  await expect(page.getByText("Hijau 3% · Biru 100%", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hasil #0008FF", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Gunakan resep 1: Hijau dan Biru" }).click();
+  await expect(page.getByText("#0008FF", { exact: true }).last()).toBeVisible();
 
   await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#0C7BC0");
   await page.getByRole("button", { name: "Cat / tinta" }).click();

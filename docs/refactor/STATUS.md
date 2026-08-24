@@ -4,7 +4,7 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The Experiment CMYK consistency correction is complete and verified. Production launch
+The Experiment RGB and CMYK consistency corrections are complete and verified. Production launch
 configuration remains the next objective.
 
 ## Completed
@@ -111,6 +111,14 @@ configuration remains the next objective.
   produce `#0B7ABF` instead of four duplicate `#0000FF` approximations.
 - The full suite now has 125 passing tests across 18 files; browser coverage remains 26 required
   passing scenarios plus one intentionally skipped configured sponsor scenario.
+- Cahaya RGB now derives independent red, green, and blue channel intensities instead of ranking
+  normalized two-source blends.
+- Target `#0008FF` resolves to Hijau 3% plus Biru 100%, applies those intensities to the mixer, and
+  reproduces the exact target result.
+- Experiment labels weights as RGB intensity or CMYK coverage when those physical models are
+  active, while Average and Weighted retain the generic weight label.
+- The full suite now has 129 passing tests across 18 files; browser coverage remains 26 required
+  passing scenarios plus one intentionally skipped configured sponsor scenario.
 
 ## In progress
 
@@ -135,8 +143,8 @@ configuration remains the next objective.
 - Color-recipe similarity currently uses RGB distance rather than perceptual Delta E scoring.
 - Cat/Tinta recipes are idealized simulations; real pigments, opacity, substrate, and material
   chemistry can produce different results.
-- Additive recipe search is intentionally limited to two lights from a curated source catalog.
-  Cat/Tinta supports CMYK channel coverage but not manufacturer-specific pigment behavior.
+- RGB intensity is rounded to whole percentages, so arbitrary targets may differ by one or two
+  channel values; Cat/Tinta still does not model manufacturer-specific pigment behavior.
 
 ## Next task
 

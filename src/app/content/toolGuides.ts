@@ -41,10 +41,10 @@ export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
   },
   "/color-mixer": {
     overview:
-      "Color Mixer memperlihatkan hasil pencampuran warna dan dapat mencari resep untuk target. Gunakan model Cahaya RGB untuk pasangan sumber cahaya atau Cat/Tinta untuk formula cakupan Cyan, Magenta, Kuning, dan Hitam.",
+      "Color Mixer memperlihatkan hasil pencampuran warna dan dapat mencari formula untuk target. Gunakan Cahaya RGB untuk intensitas kanal Merah, Hijau, dan Biru, atau Cat/Tinta untuk cakupan Cyan, Magenta, Kuning, dan Hitam.",
     steps: [
-      "Pilih warna target untuk memperoleh rekomendasi bahan dan proporsi, atau tentukan warna sumber secara manual.",
-      "Pilih model campuran yang sesuai, lalu gunakan resep terdekat untuk memuat warna dan bobot ke eksperimen.",
+      "Pilih warna target untuk memperoleh intensitas RGB atau cakupan CMYK, atau tentukan warna sumber secara manual.",
+      "Pilih model campuran yang sesuai, lalu gunakan formula untuk memuat warna dan intensitas atau cakupannya ke eksperimen.",
       "Salin kode hasil dan bandingkan kembali terhadap warna sumber sebelum diterapkan.",
     ],
     useCases: ["Resep warna target", "Warna transisi", "Eksplorasi tint sederhana"],

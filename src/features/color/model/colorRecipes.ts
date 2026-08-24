@@ -15,20 +15,15 @@ export type ColorRecipe = {
   similarity: number;
   distance: number;
   quality: "exact" | "close" | "approximation";
-  measurement: "ratio" | "coverage";
+  measurement: "intensity" | "coverage";
 };
 
 type RecipeSource = { name: string; color: RGB };
 
-const ADDITIVE_SOURCES: readonly RecipeSource[] = [
+const RGB_SOURCES: readonly RecipeSource[] = [
   { name: "Merah", color: { r: 255, g: 0, b: 0 } },
   { name: "Hijau", color: { r: 0, g: 255, b: 0 } },
   { name: "Biru", color: { r: 0, g: 0, b: 255 } },
-  { name: "Cyan", color: { r: 0, g: 255, b: 255 } },
-  { name: "Magenta", color: { r: 255, g: 0, b: 255 } },
-  { name: "Putih", color: { r: 255, g: 255, b: 255 } },
-  { name: "Oranye", color: { r: 255, g: 128, b: 0 } },
-  { name: "Ungu", color: { r: 128, g: 0, b: 255 } },
 ];
 
 const CMYK_SOURCES = {
@@ -55,8 +50,7 @@ function scoreRecipe(distance: number): Pick<ColorRecipe, "similarity" | "qualit
 }
 
 /**
- * Finds two-light additive recipes or derives an idealized CMYK ink-coverage recipe.
- * Additive results retain only the best ratio per pair so adjacent ratios do not crowd the list.
+ * Derives independent RGB light intensities or an idealized CMYK ink-coverage recipe.
  */
 export function findColorRecipes(target: RGB, mode: ColorRecipeMode, limit = 5): ColorRecipe[] {
   if (mode === "subtractive") {
@@ -90,46 +84,33 @@ export function findColorRecipes(target: RGB, mode: ColorRecipeMode, limit = 5):
     ];
   }
 
-  const sources = ADDITIVE_SOURCES.filter((source) => colorDistance(source.color, target) > 12);
-  const recipes: ColorRecipe[] = [];
+  const channels = [target.r, target.g, target.b];
+  const ingredients = RGB_SOURCES.map((source, index) => ({
+    ...source,
+    ratio: Math.round((channels[index] / 255) * 100),
+  })).filter((ingredient) => ingredient.ratio > 0);
 
-  for (let firstIndex = 0; firstIndex < sources.length; firstIndex += 1) {
-    for (let secondIndex = firstIndex + 1; secondIndex < sources.length; secondIndex += 1) {
-      const first = sources[firstIndex];
-      const second = sources[secondIndex];
-      let best: ColorRecipe | null = null;
-
-      for (let firstRatio = 10; firstRatio <= 90; firstRatio += 5) {
-        const secondRatio = 100 - firstRatio;
-        const result = mixColors(
-          [
-            { color: first.color, weight: firstRatio },
-            { color: second.color, weight: secondRatio },
-          ],
-          mode,
-        );
-        const distance = colorDistance(result, target);
-        const score = scoreRecipe(distance);
-        const candidate: ColorRecipe = {
-          ingredients: [
-            { ...first, ratio: firstRatio },
-            { ...second, ratio: secondRatio },
-          ],
-          result,
-          resultHex: rgbToHex(result),
-          distance: Number(distance.toFixed(2)),
-          ...score,
-          measurement: "ratio",
-        };
-
-        if (!best || candidate.distance < best.distance) best = candidate;
-      }
-
-      if (best) recipes.push(best);
-    }
+  if (ingredients.length === 0) {
+    ingredients.push({ name: "Tanpa cahaya", color: { r: 0, g: 0, b: 0 }, ratio: 0 });
   }
 
-  return recipes
-    .sort((a, b) => a.distance - b.distance || b.similarity - a.similarity)
-    .slice(0, Math.max(1, limit));
+  const result = mixColors(
+    ingredients.map((ingredient) => ({
+      color: ingredient.color,
+      weight: ingredient.ratio / 20,
+    })),
+    "additive",
+  );
+  const distance = colorDistance(result, target);
+
+  const recipe: ColorRecipe = {
+    ingredients,
+    result,
+    resultHex: rgbToHex(result),
+    distance: Number(distance.toFixed(2)),
+    ...scoreRecipe(distance),
+    measurement: "intensity",
+  };
+
+  return [recipe].slice(0, Math.max(1, limit));
 }

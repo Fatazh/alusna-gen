@@ -262,6 +262,24 @@ describe("mixColors", () => {
       expect(v).toBeLessThanOrEqual(255);
     }
   });
+  it("additive weights behave as independent RGB light intensity", () => {
+    expect(
+      mixColors(
+        [
+          { color: { r: 0, g: 255, b: 0 }, weight: 0.15 },
+          { color: { r: 0, g: 0, b: 255 }, weight: 5 },
+        ],
+        "additive",
+      ),
+    ).toEqual({ r: 0, g: 8, b: 255 });
+  });
+  it("additive supports partial intensity from a single light", () => {
+    expect(mixColors([{ color: { r: 255, g: 0, b: 0 }, weight: 2.5 }], "additive")).toEqual({
+      r: 128,
+      g: 0,
+      b: 0,
+    });
+  });
 });
 
 describe("randomColor", () => {

@@ -31,7 +31,8 @@ const TARGET_PRESETS = [
 const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: string }> = {
   additive: {
     label: "Cahaya RGB",
-    description: "Untuk layar dan cahaya. Contoh: merah + hijau menghasilkan kuning.",
+    description:
+      "Formula intensitas kanal RGB. Setiap persentase berdiri sendiri dan tidak harus berjumlah 100%.",
   },
   subtractive: {
     label: "Cat / tinta",
@@ -136,7 +137,7 @@ export function ExperimentModule() {
         <Card>
           <CardHeader
             title="Cari Resep Warna"
-            subtitle="Pilih warna target untuk menemukan dua warna pembentuk terdekat"
+            subtitle="Pilih warna target untuk memperoleh formula RGB atau cakupan CMYK"
           />
           <CardBody className="space-y-5">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
@@ -247,9 +248,7 @@ export function ExperimentModule() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
-                          {recipe.measurement === "coverage"
-                            ? "Formula CMYK"
-                            : recipe.ingredients.map((ingredient) => ingredient.name).join(" + ")}
+                          {recipe.measurement === "coverage" ? "Formula CMYK" : "Formula RGB"}
                         </p>
                         <p
                           className="mt-1 font-mono text-[10px]"
@@ -257,7 +256,7 @@ export function ExperimentModule() {
                         >
                           {recipe.ingredients
                             .map((ingredient) => `${ingredient.name} ${ingredient.ratio}%`)
-                            .join(recipe.measurement === "coverage" ? " · " : " / ")}
+                            .join(" · ")}
                         </p>
                       </div>
                       <span
@@ -439,8 +438,18 @@ export function ExperimentModule() {
                       className="mb-1 flex items-center justify-between text-[10px]"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      <span>Bobot</span>
-                      <span className="font-mono">{slot.weight}</span>
+                      <span>
+                        {mode === "additive"
+                          ? "Intensitas"
+                          : mode === "subtractive"
+                            ? "Cakupan"
+                            : "Bobot"}
+                      </span>
+                      <span className="font-mono">
+                        {mode === "additive" || mode === "subtractive"
+                          ? `${Math.round(slot.weight * 20)}%`
+                          : slot.weight}
+                      </span>
                     </div>
                     <input
                       type="range"
