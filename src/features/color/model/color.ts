@@ -291,7 +291,7 @@ export function mixColors(
   mode: MixMode = "average",
 ): RGB {
   if (colors.length === 0) return { r: 0, g: 0, b: 0 };
-  if (colors.length === 1) return colors[0].color;
+  if (colors.length === 1 && mode !== "subtractive") return colors[0].color;
 
   const totalWeight = colors.reduce((acc, c) => acc + (c.weight ?? 1), 0) || 1;
 
@@ -303,22 +303,22 @@ export function mixColors(
         b: clamp((colors.reduce((a, c) => a + c.color.b * (c.weight ?? 1), 0) / totalWeight) * 2),
       };
     case "subtractive":
+      // Approximate ideal CMYK-style ink coverage over a white substrate.
+      // A weight of 0–5 maps to 0–100% coverage; an omitted weight means
+      // full coverage for backwards-compatible direct model calls.
+      const subtractiveChannel = (channel: keyof RGB) =>
+        clamp(
+          colors.reduce((transmittance, entry) => {
+            const coverage =
+              entry.weight === undefined ? 1 : clamp01(Math.max(0, entry.weight) / 5);
+            const pigmentAbsorption = 1 - entry.color[channel] / 255;
+            return transmittance * (1 - coverage * pigmentAbsorption);
+          }, 1) * 255,
+        );
       return {
-        r: clamp(
-          colors.reduce((a, c) => a * (c.color.r / 255) ** (c.weight ?? 1), 1) **
-            (1 / totalWeight) *
-            255,
-        ),
-        g: clamp(
-          colors.reduce((a, c) => a * (c.color.g / 255) ** (c.weight ?? 1), 1) **
-            (1 / totalWeight) *
-            255,
-        ),
-        b: clamp(
-          colors.reduce((a, c) => a * (c.color.b / 255) ** (c.weight ?? 1), 1) **
-            (1 / totalWeight) *
-            255,
-        ),
+        r: round(subtractiveChannel("r")),
+        g: round(subtractiveChannel("g")),
+        b: round(subtractiveChannel("b")),
       };
     case "weighted":
       return {

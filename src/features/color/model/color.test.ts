@@ -233,6 +233,25 @@ describe("mixColors", () => {
       expect(v).toBeLessThanOrEqual(255);
     }
   });
+  it("subtractive weights behave as CMYK-style coverage", () => {
+    const mix = mixColors(
+      [
+        { color: { r: 0, g: 255, b: 255 }, weight: 4.7 },
+        { color: { r: 255, g: 0, b: 255 }, weight: 1.8 },
+        { color: { r: 0, g: 0, b: 0 }, weight: 1.25 },
+      ],
+      "subtractive",
+    );
+
+    expect(mix).toEqual({ r: 11, g: 122, b: 191 });
+  });
+  it("subtractive supports partial coverage from a single pigment", () => {
+    expect(mixColors([{ color: { r: 0, g: 0, b: 0 }, weight: 2.5 }], "subtractive")).toEqual({
+      r: 128,
+      g: 128,
+      b: 128,
+    });
+  });
   it("additive stays within bounds", () => {
     const mix = mixColors(
       [{ color: { r: 200, g: 100, b: 50 } }, { color: { r: 50, g: 200, b: 150 } }],

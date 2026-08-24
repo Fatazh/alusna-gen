@@ -210,7 +210,7 @@ test("Brand Kit exposes usable export previews", async ({ page }) => {
   await expect(page.getByText('"brandName": "My Brand"', { exact: false })).toBeVisible();
 });
 
-test("Experiment finds and applies a yellow light recipe", async ({ page }) => {
+test("Experiment applies a yellow light recipe and derives a CMYK target", async ({ page }) => {
   await page.goto("/color-mixer/");
 
   await expect(page.getByRole("heading", { name: "Cari Resep Warna" })).toBeVisible();
@@ -224,8 +224,11 @@ test("Experiment finds and applies a yellow light recipe", async ({ page }) => {
   );
   await expect(page.getByText("#FFFF00", { exact: true }).last()).toBeVisible();
 
+  await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#0C7BC0");
   await page.getByRole("button", { name: "Cat / tinta" }).click();
-  await expect(page.getByText(/Tidak ada campuran dua pigmen dasar/)).toBeVisible();
+  await expect(page.getByText("Cyan 94% · Magenta 36% · Hitam 25%", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hasil #0B7ABF", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Formula ini memakai cakupan CMYK/)).toBeVisible();
 });
 
 test("legacy CIKP storage migrates to ALUSNA without deleting the rollback copy", async ({

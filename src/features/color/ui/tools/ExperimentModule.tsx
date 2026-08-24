@@ -35,7 +35,8 @@ const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: st
   },
   subtractive: {
     label: "Cat / tinta",
-    description: "Simulasi pigmen ideal. Hasil cat nyata dapat berbeda karena bahan dan opasitas.",
+    description:
+      "Formula cakupan CMYK ideal. Persentase tiap tinta berdiri sendiri dan tidak harus berjumlah 100%.",
   },
 };
 
@@ -232,23 +233,31 @@ export function ExperimentModule() {
             </div>
 
             {targetRecipes.length > 0 && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div
+                className={
+                  recipeMode === "subtractive" ? "grid gap-3" : "grid gap-3 sm:grid-cols-2"
+                }
+              >
                 {targetRecipes.map((recipe, index) => (
                   <article
-                    key={`${recipe.ingredients[0].name}-${recipe.ingredients[1].name}`}
+                    key={recipe.ingredients.map((ingredient) => ingredient.name).join("-")}
                     className="rounded-lg border p-4"
                     style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
-                          {recipe.ingredients[0].name} + {recipe.ingredients[1].name}
+                          {recipe.measurement === "coverage"
+                            ? "Formula CMYK"
+                            : recipe.ingredients.map((ingredient) => ingredient.name).join(" + ")}
                         </p>
                         <p
                           className="mt-1 font-mono text-[10px]"
                           style={{ color: "var(--text-muted)" }}
                         >
-                          {recipe.ingredients[0].ratio}% / {recipe.ingredients[1].ratio}%
+                          {recipe.ingredients
+                            .map((ingredient) => `${ingredient.name} ${ingredient.ratio}%`)
+                            .join(recipe.measurement === "coverage" ? " · " : " / ")}
                         </p>
                       </div>
                       <span
@@ -262,8 +271,11 @@ export function ExperimentModule() {
                       </span>
                     </div>
                     <div
-                      className="mt-3 grid grid-cols-[1fr_1fr_0.8fr] overflow-hidden rounded-md border"
-                      style={{ borderColor: "var(--border)" }}
+                      className="mt-3 grid overflow-hidden rounded-md border"
+                      style={{
+                        borderColor: "var(--border)",
+                        gridTemplateColumns: `${recipe.ingredients.map(() => "1fr").join(" ")} 0.8fr`,
+                      }}
                     >
                       {recipe.ingredients.map((ingredient) => (
                         <div
@@ -294,7 +306,7 @@ export function ExperimentModule() {
                           backgroundColor: "var(--accent)",
                           color: "var(--accent-contrast)",
                         }}
-                        aria-label={`Gunakan resep ${index + 1}: ${recipe.ingredients[0].name} dan ${recipe.ingredients[1].name}`}
+                        aria-label={`Gunakan resep ${index + 1}: ${recipe.ingredients.map((ingredient) => ingredient.name).join(" dan ")}`}
                       >
                         Gunakan resep
                       </button>
@@ -304,7 +316,7 @@ export function ExperimentModule() {
               </div>
             )}
 
-            {recipeMode === "subtractive" && targetRecipes[0]?.similarity < 90 && (
+            {recipeMode === "subtractive" && (
               <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
                 <Lightbulb
                   size={16}
@@ -312,9 +324,9 @@ export function ExperimentModule() {
                   aria-hidden="true"
                 />
                 <p className="text-[11px] leading-5 text-amber-800 dark:text-amber-300">
-                  Tidak ada campuran dua pigmen dasar yang mendekati target dengan baik. Warna ini
-                  kemungkinan perlu dipakai sebagai pigmen dasar, lalu disesuaikan dengan putih atau
-                  hitam. Simulasi layar bukan formula cat produksi.
+                  Formula ini memakai cakupan CMYK di atas dasar putih. Hasil layar mendekati
+                  target, tetapi cat atau tinta nyata tetap dapat berbeda karena pigmen, opasitas,
+                  dan bahan permukaan.
                 </p>
               </div>
             )}
@@ -434,7 +446,7 @@ export function ExperimentModule() {
                       type="range"
                       min={0}
                       max={5}
-                      step={0.1}
+                      step={0.05}
                       value={slot.weight}
                       onChange={(e) => updateSlot(slot.id, { weight: Number(e.target.value) })}
                       className="w-full"

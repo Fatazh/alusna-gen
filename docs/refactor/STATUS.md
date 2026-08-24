@@ -4,8 +4,8 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The Experiment color-recipe finder is complete and verified. Production launch configuration
-remains the next objective.
+The Experiment CMYK consistency correction is complete and verified. Production launch
+configuration remains the next objective.
 
 ## Completed
 
@@ -97,16 +97,20 @@ remains the next objective.
 - The final local gate passes with 118 unit and contract tests, 25 required browser scenarios,
   one intentionally skipped sponsor scenario, a production build, and 0 production dependency
   vulnerabilities.
-- Experiment can now rank two-color recipes for a target using separate Cahaya RGB and Cat/Tinta
-  simulation models, then load a selected recipe and its proportions into the existing mixer.
+- Experiment can now rank two-light recipes or derive one-to-four-channel CMYK coverage for a
+  target, then load the formula into the existing mixer.
 - The default yellow target resolves to 50% red plus 50% green light with 100% similarity.
 - Low-confidence pigment results display an explicit warning that the screen model is not a
   production paint formula.
-- Recipe search is framework-independent and covered by four unit tests; the full suite now has 122
-  passing tests across 18 files.
+- Recipe search is framework-independent and its focused coverage includes exact light recipes,
+  direct pigments, arbitrary CMYK targets, and partial single-pigment coverage.
 - Browser coverage now has 26 required passing scenarios plus one intentionally skipped configured
   sponsor scenario, including the complete yellow-recipe workflow.
 - The final production dependency audit still reports 0 vulnerabilities.
+- The reported `#0C7BC0` Cat/Tinta regression is fixed: Cyan 94%, Magenta 36%, and Hitam 25% now
+  produce `#0B7ABF` instead of four duplicate `#0000FF` approximations.
+- The full suite now has 125 passing tests across 18 files; browser coverage remains 26 required
+  passing scenarios plus one intentionally skipped configured sponsor scenario.
 
 ## In progress
 
@@ -131,8 +135,8 @@ remains the next objective.
 - Color-recipe similarity currently uses RGB distance rather than perceptual Delta E scoring.
 - Cat/Tinta recipes are idealized simulations; real pigments, opacity, substrate, and material
   chemistry can produce different results.
-- Recipe search is intentionally limited to two colors from a curated source catalog. Three-color
-  and manufacturer-specific pigment recipes require a separate product decision.
+- Additive recipe search is intentionally limited to two lights from a curated source catalog.
+  Cat/Tinta supports CMYK channel coverage but not manufacturer-specific pigment behavior.
 
 ## Next task
 
