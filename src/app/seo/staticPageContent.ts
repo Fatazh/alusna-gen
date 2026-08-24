@@ -1,6 +1,7 @@
 import { APP_BRAND } from "../../shared/config/brand.ts";
 import { getRelatedTools, getToolGuide } from "../content/toolGuides.ts";
 import { ENGLISH_SEO_PAGES, SEO_PAGES, type SeoPage } from "../router/routes.ts";
+import { RELEASE_NOTES } from "../trust/releaseNotes.ts";
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -14,9 +15,19 @@ export function createStaticPageContent(page: SeoPage): string {
       ? createHomeContent(page)
       : page.kind === "tool"
         ? createToolContent(page)
-        : `<h1>${escapeHtml(page.heading)}</h1><p>${escapeHtml(page.description)}</p>`;
+        : createTrustContent(page);
 
   return `<main id="static-seo-content"><article><p>${escapeHtml(APP_BRAND.name)} — ${escapeHtml(page.locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan)}</p>${content}</article></main>`;
+}
+
+function createTrustContent(page: Extract<SeoPage, { kind: "trust" }>): string {
+  const base = `<h1>${escapeHtml(page.heading)}</h1><p>${escapeHtml(page.description)}</p>`;
+  if (page.id !== "about") return base;
+
+  const release = RELEASE_NOTES[page.locale];
+  const items = release.items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  const heading = page.locale === "en" ? "Changelog" : "Catatan perubahan";
+  return `${base}<section><h2>${heading}</h2><p><strong>${escapeHtml(release.version)} — ${escapeHtml(release.title)}</strong></p><p>${escapeHtml(release.releasedAt)}</p><p>${escapeHtml(release.summary)}</p><ul>${items}</ul></section>`;
 }
 
 function createHomeContent(page: Extract<SeoPage, { kind: "home" }>): string {

@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { APP_BRAND } from "../../shared/config/brand";
 import { type Locale } from "../../shared/i18n";
 import { type TrustPage, type TrustPageId } from "../router/routes";
+import { RELEASE_NOTES } from "./releaseNotes";
 
 type SectionCopy = { title: string; body: string };
 type TrustCopy = Record<TrustPageId, SectionCopy[]>;
@@ -150,7 +151,7 @@ const COPY: Record<Locale, TrustCopy> = {
 };
 
 export function TrustPageView({ page }: { page: TrustPage }) {
-  const updated = page.locale === "en" ? "August 21, 2026" : "21 Agustus 2026";
+  const updated = page.locale === "en" ? "August 24, 2026" : "24 Agustus 2026";
   return (
     <article
       className="mx-auto max-w-4xl rounded-2xl border px-5 py-6 sm:px-8 sm:py-8"
@@ -173,9 +174,57 @@ export function TrustPageView({ page }: { page: TrustPage }) {
             <p>{section.body}</p>
           </Section>
         ))}
+        {page.id === "about" && <Changelog locale={page.locale} />}
         <ContactSection locale={page.locale} />
       </div>
     </article>
+  );
+}
+
+function Changelog({ locale }: { locale: Locale }) {
+  const release = RELEASE_NOTES[locale];
+  return (
+    <section aria-labelledby="release-notes-title" className="border-t pt-7 theme-border">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: "var(--accent)" }}
+          >
+            {locale === "en" ? "Current version" : "Versi saat ini"}
+          </p>
+          <h2
+            id="release-notes-title"
+            className="mt-2 text-base font-semibold"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {locale === "en" ? "Changelog" : "Catatan perubahan"}
+          </h2>
+        </div>
+        <span
+          className="rounded-full border px-3 py-1 font-mono text-xs font-bold"
+          style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+        >
+          {release.version}
+        </span>
+      </div>
+      <div className="mt-4 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+        <p className="font-semibold" style={{ color: "var(--text-primary)" }}>
+          {release.title} · {release.releasedAt}
+        </p>
+        <p className="mt-1">{release.summary}</p>
+        <ul className="mt-3 space-y-2">
+          {release.items.map((item) => (
+            <li key={item} className="flex gap-2">
+              <span aria-hidden="true" style={{ color: "var(--accent)" }}>
+                •
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { ENGLISH_HOME_PAGE, ENGLISH_SEO_PAGES, HOME_PAGE, SEO_PAGES } from "../router/routes";
+import {
+  ENGLISH_HOME_PAGE,
+  ENGLISH_SEO_PAGES,
+  findSeoPage,
+  HOME_PAGE,
+  SEO_PAGES,
+} from "../router/routes";
 import { createStaticPageContent } from "./staticPageContent";
 
 describe("static page content", () => {
@@ -26,5 +32,15 @@ describe("static page content", () => {
     expect(home).toContain('href="/en/color-mixer"');
     expect(tool).toContain("How to use");
     expect(tool).toContain('href="/en/contrast-checker"');
+  });
+
+  it("includes the current version and bilingual changelog in static About pages", () => {
+    const indonesian = createStaticPageContent(findSeoPage("/tentang"));
+    const english = createStaticPageContent(findSeoPage("/en/about"));
+
+    expect(indonesian).toContain("Catatan perubahan");
+    expect(indonesian).toContain("v1.0.0");
+    expect(english).toContain("Changelog");
+    expect(english).toContain("v1.0.0");
   });
 });

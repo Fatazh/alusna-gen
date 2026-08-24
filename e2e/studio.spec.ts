@@ -131,6 +131,19 @@ test.describe("trust and legal routes", () => {
   }
 });
 
+test("About exposes the v1.0.0 changelog in both languages", async ({ page }) => {
+  await page.goto("/tentang/");
+  await expect(page.getByText("v1.0.0", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catatan perubahan" })).toBeVisible();
+  await expect(page.getByText(/Rilis publik pertama/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Use English" }).click();
+  await expect(page).toHaveURL(/\/en\/about$/);
+  await expect(page.getByText("v1.0.0", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Changelog" })).toBeVisible();
+  await expect(page.getByText(/First public release/)).toBeVisible();
+});
+
 test("footer navigates between a tool and privacy information", async ({ page }) => {
   await page.goto("/contrast-checker/");
   await page.getByRole("link", { name: "Privasi", exact: true }).click();

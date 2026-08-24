@@ -4,8 +4,8 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The bilingual Indonesian/English rollout is complete and verified. Production launch configuration
-remains the next objective.
+The ALUSNA v1.0.0 release metadata and bilingual changelog are complete and verified. Production
+launch configuration remains the next objective.
 
 ## Completed
 
@@ -149,8 +149,11 @@ remains the next objective.
   guidance, and primary controls across the color, typography, design-system, and Brand Kit tools.
 - Runtime and built HTML set locale-specific language, title, canonical, structured data, reciprocal
   `hreflang` (`id`, `en`, and `x-default`), and bilingual sitemap alternatives.
-- Unit and contract coverage expanded to 135 passing tests; browser coverage includes bilingual
-  route switching and metadata behavior.
+- Unit and contract coverage expanded to 136 passing tests; browser coverage includes 28 required
+  passing scenarios plus one intentionally skipped configured-sponsor scenario.
+- ALUSNA is marked as the `v1.0.0` public release in package metadata and the bilingual About page.
+- The About changelog records the initial toolset, browser-local behavior, bilingual URLs, SEO
+  foundation, and pre-advertising trust pages; it is also emitted in static no-JavaScript HTML.
 
 ## In progress
 
