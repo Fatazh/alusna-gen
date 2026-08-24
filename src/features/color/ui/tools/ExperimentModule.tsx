@@ -11,6 +11,7 @@ import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../Swatch";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
+import { ColorRecipeEditor } from "./ColorRecipeEditor";
 
 type Slot = { id: number; hex: string; weight: number };
 
@@ -234,83 +235,14 @@ export function ExperimentModule() {
             </div>
 
             {targetRecipes.length > 0 && (
-              <div
-                className={
-                  recipeMode === "subtractive" ? "grid gap-3" : "grid gap-3 sm:grid-cols-2"
-                }
-              >
-                {targetRecipes.map((recipe, index) => (
-                  <article
-                    key={recipe.ingredients.map((ingredient) => ingredient.name).join("-")}
-                    className="rounded-lg border p-4"
-                    style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
-                          {recipe.measurement === "coverage" ? "Formula CMYK" : "Formula RGB"}
-                        </p>
-                        <p
-                          className="mt-1 font-mono text-[10px]"
-                          style={{ color: "var(--text-muted)" }}
-                        >
-                          {recipe.ingredients
-                            .map((ingredient) => `${ingredient.name} ${ingredient.ratio}%`)
-                            .join(" · ")}
-                        </p>
-                      </div>
-                      <span
-                        className="rounded-full px-2 py-1 text-[10px] font-semibold"
-                        style={{
-                          backgroundColor: "var(--chip-active-bg)",
-                          color: "var(--accent)",
-                        }}
-                      >
-                        {recipe.similarity}% mirip
-                      </span>
-                    </div>
-                    <div
-                      className="mt-3 grid overflow-hidden rounded-md border"
-                      style={{
-                        borderColor: "var(--border)",
-                        gridTemplateColumns: `${recipe.ingredients.map(() => "1fr").join(" ")} 0.8fr`,
-                      }}
-                    >
-                      {recipe.ingredients.map((ingredient) => (
-                        <div
-                          key={ingredient.name}
-                          className="h-12"
-                          style={{ backgroundColor: rgbToHex(ingredient.color) }}
-                          title={`${ingredient.name} ${ingredient.ratio}%`}
-                        />
-                      ))}
-                      <div
-                        className="h-12 border-l-2"
-                        style={{ backgroundColor: recipe.resultHex, borderColor: "var(--app-bg)" }}
-                        title={`Hasil ${recipe.resultHex}`}
-                      />
-                    </div>
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <span
-                        className="font-mono text-[10px]"
-                        style={{ color: "var(--text-muted)" }}
-                      >
-                        Hasil {recipe.resultHex}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => applyRecipe(recipe)}
-                        className="rounded-md px-2.5 py-1.5 text-[11px] font-bold"
-                        style={{
-                          backgroundColor: "var(--accent)",
-                          color: "var(--accent-contrast)",
-                        }}
-                        aria-label={`Gunakan resep ${index + 1}: ${recipe.ingredients.map((ingredient) => ingredient.name).join(" dan ")}`}
-                      >
-                        Gunakan resep
-                      </button>
-                    </div>
-                  </article>
+              <div className="grid gap-3">
+                {targetRecipes.map((recipe) => (
+                  <ColorRecipeEditor
+                    key={`${recipeMode}-${targetHex}`}
+                    target={targetRgb as RGB}
+                    recipe={recipe}
+                    onApply={applyRecipe}
+                  />
                 ))}
               </div>
             )}

@@ -44,8 +44,8 @@ export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
       "Color Mixer memperlihatkan hasil pencampuran warna dan dapat mencari formula untuk target. Gunakan Cahaya RGB untuk intensitas kanal Merah, Hijau, dan Biru, atau Cat/Tinta untuk cakupan Cyan, Magenta, Kuning, dan Hitam.",
     steps: [
       "Pilih warna target untuk memperoleh intensitas RGB atau cakupan CMYK, atau tentukan warna sumber secara manual.",
-      "Pilih model campuran yang sesuai, lalu gunakan formula untuk memuat warna dan intensitas atau cakupannya ke eksperimen.",
-      "Salin kode hasil dan bandingkan kembali terhadap warna sumber sebelum diterapkan.",
+      "Sesuaikan persentase pada slider atau input angka sambil memantau HEX dan skor kemiripan secara langsung.",
+      "Gunakan formula untuk memuatnya ke eksperimen, lalu salin kode hasil dan bandingkan kembali terhadap warna sumber.",
     ],
     useCases: ["Resep warna target", "Warna transisi", "Eksplorasi tint sederhana"],
     tips: [

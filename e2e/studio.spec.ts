@@ -217,7 +217,7 @@ test("Experiment applies RGB intensities and derives a CMYK target", async ({ pa
   await expect(page.getByText("Merah 100% · Hijau 100%", { exact: true })).toBeVisible();
   await expect(page.getByText("100% mirip", { exact: true }).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Gunakan resep 1: Merah dan Hijau" }).click();
+  await page.getByRole("button", { name: "Gunakan formula: Merah dan Hijau" }).click();
   await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -225,16 +225,31 @@ test("Experiment applies RGB intensities and derives a CMYK target", async ({ pa
   await expect(page.getByText("#FFFF00", { exact: true }).last()).toBeVisible();
 
   await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#0008FF");
-  await expect(page.getByText("Hijau 3% · Biru 100%", { exact: true })).toBeVisible();
-  await expect(page.getByText("Hasil #0008FF", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hijau 3.14% · Biru 100%", { exact: true })).toBeVisible();
+  await expect(page.getByText("#0008FF", { exact: true }).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Gunakan resep 1: Hijau dan Biru" }).click();
+  await page.getByRole("button", { name: "Gunakan formula: Hijau dan Biru" }).click();
   await expect(page.getByText("#0008FF", { exact: true }).last()).toBeVisible();
+
+  await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#040BD7");
+  await expect(
+    page.getByText("Merah 1.57% · Hijau 4.31% · Biru 84.31%", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("100% mirip", { exact: true }).first()).toBeVisible();
+
+  const blueIntensity = page.getByRole("spinbutton", { name: "Intensitas Biru (%)" });
+  await blueIntensity.fill("84");
+  await expect(page.getByText("#040BD6", { exact: true })).toBeVisible();
+  await expect(page.getByText("99% mirip", { exact: true })).toBeVisible();
+
+  await blueIntensity.fill("84.31");
+  await expect(page.getByText("#040BD7", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("100% mirip", { exact: true }).first()).toBeVisible();
 
   await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#0C7BC0");
   await page.getByRole("button", { name: "Cat / tinta" }).click();
   await expect(page.getByText("Cyan 94% · Magenta 36% · Hitam 25%", { exact: true })).toBeVisible();
-  await expect(page.getByText("Hasil #0B7ABF", { exact: true })).toBeVisible();
+  await expect(page.getByText("#0B7ABF", { exact: true })).toBeVisible();
   await expect(page.getByText(/Formula ini memakai cakupan CMYK/)).toBeVisible();
 });
 

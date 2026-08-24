@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findColorRecipes } from "./colorRecipes";
+import { evaluateColorRecipe, findColorRecipes } from "./colorRecipes";
 
 describe("findColorRecipes", () => {
   it("finds red and green light as an exact yellow recipe", () => {
@@ -17,7 +17,7 @@ describe("findColorRecipes", () => {
     const [recipe] = findColorRecipes({ r: 0, g: 8, b: 255 }, "additive", 4);
 
     expect(recipe.ingredients.map(({ name, ratio }) => ({ name, ratio }))).toEqual([
-      { name: "Hijau", ratio: 3 },
+      { name: "Hijau", ratio: 3.14 },
       { name: "Biru", ratio: 100 },
     ]);
     expect(recipe.resultHex).toBe("#0008FF");
@@ -28,12 +28,12 @@ describe("findColorRecipes", () => {
     const [recipe] = findColorRecipes({ r: 12, g: 123, b: 192 }, "additive", 4);
 
     expect(recipe.ingredients.map(({ name, ratio }) => ({ name, ratio }))).toEqual([
-      { name: "Merah", ratio: 5 },
-      { name: "Hijau", ratio: 48 },
-      { name: "Biru", ratio: 75 },
+      { name: "Merah", ratio: 4.71 },
+      { name: "Hijau", ratio: 48.24 },
+      { name: "Biru", ratio: 75.29 },
     ]);
-    expect(recipe.resultHex).toBe("#0D7ABF");
-    expect(recipe.similarity).toBe(99);
+    expect(recipe.resultHex).toBe("#0C7BC0");
+    expect(recipe.similarity).toBe(100);
   });
 
   it("finds magenta and yellow pigment as an exact red recipe", () => {
@@ -76,5 +76,31 @@ describe("findColorRecipes", () => {
     ]);
     expect(recipe.resultHex).toBe("#000000");
     expect(recipe.similarity).toBe(100);
+  });
+
+  it("re-evaluates a manually adjusted formula and clamps invalid percentages", () => {
+    const target = { r: 4, g: 11, b: 215 };
+    const [base] = findColorRecipes(target, "additive", 1);
+    const adjusted = evaluateColorRecipe(
+      target,
+      base.ingredients.map((ingredient) => ({
+        ...ingredient,
+        ratio: ingredient.name === "Biru" ? 84 : ingredient.ratio,
+      })),
+      "intensity",
+    );
+
+    expect(adjusted.resultHex).toBe("#040BD6");
+    expect(adjusted.similarity).toBe(99);
+
+    const clamped = evaluateColorRecipe(
+      target,
+      [
+        { name: "Merah", color: { r: 255, g: 0, b: 0 }, ratio: -10 },
+        { name: "Biru", color: { r: 0, g: 0, b: 255 }, ratio: 140 },
+      ],
+      "intensity",
+    );
+    expect(clamped.ingredients.map((ingredient) => ingredient.ratio)).toEqual([0, 100]);
   });
 });

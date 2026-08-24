@@ -49,6 +49,39 @@ function scoreRecipe(distance: number): Pick<ColorRecipe, "similarity" | "qualit
   };
 }
 
+function clampPercentage(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
+
+export function evaluateColorRecipe(
+  target: RGB,
+  ingredients: ColorRecipeIngredient[],
+  measurement: ColorRecipe["measurement"],
+): ColorRecipe {
+  const safeIngredients = ingredients.map((ingredient) => ({
+    ...ingredient,
+    ratio: clampPercentage(ingredient.ratio),
+  }));
+  const result = mixColors(
+    safeIngredients.map((ingredient) => ({
+      color: ingredient.color,
+      weight: ingredient.ratio / 20,
+    })),
+    measurement === "intensity" ? "additive" : "subtractive",
+  );
+  const distance = colorDistance(result, target);
+
+  return {
+    ingredients: safeIngredients,
+    result,
+    resultHex: rgbToHex(result),
+    distance: Number(distance.toFixed(2)),
+    ...scoreRecipe(distance),
+    measurement,
+  };
+}
+
 /**
  * Derives independent RGB light intensities or an idealized CMYK ink-coverage recipe.
  */
@@ -63,54 +96,20 @@ export function findColorRecipes(target: RGB, mode: ColorRecipeMode, limit = 5):
     if (ingredients.length === 0) {
       ingredients.push({ name: "Putih dasar", color: { r: 255, g: 255, b: 255 }, ratio: 0 });
     }
-    const result = mixColors(
-      ingredients.map((ingredient) => ({
-        color: ingredient.color,
-        weight: ingredient.ratio / 20,
-      })),
-      "subtractive",
-    );
-    const distance = colorDistance(result, target);
-
-    return [
-      {
-        ingredients,
-        result,
-        resultHex: rgbToHex(result),
-        distance: Number(distance.toFixed(2)),
-        ...scoreRecipe(distance),
-        measurement: "coverage",
-      },
-    ];
+    return [evaluateColorRecipe(target, ingredients, "coverage")];
   }
 
   const channels = [target.r, target.g, target.b];
   const ingredients = RGB_SOURCES.map((source, index) => ({
     ...source,
-    ratio: Math.round((channels[index] / 255) * 100),
+    ratio: Math.round((channels[index] / 255) * 10_000) / 100,
   })).filter((ingredient) => ingredient.ratio > 0);
 
   if (ingredients.length === 0) {
     ingredients.push({ name: "Tanpa cahaya", color: { r: 0, g: 0, b: 0 }, ratio: 0 });
   }
 
-  const result = mixColors(
-    ingredients.map((ingredient) => ({
-      color: ingredient.color,
-      weight: ingredient.ratio / 20,
-    })),
-    "additive",
-  );
-  const distance = colorDistance(result, target);
-
-  const recipe: ColorRecipe = {
-    ingredients,
-    result,
-    resultHex: rgbToHex(result),
-    distance: Number(distance.toFixed(2)),
-    ...scoreRecipe(distance),
-    measurement: "intensity",
-  };
+  const recipe = evaluateColorRecipe(target, ingredients, "intensity");
 
   return [recipe].slice(0, Math.max(1, limit));
 }
