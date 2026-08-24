@@ -4,8 +4,8 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The perceptual Experiment formula scoring correction is complete and verified. Production launch
-configuration remains the next objective.
+The Experiment formula HEX copy controls are complete and verified. Production launch configuration
+remains the next objective.
 
 ## Completed
 
@@ -135,6 +135,8 @@ configuration remains the next objective.
   `#2115C2` at `99% · Sangat dekat`.
 - The full suite now has 132 passing tests across 18 files; browser coverage remains 26 required
   passing scenarios plus one intentionally skipped configured sponsor scenario.
+- Every RGB or CMYK formula ingredient now displays its HEX code with a dedicated accessible copy
+  action; the calculated formula result also has its own copy action.
 
 ## In progress
 

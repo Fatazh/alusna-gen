@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
+import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { rgbToHex, type RGB } from "../../model/color";
 import {
   COLOR_RECIPE_QUALITY_LABELS,
@@ -66,22 +67,33 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
       <div className="mt-4 space-y-3">
         {adjustedRecipe.ingredients.map((ingredient, index) => (
           <div key={ingredient.name}>
-            <div className="flex items-center justify-between gap-3">
-              <label
-                htmlFor={`recipe-${recipe.measurement}-${ingredient.name}`}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                <span
-                  className="h-3 w-3 rounded-full border"
-                  style={{
-                    backgroundColor: rgbToHex(ingredient.color),
-                    borderColor: "var(--border)",
-                  }}
-                  aria-hidden="true"
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                <label
+                  htmlFor={`recipe-${recipe.measurement}-${ingredient.name}`}
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <span
+                    className="h-3 w-3 rounded-full border"
+                    style={{
+                      backgroundColor: rgbToHex(ingredient.color),
+                      borderColor: "var(--border)",
+                    }}
+                    aria-hidden="true"
+                  />
+                  {ingredient.name}
+                </label>
+                <code className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
+                  {rgbToHex(ingredient.color)}
+                </code>
+                <CopyButton
+                  value={rgbToHex(ingredient.color)}
+                  label="Salin"
+                  ariaLabel={`Salin HEX ${ingredient.name} ${rgbToHex(ingredient.color)}`}
+                  className="px-1.5 py-1 text-[10px]"
                 />
-                {ingredient.name}
-              </label>
+              </div>
               <div className="flex items-center gap-1">
                 <input
                   id={`recipe-${recipe.measurement}-${ingredient.name}`}
@@ -123,7 +135,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
         className="mt-4 flex items-center justify-between gap-3 rounded-md border p-3"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
       >
-        <div>
+        <div className="min-w-0">
           <p
             className="text-[10px] uppercase tracking-[0.12em]"
             style={{ color: "var(--text-muted)" }}
@@ -136,6 +148,12 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
             Jarak perceptual {adjustedRecipe.distance.toFixed(2)}
           </p>
+          <CopyButton
+            value={adjustedRecipe.resultHex}
+            label="Salin hasil"
+            ariaLabel={`Salin HEX hasil ${adjustedRecipe.resultHex}`}
+            className="mt-1 -ml-1.5 px-1.5 py-1 text-[10px]"
+          />
         </div>
         <div
           className="h-10 w-20 rounded-md border"

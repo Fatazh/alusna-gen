@@ -8,9 +8,10 @@ type CopyButtonProps = {
   value: string;
   className?: string;
   label?: string;
+  ariaLabel?: string;
 };
 
-export function CopyButton({ value, className, label }: CopyButtonProps) {
+export function CopyButton({ value, className, label, ariaLabel }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const { show } = useToast();
 
@@ -38,6 +39,7 @@ export function CopyButton({ value, className, label }: CopyButtonProps) {
       )}
       style={!copied ? { color: "var(--text-secondary)" } : undefined}
       title="Salin ke clipboard"
+      aria-label={ariaLabel}
     >
       {copied ? (
         <Check size={14} weight="bold" aria-hidden="true" />

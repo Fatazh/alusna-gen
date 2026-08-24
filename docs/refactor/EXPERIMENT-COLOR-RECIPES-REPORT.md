@@ -33,6 +33,8 @@ this task.
   channel exactly after rounding.
 - Let users adjust each RGB intensity or CMYK coverage with synchronized sliders and numeric inputs;
   recalculate the HEX result and similarity immediately, with a reset to the generated formula.
+- Display and copy the HEX code for every formula ingredient, with a separate copy action for the
+  calculated result so source colors and output are not conflated.
 - Model additive mixing as emitted-light intensity. A mixer weight from 0 to 5 maps to 0% to 100%,
   matching the existing control range and the recipe application flow.
 - Derive Cat/Tinta recipes from CMYK channel coverage. This supports one to four ingredients and
@@ -59,6 +61,8 @@ this task.
   all at 100% produces black, distance 45.59, and `9% · Berbeda jauh` instead of the misleading 55%.
 - Changing the same target regenerates Cyan 83%, Magenta 89%, and Hitam 24%, yielding `#2115C2` at
   `99% · Sangat dekat`.
+- Browser verification confirmed that Cyan, Magenta, and Hitam show `#00FFFF`, `#FF00FF`, and
+  `#000000`; activating Cyan's copy action shows the successful copied state and toast.
 - Browser checks passed at desktop and 390 x 844 mobile sizes with no document overflow or unnamed
   buttons.
 - Applying a recipe correctly loads one to four experiment slots, their intensity or coverage, and
@@ -84,7 +88,7 @@ this task.
 - The adjustable percentages represent an idealized screen-light or CMYK coverage model; manual
   changes can reduce similarity and are not a physical pigment recipe.
 - Cat/Tinta supports up to four CMYK channels but not manufacturer-specific pigments.
-- The lazy Experiment chunk is 7.26 kB gzip; the main entry remains effectively unchanged at 66.25
+- The lazy Experiment chunk is 7.36 kB gzip; the main entry remains effectively unchanged at 66.27
   kB gzip.
 
 ## Next planned task

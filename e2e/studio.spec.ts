@@ -249,6 +249,10 @@ test("Experiment applies RGB intensities and derives a CMYK target", async ({ pa
   await page.getByRole("textbox", { name: "Warna target", exact: true }).fill("#2115C1");
   await page.getByRole("button", { name: "Cat / tinta" }).click();
   await expect(page.getByText("Cyan 83% · Magenta 89% · Hitam 24%", { exact: true })).toBeVisible();
+  await expect(page.getByText("#00FFFF", { exact: true })).toBeVisible();
+  await expect(page.getByText("#FF00FF", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Salin HEX Cyan #00FFFF" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Salin HEX hasil #2115C2" })).toBeVisible();
 
   await page.getByRole("spinbutton", { name: "Cakupan Cyan (%)" }).fill("100");
   await page.getByRole("spinbutton", { name: "Cakupan Magenta (%)" }).fill("100");
