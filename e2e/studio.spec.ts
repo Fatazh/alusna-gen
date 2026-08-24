@@ -214,6 +214,14 @@ test("Experiment applies RGB intensities and derives a CMYK target", async ({ pa
   await page.goto("/color-mixer/");
 
   await expect(page.getByRole("heading", { name: "Cari Resep Warna" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Average" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
   await expect(page.getByText("Merah 100% · Hijau 100%", { exact: true })).toBeVisible();
   await expect(page.getByText("100% · Tepat", { exact: true }).first()).toBeVisible();
 

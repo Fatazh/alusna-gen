@@ -55,7 +55,7 @@ export function ExperimentModule() {
     { id: 1, hex: "#FF6B6B", weight: 1 },
     { id: 2, hex: "#4ECDC4", weight: 1 },
   ]);
-  const [mode, setMode] = useState<MixMode>("average");
+  const [mode, setMode] = useState<MixMode>("additive");
   const [targetHex, setTargetHex] = useState("#FFFF00");
   const [recipeMode, setRecipeMode] = useState<ColorRecipeMode>("additive");
   const [past, setPast] = useState<Slot[][]>([]);

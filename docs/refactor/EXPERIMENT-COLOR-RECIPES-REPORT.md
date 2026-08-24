@@ -35,6 +35,8 @@ this task.
   recalculate the HEX result and similarity immediately, with a reset to the generated formula.
 - Display and copy the HEX code for every formula ingredient, with a separate copy action for the
   calculated result so source colors and output are not conflated.
+- Default the manual Experiment Color mixer to Additive so its initial model matches the Cahaya RGB
+  recipe finder; Average remains available when the user explicitly wants arithmetic blending.
 - Model additive mixing as emitted-light intensity. A mixer weight from 0 to 5 maps to 0% to 100%,
   matching the existing control range and the recipe application flow.
 - Derive Cat/Tinta recipes from CMYK channel coverage. This supports one to four ingredients and
