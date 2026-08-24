@@ -10,6 +10,7 @@ import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
 import { useToast } from "../../../shared/ui/toastContext";
 import { TONE_PROFILES, type BrandKit } from "../model/brandKit";
 import { loadGoogleFont } from "../../typography";
+import { useLocale } from "../../../shared/i18n";
 
 // ---------------------------------------------------------------------------
 // Palette Tab
@@ -42,6 +43,7 @@ export function PaletteTab({
   setBackgroundOverride: (c: RGB | null) => void;
   setTextColorOverride: (c: RGB | null) => void;
 }) {
+  const { text } = useLocale();
   const { show } = useToast();
   const toneStyle = TONE_PROFILES[kit.tone].style;
   const savedColors = useStudio((s) => s.savedColors);
@@ -164,12 +166,18 @@ export function PaletteTab({
               </div>
               <div>
                 <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
-                  Sesuaikan Otomatis
+                  {text("Sesuaikan Otomatis", "Auto adjust")}
                 </div>
                 <div className="text-[10px]" style={{ color: "var(--text-secondary)" }}>
                   {autoAdjust
-                    ? "Mengubah warna akan menyesuaikan warna lain secara harmonis"
-                    : "Pilih warna bebas untuk setiap kolom — hanya tone yang disesuaikan"}
+                    ? text(
+                        "Mengubah warna akan menyesuaikan warna lain secara harmonis",
+                        "Changing one color will harmonize related colors",
+                      )
+                    : text(
+                        "Pilih warna bebas untuk setiap kolom — hanya tone yang disesuaikan",
+                        "Choose each color independently",
+                      )}
                 </div>
               </div>
             </div>
@@ -187,7 +195,7 @@ export function PaletteTab({
                 "relative h-6 w-11 rounded-full transition-colors duration-200 " +
                 (autoAdjust ? "bg-indigo-500" : "bg-zinc-400 dark:bg-zinc-700")
               }
-              aria-label="Toggle sesuaikan otomatis"
+              aria-label={text("Toggle sesuaikan otomatis", "Toggle automatic color adjustment")}
             >
               <span
                 className="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
@@ -201,11 +209,14 @@ export function PaletteTab({
       {/* Main Palette with Inline Color Pickers */}
       <Card>
         <CardHeader
-          title="Palette Utama"
+          title={text("Palette Utama", "Main Palette")}
           subtitle={
             autoAdjust
-              ? "Klik untuk copy HEX, atau gunakan tombol di bawah untuk pilih warna"
-              : "Pilih warna bebas untuk setiap kolom"
+              ? text(
+                  "Klik untuk copy HEX, atau gunakan tombol di bawah untuk pilih warna",
+                  "Click to copy HEX or use the button below to choose a color",
+                )
+              : text("Pilih warna bebas untuk setiap kolom", "Choose each color independently")
           }
         />
         <CardBody>
@@ -263,7 +274,7 @@ export function PaletteTab({
                         className="cursor-pointer rounded-md border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium text-indigo-700 transition hover:bg-indigo-500/20 dark:text-indigo-300"
                       >
                         <Palette size={13} className="mr-1 inline" aria-hidden="true" />
-                        Pilih Warna
+                        {text("Pilih Warna", "Choose color")}
                       </label>
                       <input
                         type="color"
@@ -288,7 +299,7 @@ export function PaletteTab({
                         style={{ color: "var(--text-muted)" }}
                       >
                         <LockSimple size={11} className="mr-1 inline" aria-hidden="true" />
-                        {autoAdjust ? "Otomatis" : "Manual"}
+                        {autoAdjust ? text("Otomatis", "Automatic") : "Manual"}
                       </span>
                     </div>
                   )}
@@ -303,8 +314,11 @@ export function PaletteTab({
       {savedColors.length > 0 && (
         <Card>
           <CardHeader
-            title="Pilih dari Palet Tersimpan"
-            subtitle="Klik untuk mengganti warna Primary"
+            title={text("Pilih dari Palet Tersimpan", "Choose from Saved Colors")}
+            subtitle={text(
+              "Klik untuk mengganti warna Primary",
+              "Choose a saved color to replace Primary",
+            )}
           />
           <CardBody>
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
@@ -341,7 +355,11 @@ export function PaletteTab({
             </div>
             <div className="mt-3 flex items-center gap-2">
               <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                {savedColors.length} warna tersimpan — pilih untuk Primary
+                {savedColors.length}{" "}
+                {text(
+                  "warna tersimpan — pilih untuk Primary",
+                  "saved colors — choose one for Primary",
+                )}
               </span>
             </div>
           </CardBody>
@@ -350,7 +368,13 @@ export function PaletteTab({
 
       {/* Color Harmony Suggestions */}
       <Card>
-        <CardHeader title="Saran Harmoni" subtitle="Klik untuk mengganti warna secondary/accent" />
+        <CardHeader
+          title={text("Saran Harmoni", "Harmony Suggestions")}
+          subtitle={text(
+            "Klik untuk mengganti warna secondary/accent",
+            "Choose a suggestion for Secondary or Accent",
+          )}
+        />
         <CardBody>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {[

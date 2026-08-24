@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { PUBLIC_PAGES } from "./src/app/router/routes.ts";
+import { findAlternatePage, PUBLIC_PAGES } from "./src/app/router/routes.ts";
 import { createStaticPageContent } from "./src/app/seo/staticPageContent.ts";
 import { APP_BRAND } from "./src/shared/config/brand.ts";
 
@@ -19,6 +19,10 @@ function staticSeoPages(siteUrl: string): Plugin {
 
       const renderPage = (page: (typeof PUBLIC_PAGES)[number]) => {
         const canonical = origin ? `${origin}${page.path}` : "";
+        const alternate = findAlternatePage(page);
+        const alternateUrl = origin ? `${origin}${alternate.path}` : "";
+        const idUrl = page.locale === "id" ? canonical : alternateUrl;
+        const enUrl = page.locale === "en" ? canonical : alternateUrl;
         const socialMeta = [
           `<meta property="og:type" content="website">`,
           `<meta property="og:site_name" content="${escapeHtml(APP_BRAND.name)}">`,
@@ -27,10 +31,14 @@ function staticSeoPages(siteUrl: string): Plugin {
           canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}">` : "",
           `<meta name="twitter:card" content="summary">`,
           canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">` : "",
+          idUrl ? `<link rel="alternate" hreflang="id" href="${escapeHtml(idUrl)}">` : "",
+          enUrl ? `<link rel="alternate" hreflang="en" href="${escapeHtml(enUrl)}">` : "",
+          idUrl ? `<link rel="alternate" hreflang="x-default" href="${escapeHtml(idUrl)}">` : "",
         ]
           .filter(Boolean)
           .join("\n        ");
         return source
+          .replace(/<html lang="[^"]+">/, `<html lang="${page.locale}">`)
           .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(page.title)}</title>`)
           .replace(
             /<meta name="description"[^>]*>/,
@@ -58,13 +66,16 @@ function staticSeoPages(siteUrl: string): Plugin {
         source: `User-agent: *\nAllow: /${sitemapLine}\n`,
       });
       if (origin) {
-        const urls = PUBLIC_PAGES.map(
-          (page) => `  <url><loc>${escapeHtml(`${origin}${page.path}`)}</loc></url>`,
-        ).join("\n");
+        const urls = PUBLIC_PAGES.map((page) => {
+          const alternate = findAlternatePage(page);
+          const idPage = page.locale === "id" ? page : alternate;
+          const enPage = page.locale === "en" ? page : alternate;
+          return `  <url><loc>${escapeHtml(`${origin}${page.path}`)}</loc><xhtml:link rel="alternate" hreflang="id" href="${escapeHtml(`${origin}${idPage.path}`)}"/><xhtml:link rel="alternate" hreflang="en" href="${escapeHtml(`${origin}${enPage.path}`)}"/><xhtml:link rel="alternate" hreflang="x-default" href="${escapeHtml(`${origin}${idPage.path}`)}"/></url>`;
+        }).join("\n");
         this.emitFile({
           type: "asset",
           fileName: "sitemap.xml",
-          source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+          source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`,
         });
       }
     },

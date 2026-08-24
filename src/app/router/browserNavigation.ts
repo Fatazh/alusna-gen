@@ -8,7 +8,9 @@ export function isTopModule(value: string | null): value is TopModule {
 
 export function resolveInitialPage(pathname: string, search: string): SeoPage {
   const legacyModule = new URLSearchParams(search).get("m");
-  if (pathname === "/" && isTopModule(legacyModule)) return findPageForModule(legacyModule);
+  if ((pathname === "/" || pathname === "/en") && isTopModule(legacyModule)) {
+    return findPageForModule(legacyModule, "pattern", pathname === "/en" ? "en" : "id");
+  }
   return findSeoPage(pathname);
 }
 

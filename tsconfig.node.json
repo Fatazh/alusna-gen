@@ -18,6 +18,7 @@
     "src/app/content/toolGuides.ts",
     "src/app/router/routes.ts",
     "src/app/seo/staticPageContent.ts",
-    "src/shared/config/brand.ts"
+    "src/shared/config/brand.ts",
+    "src/shared/i18n/locale.ts"
   ]
 }

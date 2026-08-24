@@ -39,4 +39,12 @@ describe("SEO page routing", () => {
     expect(isHomePage(findSeoPage("/"))).toBe(true);
     expect(findSeoPage("/unknown").path).toBe("/");
   });
+
+  it("keeps Indonesian URLs and maps every page to an indexable English alternative", () => {
+    expect(findSeoPage("/color-mixer").locale).toBe("id");
+    expect(findSeoPage("/en/color-mixer").locale).toBe("en");
+    expect(findSeoPage("/en/privacy").path).toBe("/en/privacy");
+    expect(findSeoPage("/en/unknown").path).toBe("/en");
+    expect(findPageForModule("brand", "pattern", "en").path).toBe("/en/brand-kit-generator");
+  });
 });

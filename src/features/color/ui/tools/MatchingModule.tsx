@@ -15,6 +15,7 @@ import { Swatch, ColorDetail } from "../Swatch";
 import { ColorPicker } from "../ColorPicker";
 import { cn } from "../../../../shared/lib/cn";
 import { useToast } from "../../../../shared/ui/toastContext";
+import { useLocale } from "../../../../shared/i18n";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -34,6 +35,7 @@ type View = "smart" | "classic";
 // Main component
 // ---------------------------------------------------------------------------
 export function MatchingModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
@@ -62,10 +64,10 @@ export function MatchingModule() {
         {/* View switcher */}
         <div className="flex items-center gap-2">
           <ViewTab active={view === "smart"} onClick={() => setView("smart")}>
-            Rekomendasi Cerdas
+            {text("Rekomendasi Cerdas", "Smart recommendations")}
           </ViewTab>
           <ViewTab active={view === "classic"} onClick={() => setView("classic")}>
-            Harmoni Klasik
+            {text("Harmoni Klasik", "Classic harmony")}
           </ViewTab>
         </div>
 
@@ -93,7 +95,10 @@ export function MatchingModule() {
 
         {/* Color picker (shared by both views) */}
         <Card>
-          <CardHeader title="Warna Primer" subtitle="Pilih atau ketik nama warna" />
+          <CardHeader
+            title={text("Warna Primer", "Primary color")}
+            subtitle={text("Pilih atau ketik nama warna", "Choose a color or type its name")}
+          />
           <CardBody>
             <ColorPicker
               rgb={selectedColor}
@@ -108,7 +113,7 @@ export function MatchingModule() {
 
       {/* ── Right column — detail panel ── */}
       <Card className="h-fit">
-        <CardHeader title="Detail Warna Aktif" />
+        <CardHeader title={text("Detail Warna Aktif", "Active color details")} />
         <CardBody className="space-y-4">
           <Swatch rgb={selectedColor} size="lg" showCode={false} />
           <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />
@@ -117,7 +122,7 @@ export function MatchingModule() {
             onClick={() => saveColor(selectedColor, getColorName(selectedColor).label)}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
           >
-            Simpan ke palet
+            {text("Simpan ke palet", "Save to palette")}
           </button>
         </CardBody>
       </Card>
@@ -139,12 +144,19 @@ function SmartView({
   onSelect: (rgb: RGB) => void;
   onSave: (rgb: RGB) => void;
 }) {
+  const { text } = useLocale();
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader
-          title="Matching Color — Rekomendasi Cerdas"
-          subtitle="Pasangan disusun dari dominan → pendukung → cadangan"
+          title={text(
+            "Matching Color — Rekomendasi Cerdas",
+            "Color Matching — Smart Recommendations",
+          )}
+          subtitle={text(
+            "Pasangan disusun dari dominan → pendukung → cadangan",
+            "Pairs are ordered from dominant to supporting and fallback roles",
+          )}
         />
         <CardBody className="space-y-5">
           {/* Ranked grid */}
@@ -172,6 +184,7 @@ function PairCard({
   onSelect: (rgb: RGB) => void;
   onSave: (rgb: RGB) => void;
 }) {
+  const { text } = useLocale();
   const meta = ROLE_META[pair.role];
   const hex = rgbToHex(pair.rgb);
   const textCol = bestTextOn(pair.rgb);
@@ -202,16 +215,16 @@ function PairCard({
           type="button"
           onClick={() => onSelect(pair.rgb)}
           className="absolute inset-0"
-          aria-label={`Pilih ${colorInfo.label}`}
-          title={`Pilih ${colorInfo.label}`}
+          aria-label={`${text("Pilih", "Choose")} ${colorInfo.label}`}
+          title={`${text("Pilih", "Choose")} ${colorInfo.label}`}
         />
         <button
           type="button"
           onClick={copyHex}
           className="absolute bottom-2 left-2 right-2 cursor-pointer text-left font-mono text-[9px] leading-tight transition hover:underline"
           style={{ color: textCol }}
-          aria-label={`Salin ${hex}`}
-          title="Klik untuk salin HEX"
+          aria-label={`${text("Salin", "Copy")} ${hex}`}
+          title={text("Klik untuk salin HEX", "Click to copy HEX")}
         >
           {hex}
         </button>
@@ -237,7 +250,7 @@ function PairCard({
             onClick={() => onSave(pair.rgb)}
             className="text-[10px] transition"
             style={{ color: "var(--text-muted)" }}
-            title="Simpan ke palet"
+            title={text("Simpan ke palet", "Save to palette")}
           >
             + simpan
           </button>
@@ -260,6 +273,7 @@ function PairCard({
 
 // Mini UI preview showing the palette in action
 function PalettePreview({ primary, pairs }: { primary: RGB; pairs: ColorPair[] }) {
+  const { text } = useLocale();
   const dominan = pairs.find((p) => p.role === "dominan")?.rgb ?? primary;
   const aksen = pairs.find((p) => p.role === "aksen")?.rgb ?? primary;
   const netral = pairs.find((p) => p.role === "netral")?.rgb ?? primary;
@@ -290,10 +304,13 @@ function PalettePreview({ primary, pairs }: { primary: RGB; pairs: ColorPair[] }
         {/* Heading */}
         <div>
           <p className="text-xl font-bold leading-tight" style={{ color: dominanHex }}>
-            Judul Halaman
+            {text("Judul Halaman", "Page title")}
           </p>
           <p className="mt-1 text-sm" style={{ color: teksHex }}>
-            Ini adalah contoh teks paragraf menggunakan palet yang telah dipilih.
+            {text(
+              "Ini adalah contoh teks paragraf menggunakan palet yang telah dipilih.",
+              "This is sample paragraph text using the selected palette.",
+            )}
           </p>
         </div>
 
@@ -332,7 +349,7 @@ function PalettePreview({ primary, pairs }: { primary: RGB; pairs: ColorPair[] }
         {/* Contrast info bar */}
         <div className="rounded-lg px-3 py-2" style={{ backgroundColor: primaryHex }}>
           <p className="text-[11px]" style={{ color: teksHex }}>
-            Kontras teks pada primary: {contrast.toFixed(2)} ·{" "}
+            {text("Kontras teks pada primary", "Text contrast on primary")}: {contrast.toFixed(2)} ·{" "}
             <span className="font-semibold">{rating}</span>
           </p>
         </div>
@@ -359,12 +376,16 @@ function ClassicView({
   onSelect: (rgb: RGB) => void;
   onSave: (rgb: RGB) => void;
 }) {
+  const { text } = useLocale();
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader
-          title="Matching Color — Harmoni Klasik"
-          subtitle="Pilih tipe relasi lalu klik warna untuk memakainya"
+          title={text("Matching Color — Harmoni Klasik", "Color Matching — Classic Harmony")}
+          subtitle={text(
+            "Pilih tipe relasi lalu klik warna untuk memakainya",
+            "Choose a relationship, then select a color to use it",
+          )}
         />
         <CardBody className="space-y-5">
           {/* Harmony type selector */}
@@ -412,6 +433,7 @@ function ClassicView({
 }
 
 function ClassicContrastPreview({ colors }: { colors: RGB[] }) {
+  const { text } = useLocale();
   if (colors.length < 2) return null;
   const bg = colors[0];
   const fg = colors[1];
@@ -421,7 +443,7 @@ function ClassicContrastPreview({ colors }: { colors: RGB[] }) {
   return (
     <div className="rounded-xl p-4" style={{ backgroundColor: rgbToHex(bg) }}>
       <p className="text-base font-semibold" style={{ color: rgbToHex(fg) }}>
-        Contoh teks dengan padanan warna
+        {text("Contoh teks dengan padanan warna", "Sample text with matching colors")}
       </p>
       <p className="mt-1 text-xs" style={{ color: rgbToHex(fg) }}>
         Kontras: {ratio.toFixed(2)} · {rating}

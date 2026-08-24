@@ -10,6 +10,7 @@ import {
 } from "../model/color";
 import { searchColorNames } from "../model/colorNames";
 import { bestTextOn } from "../model/color";
+import { useLocale } from "../../../shared/i18n";
 
 type ColorPickerProps = {
   rgb: RGB;
@@ -28,6 +29,7 @@ export function ColorPicker({
   onAlphaChange,
   showAlpha = false,
 }: ColorPickerProps) {
+  const { text } = useLocale();
   const pickerId = useId();
   const hsl = rgbToHsl(rgb);
   const hsv = rgbToHsv(rgb);
@@ -80,7 +82,7 @@ export function ColorPicker({
             onRgbChange({ r, g, b });
           }}
           className="h-12 w-14 shrink-0 rounded-xl"
-          aria-label="Pemilih warna"
+          aria-label={text("Pemilih warna", "Color picker")}
         />
         <div className="flex-1">
           <label
@@ -88,7 +90,7 @@ export function ColorPicker({
             className="mb-1 block text-[11px] font-medium"
             style={{ color: "var(--text-muted)" }}
           >
-            Kode HEX
+            {text("Kode HEX", "HEX code")}
           </label>
           <input
             id={`${pickerId}-hex`}
@@ -149,9 +151,9 @@ export function ColorPicker({
               ? { borderColor: "var(--input-border)", color: "var(--text-secondary)" }
               : undefined
           }
-          title="Cari warna berdasarkan nama"
+          title={text("Cari warna berdasarkan nama", "Search colors by name")}
         >
-          Cari nama
+          {text("Cari nama", "Search name")}
         </button>
 
         {/* Random color */}
@@ -160,9 +162,9 @@ export function ColorPicker({
           onClick={() => onRgbChange(randomColor())}
           className="shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition"
           style={{ borderColor: "var(--input-border)", color: "var(--text-secondary)" }}
-          title="Warna acak"
+          title={text("Warna acak", "Random color")}
         >
-          Acak
+          {text("Acak", "Random")}
         </button>
 
         {/* EyeDropper (Chromium-only) */}
@@ -185,9 +187,9 @@ export function ColorPicker({
             }}
             className="shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition"
             style={{ borderColor: "var(--input-border)", color: "var(--text-secondary)" }}
-            title="Ambil warna dari layar"
+            title={text("Ambil warna dari layar", "Pick a color from the screen")}
           >
-            Pipet
+            {text("Pipet", "Eyedropper")}
           </button>
         )}
       </div>
@@ -201,7 +203,10 @@ export function ColorPicker({
           <input
             type="text"
             autoFocus
-            placeholder="Ketik nama warna... (contoh: crimson, teal, gold)"
+            placeholder={text(
+              "Ketik nama warna... (contoh: crimson, teal, gold)",
+              "Type a color name... (for example: crimson, teal, gold)",
+            )}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
@@ -217,7 +222,7 @@ export function ColorPicker({
                 className="col-span-full py-3 text-center text-xs"
                 style={{ color: "var(--text-muted)" }}
               >
-                Tidak ada warna yang cocok
+                {text("Tidak ada warna yang cocok", "No matching colors")}
               </p>
             )}
             {searchResults.map((r) => {
@@ -249,7 +254,8 @@ export function ColorPicker({
           </div>
           {!query && (
             <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-              {searchResults.length} warna tersedia — ketik untuk filter
+              {searchResults.length}{" "}
+              {text("warna tersedia — ketik untuk filter", "colors available — type to filter")}
             </p>
           )}
         </div>

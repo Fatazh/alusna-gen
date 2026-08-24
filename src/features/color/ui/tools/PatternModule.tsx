@@ -9,6 +9,7 @@ import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { ColorDetail } from "../Swatch";
+import { useLocale } from "../../../../shared/i18n";
 
 const WORKSPACE_PALETTES = [
   { name: "ALUSNA", colors: ["#1E40AF", "#D81B60", "#F2B705", "#F2F4F7", "#111111"] },
@@ -16,6 +17,7 @@ const WORKSPACE_PALETTES = [
 ];
 
 export function PatternModule() {
+  const { text } = useLocale();
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const setSelectedAlpha = useStudio((s) => s.setSelectedAlpha);
   const selectedColor = useStudio((s) => s.selectedColor);
@@ -154,7 +156,7 @@ export function PatternModule() {
                       className="mt-0.5 block text-[10px]"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      {palette.colors.length} warna terkurasi
+                      {palette.colors.length} {text("warna terkurasi", "curated colors")}
                     </span>
                   </span>
                   <span
@@ -193,7 +195,7 @@ export function PatternModule() {
               className="mt-3 text-center text-[10px] leading-4"
               style={{ color: "var(--text-muted)" }}
             >
-              Warna yang dikunci tetap dipertahankan.
+              {text("Warna yang dikunci tetap dipertahankan.", "Locked colors are preserved.")}
             </p>
           </div>
         </aside>
@@ -222,7 +224,7 @@ export function PatternModule() {
                       backgroundColor: hex,
                       boxShadow: selected ? "inset 0 0 0 3px var(--accent)" : undefined,
                     }}
-                    aria-label={`Pilih ${info.label} ${hex}`}
+                    aria-label={`${text("Pilih", "Choose")} ${info.label} ${hex}`}
                   >
                     <span
                       className="absolute left-4 top-4 font-mono text-[10px] font-semibold"
@@ -259,7 +261,11 @@ export function PatternModule() {
                           borderColor: locked.has(index) ? "var(--accent)" : "var(--border)",
                           color: locked.has(index) ? "var(--accent)" : "var(--text-secondary)",
                         }}
-                        aria-label={locked.has(index) ? `Buka kunci ${hex}` : `Kunci ${hex}`}
+                        aria-label={
+                          locked.has(index)
+                            ? `${text("Buka kunci", "Unlock")} ${hex}`
+                            : `${text("Kunci", "Lock")} ${hex}`
+                        }
                       >
                         {locked.has(index) ? (
                           <LockSimple size={15} weight="fill" />
@@ -272,7 +278,7 @@ export function PatternModule() {
                         onClick={() => saveColor(rgb, info.label)}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition"
                         style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-                        aria-label={`Simpan ${hex}`}
+                        aria-label={`${text("Simpan", "Save")} ${hex}`}
                       >
                         <Plus size={15} />
                       </button>
@@ -298,14 +304,17 @@ export function PatternModule() {
                     Saved colors
                   </h3>
                   <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
-                    Klik warna untuk memuatnya ke inspector.
+                    {text(
+                      "Klik warna untuk memuatnya ke inspector.",
+                      "Choose a color to load it into the inspector.",
+                    )}
                   </p>
                 </div>
                 <span
                   className="inline-flex items-center gap-1 text-[11px] font-semibold"
                   style={{ color: "var(--accent)" }}
                 >
-                  {savedColors.length} tersimpan <ArrowRight size={13} />
+                  {savedColors.length} {text("tersimpan", "saved")} <ArrowRight size={13} />
                 </span>
               </div>
               <div
@@ -319,7 +328,7 @@ export function PatternModule() {
                     onClick={() => selectColor(color.rgb)}
                     className="group relative min-w-16 flex-1"
                     style={{ backgroundColor: rgbToHex(color.rgb) }}
-                    aria-label={`Pilih warna tersimpan ${color.name}`}
+                    aria-label={`${text("Pilih warna tersimpan", "Choose saved color")} ${color.name}`}
                   >
                     <span className="absolute inset-x-0 bottom-0 truncate bg-black/45 px-2 py-1 font-mono text-[9px] text-white opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
                       {rgbToHex(color.rgb)}
@@ -356,7 +365,7 @@ export function PatternModule() {
                 className="text-base font-bold tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
-                Inspector warna aktif
+                {text("Inspector warna aktif", "Active color inspector")}
               </h3>
               <div className="mt-4">
                 <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />

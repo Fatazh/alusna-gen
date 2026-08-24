@@ -9,7 +9,8 @@ export function ToolGuideView({
   onNavigate: (path: string) => void;
 }) {
   const guide = getToolGuide(page);
-  const relatedTools = getRelatedTools(guide);
+  const relatedTools = getRelatedTools(guide, page.locale);
+  const english = page.locale === "en";
 
   return (
     <article
@@ -19,10 +20,10 @@ export function ToolGuideView({
     >
       <header className="max-w-4xl">
         <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
-          Panduan praktis
+          {english ? "Practical guide" : "Panduan praktis"}
         </p>
         <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>
-          Cara menggunakan {page.heading}
+          {english ? "How to use" : "Cara menggunakan"} {page.heading}
         </h2>
         <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
           {guide.overview}
@@ -32,7 +33,7 @@ export function ToolGuideView({
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section aria-labelledby="tool-guide-steps">
           <h3 id="tool-guide-steps" className="text-base font-semibold theme-text">
-            Langkah penggunaan
+            {english ? "How to use it" : "Langkah penggunaan"}
           </h3>
           <ol className="mt-3 space-y-3">
             {guide.steps.map((step, index) => (
@@ -50,14 +51,17 @@ export function ToolGuideView({
         </section>
 
         <div className="space-y-5">
-          <GuideList title="Cocok digunakan untuk" items={guide.useCases} />
-          <GuideList title="Catatan penting" items={guide.tips} />
+          <GuideList
+            title={english ? "Best used for" : "Cocok digunakan untuk"}
+            items={guide.useCases}
+          />
+          <GuideList title={english ? "Important notes" : "Catatan penting"} items={guide.tips} />
         </div>
       </div>
 
       <section aria-labelledby="related-tools-title" className="border-t pt-6 theme-border">
         <h3 id="related-tools-title" className="text-base font-semibold theme-text">
-          Lanjutkan dengan alat terkait
+          {english ? "Continue with related tools" : "Lanjutkan dengan alat terkait"}
         </h3>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {relatedTools.map((related) => (

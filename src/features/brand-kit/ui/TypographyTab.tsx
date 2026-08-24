@@ -5,6 +5,7 @@ import { bestTextOn, rgbToHex } from "../../color";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
 import { type BrandKit } from "../model/brandKit";
 import { loadGoogleFont } from "../../typography";
+import { useLocale } from "../../../shared/i18n";
 
 type FontOption = {
   family: string;
@@ -67,6 +68,7 @@ export function TypographyTab({
   onSelectBody,
   onSelectMono,
 }: TypographyTabProps) {
+  const { text } = useLocale();
   const uploadedFonts = useStudio((state) => state.uploadedFonts);
   const uploadedFamilies = useMemo(
     () => new Set(uploadedFonts.map((font) => font.family)),
@@ -93,8 +95,11 @@ export function TypographyTab({
     <div className="space-y-4 animate-fade-in">
       <Card>
         <CardHeader
-          title="Live Preview Tipografi"
-          subtitle="Pilihan font langsung diterapkan ke Brand Kit dan seluruh hasil export"
+          title={text("Live Preview Tipografi", "Live Typography Preview")}
+          subtitle={text(
+            "Pilihan font langsung diterapkan ke Brand Kit dan seluruh hasil export",
+            "Font choices are applied to the Brand Kit and every export",
+          )}
         />
         <CardBody>
           <div
@@ -115,7 +120,11 @@ export function TypographyTab({
                 className="mt-2 text-sm opacity-80"
                 style={{ fontFamily: `'${kit.bodyFont}', sans-serif` }}
               >
-                {kit.tagline || "Identitas brand yang konsisten dan mudah dikenali"}
+                {kit.tagline ||
+                  text(
+                    "Identitas brand yang konsisten dan mudah dikenali",
+                    "A consistent and recognizable brand identity",
+                  )}
               </div>
             </div>
             <div
@@ -129,8 +138,10 @@ export function TypographyTab({
                 className="text-sm leading-relaxed"
                 style={{ fontFamily: `'${kit.bodyFont}', sans-serif` }}
               >
-                Tipografi body digunakan untuk paragraf, deskripsi produk, dan komunikasi
-                sehari-hari.
+                {text(
+                  "Tipografi body digunakan untuk paragraf, deskripsi produk, dan komunikasi sehari-hari.",
+                  "Body typography is used for paragraphs, product descriptions, and everyday communication.",
+                )}
               </p>
               <code
                 className="block rounded-lg px-3 py-2 text-xs"
@@ -162,8 +173,11 @@ export function TypographyTab({
       </Card>
 
       <FontSection
-        title="Font Heading"
-        description="Pilih Sans Serif, Serif, atau Display untuk judul brand"
+        title={text("Font Heading", "Heading Font")}
+        description={text(
+          "Pilih Sans Serif, Serif, atau Display untuk judul brand",
+          "Choose a Sans Serif, Serif, or Display face for brand headings",
+        )}
         options={headlineOptions}
         selected={kit.headlineFont}
         uploadedFamilies={uploadedFamilies}
@@ -180,7 +194,10 @@ export function TypographyTab({
 
       <FontSection
         title="Font Body"
-        description="Font untuk paragraf, deskripsi, dan komunikasi brand"
+        description={text(
+          "Font untuk paragraf, deskripsi, dan komunikasi brand",
+          "A font for paragraphs, descriptions, and brand communication",
+        )}
         options={bodyOptions}
         selected={kit.bodyFont}
         uploadedFamilies={uploadedFamilies}
@@ -197,7 +214,10 @@ export function TypographyTab({
 
       <FontSection
         title="Font Monospace"
-        description="Font untuk kode, token, dan nilai teknis"
+        description={text(
+          "Font untuk kode, token, dan nilai teknis",
+          "A font for code, tokens, and technical values",
+        )}
         options={monoOptions}
         selected={kit.monoFont}
         uploadedFamilies={uploadedFamilies}

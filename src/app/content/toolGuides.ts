@@ -1,4 +1,4 @@
-import { SEO_PAGES, type ToolPage } from "../router/routes.ts";
+import { ENGLISH_SEO_PAGES, SEO_PAGES, type ToolPage } from "../router/routes.ts";
 
 export type ToolGuide = {
   overview: string;
@@ -6,6 +6,174 @@ export type ToolGuide = {
   useCases: readonly string[];
   tips: readonly string[];
   relatedPaths: readonly string[];
+};
+
+const ENGLISH_TOOL_GUIDES: Record<string, ToolGuide> = {
+  "/color-palette-generator": {
+    overview:
+      "A focused palette keeps product interfaces and brand assets visually consistent. Start with a useful direction, then assign each selected color a clear role.",
+    steps: [
+      "Choose a palette pattern as a starting point.",
+      "Inspect each color in HEX, RGB, HSL, and CMYK.",
+      "Save useful colors and export them in the format your workflow needs.",
+    ],
+    useCases: ["Visual identity", "Web and app UI", "Presentations and social content"],
+    tips: [
+      "Assign semantic roles such as primary, surface, and accent.",
+      "Check text and background pairs before production use.",
+    ],
+    relatedPaths: ["/color-matching", "/contrast-checker", "/brand-kit-generator"],
+  },
+  "/color-matching": {
+    overview:
+      "Color harmony gives structure to subjective choices. Compare complementary, analogous, and triadic relationships before assigning visual roles.",
+    steps: [
+      "Choose a base color that represents the design direction.",
+      "Compare harmony methods and inspect hue changes.",
+      "Save a combination and test dominant, supporting, and accent roles.",
+    ],
+    useCases: ["Visual campaigns", "Illustration", "Interface themes"],
+    tips: [
+      "Avoid using every color in equal proportions.",
+      "A harmonious palette can still fail text contrast requirements.",
+    ],
+    relatedPaths: ["/color-palette-generator", "/color-blindness-simulator", "/contrast-checker"],
+  },
+  "/color-mixer": {
+    overview:
+      "Color Mixer combines source colors and can derive a formula for a target. Use RGB Light for channel intensity or Paint / Ink for idealized CMYK coverage.",
+    steps: [
+      "Choose a target color or set source colors manually.",
+      "Adjust percentages while monitoring HEX and perceptual similarity.",
+      "Apply the formula to the experiment and copy the resulting color.",
+    ],
+    useCases: ["Target color formulas", "Color transitions", "Simple tint exploration"],
+    tips: [
+      "RGB light and physical paint mixing are different models.",
+      "Use Shade Generator for a systematic light-to-dark scale.",
+    ],
+    relatedPaths: ["/gradient-generator", "/shade-generator", "/color-matching"],
+  },
+  "/gradient-generator": {
+    overview:
+      "Effective gradients use direction, stops, and contrast to support content. Build the transition here and copy CSS for a real component test.",
+    steps: [
+      "Choose start and end colors.",
+      "Set the direction and add only necessary stops.",
+      "Copy the CSS and test it at the intended component size.",
+    ],
+    useCases: ["Website heroes", "Card backgrounds", "Highlights and decoration"],
+    tips: [
+      "Keep text away from areas with unstable contrast.",
+      "Subtle gradients are generally easier to integrate.",
+    ],
+    relatedPaths: ["/color-mixer", "/color-palette-generator", "/contrast-checker"],
+  },
+  "/shade-generator": {
+    overview:
+      "A 50–950 scale turns one color into a reusable range for surfaces, borders, text, and interaction states.",
+    steps: [
+      "Enter the base color.",
+      "Review every level and identify the closest brand default.",
+      "Export the scale with a meaningful semantic or family name.",
+    ],
+    useCases: ["Tailwind themes", "Component states", "Semantic color tokens"],
+    tips: [
+      "Level 500 is not automatically the right primary color.",
+      "Scale numbers do not guarantee WCAG contrast.",
+    ],
+    relatedPaths: ["/design-token-generator", "/contrast-checker", "/color-palette-generator"],
+  },
+  "/image-color-extractor": {
+    overview:
+      "Image Color Extractor finds dominant colors locally in your browser. Treat the result as exploration material, then reduce it to clear functional roles.",
+    steps: [
+      "Choose an image that represents the intended visual mood.",
+      "Compare dominant colors with smaller distinctive details.",
+      "Save relevant colors and refine them in Palette or Brand Kit.",
+    ],
+    useCases: ["Moodboards", "Product photography", "Visual identity references"],
+    tips: [
+      "Strong shadows can overproduce dark colors.",
+      "You must still have permission to use the source asset.",
+    ],
+    relatedPaths: ["/color-palette-generator", "/color-matching", "/brand-kit-generator"],
+  },
+  "/color-blindness-simulator": {
+    overview:
+      "This simulator provides an initial view of how color distinctions may change across several color-vision conditions. It is not a medical diagnosis or user testing replacement.",
+    steps: [
+      "Enter colors that already have interface roles.",
+      "Compare simulations and find hard-to-distinguish elements.",
+      "Add labels, icons, patterns, or lightness differences.",
+    ],
+    useCases: ["Application states", "Data charts", "Notification systems"],
+    tips: [
+      "Never use color as the only status indicator.",
+      "Use Contrast Checker to assess text readability.",
+    ],
+    relatedPaths: ["/contrast-checker", "/color-matching", "/design-token-generator"],
+  },
+  "/contrast-checker": {
+    overview:
+      "Contrast Checker calculates foreground-to-background contrast and reports WCAG status for the actual text size and weight you plan to use.",
+    steps: [
+      "Enter the exact text and background colors.",
+      "Review normal-text, large-text, AA, and AAA results.",
+      "Adjust one color's lightness if the pair fails.",
+    ],
+    useCases: ["Text and backgrounds", "Buttons", "Forms and focus states"],
+    tips: [
+      "Passing color contrast does not guarantee complete accessibility.",
+      "Check hover, disabled, error, and dark-mode states too.",
+    ],
+    relatedPaths: ["/color-blindness-simulator", "/shade-generator", "/brand-kit-generator"],
+  },
+  "/font-pairing": {
+    overview:
+      "Font pairing balances visual character and readability. Strong pairs usually have clearly different jobs without competing in shape, weight, or proportion.",
+    steps: [
+      "Choose a heading font for character and a body font for reading.",
+      "Test realistic headings, paragraphs, labels, buttons, and numbers.",
+      "Copy CSS after size, line height, weight, and fallbacks are final.",
+    ],
+    useCases: ["Landing pages", "Editorial design", "Brand identity"],
+    tips: [
+      "One family with several weights may be enough.",
+      "Check licensing, language support, and performance.",
+    ],
+    relatedPaths: ["/brand-kit-generator", "/design-token-generator", "/color-palette-generator"],
+  },
+  "/design-token-generator": {
+    overview:
+      "Design tokens translate visual decisions into reusable names and values across design and code. Good tokens communicate purpose, not just raw values.",
+    steps: [
+      "Set a base color and clear prefix.",
+      "Review color, typography, spacing, radius, and shadow roles.",
+      "Choose an export format and review names before production use.",
+    ],
+    useCases: ["Design systems", "Developer handoff", "Multi-platform themes"],
+    tips: [
+      "Prefer semantic names such as text-primary or surface.",
+      "Version and review tokens shared by multiple products.",
+    ],
+    relatedPaths: ["/shade-generator", "/font-pairing", "/brand-kit-generator"],
+  },
+  "/brand-kit-generator": {
+    overview:
+      "Brand Kit keeps foundational color, typography, tone, and visual-use decisions in one place. Adapt the generated foundation to your real brand context.",
+    steps: [
+      "Enter brand identity, tone, logo, colors, and typography.",
+      "Review guidelines, previews, and accessibility checks.",
+      "Export the formats required by your team.",
+    ],
+    useCases: ["New brands", "Internal documentation", "Design and developer handoff"],
+    tips: [
+      "Keep the JSON export as a re-importable source.",
+      "Confirm usage rights for every logo, font, photo, and name.",
+    ],
+    relatedPaths: ["/color-palette-generator", "/font-pairing", "/design-token-generator"],
+  },
 };
 
 export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
@@ -177,12 +345,14 @@ export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
 };
 
 export function getToolGuide(page: ToolPage): ToolGuide {
-  return TOOL_GUIDES[page.path];
+  const basePath = page.path.replace(/^\/en(?=\/)/, "");
+  return page.locale === "en" ? ENGLISH_TOOL_GUIDES[basePath] : TOOL_GUIDES[basePath];
 }
 
-export function getRelatedTools(guide: ToolGuide): ToolPage[] {
+export function getRelatedTools(guide: ToolGuide, locale: ToolPage["locale"] = "id"): ToolPage[] {
+  const pages = locale === "en" ? ENGLISH_SEO_PAGES : SEO_PAGES;
   return guide.relatedPaths.flatMap((path) => {
-    const page = SEO_PAGES.find((candidate) => candidate.path === path);
+    const page = pages.find((candidate) => candidate.path.replace(/^\/en(?=\/)/, "") === path);
     return page ? [page] : [];
   });
 }

@@ -1,212 +1,318 @@
+import { withBrandTitle } from "../../shared/config/brand.ts";
+import { localeFromPath, type Locale } from "../../shared/i18n/locale.ts";
+
 export type ColorTab =
   "pattern" | "matching" | "experiment" | "gradient" | "shades" | "image" | "a11y" | "contrast";
-
 export type TopModule = "color" | "font" | "design" | "brand";
+export type TrustPageId = "about" | "privacy" | "terms" | "advertising";
+export type PageKey = "home" | TopModule | ColorTab | TrustPageId;
 
-export type ToolPage = {
+type PageBase = {
+  key: PageKey;
+  locale: Locale;
+  path: string;
+  title: string;
+  heading: string;
+  description: string;
+};
+export type ToolPage = PageBase & {
   kind: "tool";
+  topTab: TopModule;
+  colorTab?: ColorTab;
+};
+export type HomePage = PageBase & { kind: "home" };
+export type TrustPage = PageBase & { kind: "trust"; id: TrustPageId };
+export type SeoPage = HomePage | ToolPage | TrustPage;
+
+type LocalizedCopy = { id: string; en: string };
+type ToolDefinition = {
+  key: PageKey;
   path: string;
   topTab: TopModule;
   colorTab?: ColorTab;
-  title: string;
-  heading: string;
-  description: string;
+  title: LocalizedCopy;
+  heading: LocalizedCopy;
+  description: LocalizedCopy;
 };
+const copy = (id: string, en: string): LocalizedCopy => ({ id, en });
 
-export type HomePage = {
-  kind: "home";
-  path: "/";
-  title: string;
-  heading: string;
-  description: string;
-};
-
-export type TrustPageId = "about" | "privacy" | "terms" | "advertising";
-
-export type TrustPage = {
-  kind: "trust";
-  id: TrustPageId;
-  path: string;
-  title: string;
-  heading: string;
-  description: string;
-};
-
-export type SeoPage = HomePage | ToolPage | TrustPage;
-
-export const HOME_PAGE: HomePage = {
-  kind: "home",
-  path: "/",
-  title: withBrandTitle("Alat Warna, Tipografi & Brand Kit Gratis"),
-  heading: "Bagusnya dimulai di sini.",
-  description:
-    "Toolkit desain gratis untuk membuat palet warna, memilih tipografi, menyusun design token, dan membangun brand kit langsung di browser.",
-};
-
-export const SEO_PAGES: ToolPage[] = [
+const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
-    kind: "tool",
+    key: "pattern",
     path: "/color-palette-generator",
     topTab: "color",
     colorTab: "pattern",
-    title: withBrandTitle("Color Palette Generator Gratis"),
-    heading: "Color Palette Generator Gratis",
-    description:
+    title: copy("Color Palette Generator Gratis", "Free Color Palette Generator"),
+    heading: copy("Color Palette Generator Gratis", "Free Color Palette Generator"),
+    description: copy(
       "Buat, simpan, dan ekspor palet warna untuk website, aplikasi, dan identitas brand langsung dari browser.",
+      "Create, save, and export color palettes for websites, apps, and brand identities directly in your browser.",
+    ),
   },
   {
-    kind: "tool",
+    key: "matching",
     path: "/color-matching",
     topTab: "color",
     colorTab: "matching",
-    title: withBrandTitle("Color Matching dan Harmoni Warna"),
-    heading: "Color Matching dan Harmoni Warna",
-    description:
+    title: copy("Color Matching dan Harmoni Warna", "Color Matching and Color Harmony"),
+    heading: copy("Color Matching dan Harmoni Warna", "Color Matching and Color Harmony"),
+    description: copy(
       "Temukan kombinasi warna complementary, analogous, triadic, dan harmoni lain untuk kebutuhan desain.",
+      "Discover complementary, analogous, triadic, and other harmonious color combinations for your designs.",
+    ),
   },
   {
-    kind: "tool",
+    key: "experiment",
     path: "/color-mixer",
     topTab: "color",
     colorTab: "experiment",
-    title: withBrandTitle("Color Mixer Online Gratis"),
-    heading: "Color Mixer Online",
-    description:
+    title: copy("Color Mixer Online Gratis", "Free Online Color Mixer"),
+    heading: copy("Color Mixer Online", "Online Color Mixer"),
+    description: copy(
       "Campurkan warna secara visual dan lihat hasil HEX, RGB, HSL, serta komposisi warna secara instan.",
+      "Mix colors visually and inspect the resulting HEX, RGB, HSL, and color composition instantly.",
+    ),
   },
   {
-    kind: "tool",
+    key: "gradient",
     path: "/gradient-generator",
     topTab: "color",
     colorTab: "gradient",
-    title: withBrandTitle("CSS Gradient Generator Gratis"),
-    heading: "CSS Gradient Generator",
-    description:
+    title: copy("CSS Gradient Generator Gratis", "Free CSS Gradient Generator"),
+    heading: copy("CSS Gradient Generator", "CSS Gradient Generator"),
+    description: copy(
       "Buat gradien CSS, atur arah dan color stop, lalu salin kode siap pakai untuk proyek web.",
+      "Build CSS gradients, adjust direction and color stops, then copy production-ready code for web projects.",
+    ),
   },
   {
-    kind: "tool",
+    key: "shades",
     path: "/shade-generator",
     topTab: "color",
     colorTab: "shades",
-    title: withBrandTitle("Color Shade Generator 50–950"),
-    heading: "Color Shade Generator",
-    description:
+    title: copy("Color Shade Generator 50–950", "Color Shade Generator 50–950"),
+    heading: copy("Color Shade Generator", "Color Shade Generator"),
+    description: copy(
       "Hasilkan skala warna 50 sampai 950 untuk design system, Tailwind CSS, dan UI aplikasi.",
+      "Generate a 50–950 color scale for design systems, Tailwind CSS, and application interfaces.",
+    ),
   },
   {
-    kind: "tool",
+    key: "image",
     path: "/image-color-extractor",
     topTab: "color",
     colorTab: "image",
-    title: withBrandTitle("Ekstrak Palet Warna dari Gambar"),
-    heading: "Image Color Palette Extractor",
-    description:
+    title: copy("Ekstrak Palet Warna dari Gambar", "Extract a Color Palette from an Image"),
+    heading: copy("Image Color Palette Extractor", "Image Color Palette Extractor"),
+    description: copy(
       "Upload gambar dan ekstrak warna dominan secara lokal di browser tanpa mengirim gambar ke server.",
+      "Upload an image and extract its dominant colors locally without sending the file to a server.",
+    ),
   },
   {
-    kind: "tool",
+    key: "a11y",
     path: "/color-blindness-simulator",
     topTab: "color",
     colorTab: "a11y",
-    title: withBrandTitle("Simulasi Buta Warna Online"),
-    heading: "Color Blindness Simulator",
-    description:
+    title: copy("Simulasi Buta Warna Online", "Online Color Blindness Simulator"),
+    heading: copy("Color Blindness Simulator", "Color Blindness Simulator"),
+    description: copy(
       "Simulasikan beberapa jenis buta warna dan periksa apakah palet tetap mudah dibedakan.",
+      "Simulate several types of color vision deficiency and check whether your palette remains distinguishable.",
+    ),
   },
   {
-    kind: "tool",
+    key: "contrast",
     path: "/contrast-checker",
     topTab: "color",
     colorTab: "contrast",
-    title: withBrandTitle("WCAG Contrast Checker Gratis"),
-    heading: "WCAG Color Contrast Checker",
-    description:
+    title: copy("WCAG Contrast Checker Gratis", "Free WCAG Contrast Checker"),
+    heading: copy("WCAG Color Contrast Checker", "WCAG Color Contrast Checker"),
+    description: copy(
       "Periksa rasio kontras warna dan status WCAG AA atau AAA untuk teks, tombol, dan antarmuka.",
+      "Check color contrast ratios and WCAG AA or AAA status for text, buttons, and interfaces.",
+    ),
   },
   {
-    kind: "tool",
+    key: "font",
     path: "/font-pairing",
     topTab: "font",
-    title: withBrandTitle("Font Pairing dan Typography Preview"),
-    heading: "Font Pairing dan Typography Preview",
-    description:
+    title: copy("Font Pairing dan Typography Preview", "Font Pairing and Typography Preview"),
+    heading: copy("Font Pairing dan Typography Preview", "Font Pairing and Typography Preview"),
+    description: copy(
       "Bandingkan pasangan font, atur ukuran dan ketebalan, lalu salin CSS tipografi untuk proyek desain.",
+      "Compare font pairs, adjust size and weight, then copy typography CSS for your design project.",
+    ),
   },
   {
-    kind: "tool",
+    key: "design",
     path: "/design-token-generator",
     topTab: "design",
-    title: withBrandTitle("Design Token Generator | CSS, Tailwind dan JSON"),
-    heading: "Design Token Generator",
-    description:
+    title: copy(
+      "Design Token Generator | CSS, Tailwind dan JSON",
+      "Design Token Generator | CSS, Tailwind and JSON",
+    ),
+    heading: copy("Design Token Generator", "Design Token Generator"),
+    description: copy(
       "Buat color roles, typography, spacing, radius, dan shadow lalu ekspor ke CSS, Tailwind, JSON, atau React Native.",
+      "Create color roles, typography, spacing, radii, and shadows, then export to CSS, Tailwind, JSON, or React Native.",
+    ),
   },
   {
-    kind: "tool",
+    key: "brand",
     path: "/brand-kit-generator",
     topTab: "brand",
-    title: withBrandTitle("Brand Kit Generator Gratis"),
-    heading: "Brand Kit Generator",
-    description:
+    title: copy("Brand Kit Generator Gratis", "Free Brand Kit Generator"),
+    heading: copy("Brand Kit Generator", "Brand Kit Generator"),
+    description: copy(
       "Susun palet, tipografi, panduan brand, dan audit aksesibilitas dalam satu alat yang berjalan di browser.",
+      "Build a palette, typography system, brand guidelines, and accessibility audit in one browser-based tool.",
+    ),
   },
 ];
 
-export const TRUST_PAGES: TrustPage[] = [
+const TRUST_DEFINITIONS = [
   {
-    kind: "trust",
-    id: "about",
-    path: "/tentang",
-    title: withBrandTitle("Tentang ALUSNA"),
-    heading: "Tentang ALUSNA",
-    description:
+    id: "about" as const,
+    idPath: "/tentang",
+    enPath: "/about",
+    title: copy("Tentang ALUSNA", "About ALUSNA"),
+    heading: copy("Tentang ALUSNA", "About ALUSNA"),
+    description: copy(
       "Pelajari tujuan ALUSNA sebagai toolkit warna, tipografi, design system, dan brand kit yang berjalan di browser.",
+      "Learn how ALUSNA supports color, typography, design-system, and brand-kit work directly in the browser.",
+    ),
   },
   {
-    kind: "trust",
-    id: "privacy",
-    path: "/privasi",
-    title: withBrandTitle("Kebijakan Privasi"),
-    heading: "Kebijakan Privasi",
-    description:
+    id: "privacy" as const,
+    idPath: "/privasi",
+    enPath: "/privacy",
+    title: copy("Kebijakan Privasi", "Privacy Policy"),
+    heading: copy("Kebijakan Privasi", "Privacy Policy"),
+    description: copy(
       "Penjelasan tentang penyimpanan lokal, upload file, Google Fonts, tautan sponsor, dan pilihan privasi di ALUSNA.",
+      "How ALUSNA handles local storage, file uploads, Google Fonts, sponsor links, and privacy choices.",
+    ),
   },
   {
-    kind: "trust",
-    id: "terms",
-    path: "/ketentuan",
-    title: withBrandTitle("Ketentuan Penggunaan"),
-    heading: "Ketentuan Penggunaan",
-    description:
+    id: "terms" as const,
+    idPath: "/ketentuan",
+    enPath: "/terms",
+    title: copy("Ketentuan Penggunaan", "Terms of Use"),
+    heading: copy("Ketentuan Penggunaan", "Terms of Use"),
+    description: copy(
       "Ketentuan penggunaan alat gratis ALUSNA, tanggung jawab pengguna, dan batas layanan.",
+      "Terms for using ALUSNA's free tools, user responsibilities, and service limitations.",
+    ),
   },
   {
-    kind: "trust",
-    id: "advertising",
-    path: "/kebijakan-iklan",
-    title: withBrandTitle("Kebijakan Iklan dan Afiliasi"),
-    heading: "Kebijakan Iklan dan Afiliasi",
-    description:
+    id: "advertising" as const,
+    idPath: "/kebijakan-iklan",
+    enPath: "/advertising-policy",
+    title: copy("Kebijakan Iklan dan Afiliasi", "Advertising and Affiliate Policy"),
+    heading: copy("Kebijakan Iklan dan Afiliasi", "Advertising and Affiliate Policy"),
+    description: copy(
       "Cara ALUSNA menandai sponsor, iklan, dan tautan afiliasi tanpa memengaruhi hasil alat desain.",
+      "How ALUSNA labels sponsorships, advertisements, and affiliate links without affecting tool results.",
+    ),
   },
 ];
 
-export const PUBLIC_PAGES: SeoPage[] = [HOME_PAGE, ...SEO_PAGES, ...TRUST_PAGES];
+function localizedPath(locale: Locale, basePath: string): string {
+  return locale === "en" ? `/en${basePath === "/" ? "" : basePath}` : basePath;
+}
+
+function makeHome(locale: Locale): HomePage {
+  return {
+    kind: "home",
+    key: "home",
+    locale,
+    path: localizedPath(locale, "/"),
+    title: withBrandTitle(
+      locale === "id"
+        ? "Alat Warna, Tipografi & Brand Kit Gratis"
+        : "Free Color, Typography & Brand Kit Tools",
+    ),
+    heading: locale === "id" ? "Bagusnya dimulai di sini." : "Better design starts here.",
+    description:
+      locale === "id"
+        ? "Toolkit desain gratis untuk membuat palet warna, memilih tipografi, menyusun design token, dan membangun brand kit langsung di browser."
+        : "A free design toolkit for creating color palettes, choosing typography, generating design tokens, and building brand kits directly in your browser.",
+  };
+}
+
+function makeTools(locale: Locale): ToolPage[] {
+  return TOOL_DEFINITIONS.map((definition) => ({
+    kind: "tool",
+    key: definition.key,
+    locale,
+    path: localizedPath(locale, definition.path),
+    topTab: definition.topTab,
+    colorTab: definition.colorTab,
+    title: withBrandTitle(definition.title[locale]),
+    heading: definition.heading[locale],
+    description: definition.description[locale],
+  }));
+}
+
+function makeTrustPages(locale: Locale): TrustPage[] {
+  return TRUST_DEFINITIONS.map((definition) => ({
+    kind: "trust",
+    key: definition.id,
+    id: definition.id,
+    locale,
+    path: localizedPath(locale, locale === "id" ? definition.idPath : definition.enPath),
+    title: withBrandTitle(definition.title[locale]),
+    heading: definition.heading[locale],
+    description: definition.description[locale],
+  }));
+}
+
+export const HOME_PAGE = makeHome("id");
+export const ENGLISH_HOME_PAGE = makeHome("en");
+export const SEO_PAGES = makeTools("id");
+export const ENGLISH_SEO_PAGES = makeTools("en");
+export const TRUST_PAGES = makeTrustPages("id");
+export const ENGLISH_TRUST_PAGES = makeTrustPages("en");
+export const PUBLIC_PAGES: SeoPage[] = [
+  HOME_PAGE,
+  ...SEO_PAGES,
+  ...TRUST_PAGES,
+  ENGLISH_HOME_PAGE,
+  ...ENGLISH_SEO_PAGES,
+  ...ENGLISH_TRUST_PAGES,
+];
 
 export const DEFAULT_TOOL_PAGE = SEO_PAGES[0];
 export const DEFAULT_SEO_PAGE = HOME_PAGE;
 
 export function findSeoPage(pathname: string): SeoPage {
   const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return PUBLIC_PAGES.find((page) => page.path === normalized) ?? DEFAULT_SEO_PAGE;
+  return (
+    PUBLIC_PAGES.find((page) => page.path === normalized) ??
+    (localeFromPath(normalized) === "en" ? ENGLISH_HOME_PAGE : HOME_PAGE)
+  );
 }
 
-export function findPageForModule(topTab: TopModule, colorTab: ColorTab = "pattern"): ToolPage {
+export function findPageForModule(
+  topTab: TopModule,
+  colorTab: ColorTab = "pattern",
+  locale: Locale = "id",
+): ToolPage {
+  const pages = locale === "en" ? ENGLISH_SEO_PAGES : SEO_PAGES;
   return (
-    SEO_PAGES.find(
+    pages.find(
       (page) => page.topTab === topTab && (topTab !== "color" || page.colorTab === colorTab),
-    ) ?? DEFAULT_TOOL_PAGE
+    ) ?? pages[0]
+  );
+}
+
+export function findAlternatePage(page: SeoPage): SeoPage {
+  const targetLocale: Locale = page.locale === "id" ? "en" : "id";
+  return (
+    PUBLIC_PAGES.find(
+      (candidate) => candidate.locale === targetLocale && candidate.key === page.key,
+    ) ?? (targetLocale === "en" ? ENGLISH_HOME_PAGE : HOME_PAGE)
   );
 }
 
@@ -217,4 +323,3 @@ export function isToolPage(page: SeoPage): page is ToolPage {
 export function isHomePage(page: SeoPage): page is HomePage {
   return page.kind === "home";
 }
-import { withBrandTitle } from "../../shared/config/brand.ts";

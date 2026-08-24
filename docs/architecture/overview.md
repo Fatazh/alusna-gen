@@ -38,6 +38,8 @@ Current strengths:
 - Static SEO pages are produced at build time.
 - Homepage and tool guidance are included in built HTML as a crawlable no-JavaScript fallback.
 - Analytics is an opt-in, provider-neutral app boundary with no default network transmission.
+- Indonesian public URLs have indexable English `/en` counterparts with shared feature components,
+  reciprocal `hreflang`, and locale-specific static HTML.
 - Dependency-cruiser enforces cross-feature public API access.
 
 Current pressure points:
@@ -129,3 +131,5 @@ Brand Kit moves last because it consumes color, typography, design-system, stora
 Maintenance procedures are documented in [maintenance.md](maintenance.md). Public-entry details are
 recorded in [ADR 007](../decisions/007-feature-public-entry-points.md). The organic-growth and
 measurement boundary is recorded in [ADR 008](../decisions/008-organic-growth-foundation.md).
+The bilingual URL and indexing strategy is recorded in
+[ADR 010](../decisions/010-bilingual-routing-and-seo.md).

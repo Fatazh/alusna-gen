@@ -4,7 +4,7 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The Experiment target-name clarification is complete and verified. Production launch configuration
+The bilingual Indonesian/English rollout is complete and verified. Production launch configuration
 remains the next objective.
 
 ## Completed
@@ -141,6 +141,16 @@ remains the next objective.
   with the default Cahaya RGB recipe finder while preserving Average as an explicit option.
 - Exact RGB/CSS primaries now use localized target labels with standards context; `#00FF00` appears
   as `Hijau RGB (CSS: Lime)`, matching the Hijau recipe channel without hiding the CSS keyword.
+- All 16 existing Indonesian public URLs remain unchanged and now have English counterparts under
+  `/en`, bringing the static public-page total to 32.
+- The header language switch maps to the same logical page without automatic redirects; Indonesian
+  remains the default locale and existing persisted design state is shared unchanged.
+- English routes include localized shell, homepage, trust/legal content, tool metadata, evergreen
+  guidance, and primary controls across the color, typography, design-system, and Brand Kit tools.
+- Runtime and built HTML set locale-specific language, title, canonical, structured data, reciprocal
+  `hreflang` (`id`, `en`, and `x-default`), and bilingual sitemap alternatives.
+- Unit and contract coverage expanded to 135 passing tests; browser coverage includes bilingual
+  route switching and metadata behavior.
 
 ## In progress
 
@@ -168,6 +178,8 @@ remains the next objective.
   chemistry can produce different results.
 - Adjustable formulas are idealized screen simulations; Cat/Tinta still does not model
   manufacturer-specific pigment behavior.
+- Every new or changed user-facing message now requires both Indonesian and English copy; the
+  translation catalog has no external localization platform or professional editorial review.
 
 ## Next task
 

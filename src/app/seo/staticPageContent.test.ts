@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HOME_PAGE, SEO_PAGES } from "../router/routes";
+import { ENGLISH_HOME_PAGE, ENGLISH_SEO_PAGES, HOME_PAGE, SEO_PAGES } from "../router/routes";
 import { createStaticPageContent } from "./staticPageContent";
 
 describe("static page content", () => {
@@ -17,5 +17,14 @@ describe("static page content", () => {
     expect(html).toContain(`Cara menggunakan ${page.heading}`);
     expect(html).toContain("Langkah penggunaan");
     expect(html).toContain('href="/contrast-checker"');
+  });
+
+  it("emits English homepage and guidance links under /en", () => {
+    const home = createStaticPageContent(ENGLISH_HOME_PAGE);
+    const tool = createStaticPageContent(ENGLISH_SEO_PAGES[0]);
+    expect(home).toContain("All ALUSNA tools");
+    expect(home).toContain('href="/en/color-mixer"');
+    expect(tool).toContain("How to use");
+    expect(tool).toContain('href="/en/contrast-checker"');
   });
 });

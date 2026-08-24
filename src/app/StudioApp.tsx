@@ -24,6 +24,7 @@ import { loadFontModule } from "../features/typography/loaders";
 import { loadDesignSystemModule } from "../features/design-system/loaders";
 import { loadBrandKitModule } from "../features/brand-kit/loaders";
 import { useStudio } from "../store/studio";
+import { LocaleProvider } from "../shared/i18n";
 import { findPageForModule, isHomePage, isToolPage, type ColorTab } from "./router/routes";
 
 const PatternModule = lazy(loadPatternModule);
@@ -67,8 +68,15 @@ export default function App() {
   const selectedColor = useStudio((s) => s.selectedColor);
   const colorHistory = useStudio((s) => s.colorHistory);
   const activeFontFamily = useStudio((s) => s.activeFontFamily);
-  const { colorTab, topTab, currentPage, switchTopTab, switchColorTab, navigateToPath } =
-    useStudioRouter();
+  const {
+    colorTab,
+    topTab,
+    currentPage,
+    switchTopTab,
+    switchColorTab,
+    navigateToPath,
+    switchLocale,
+  } = useStudioRouter();
   const showingTool = isToolPage(currentPage);
   const showingHome = isHomePage(currentPage);
 
@@ -84,116 +92,137 @@ export default function App() {
 
   return (
     <AppProviders>
-      <div className="min-h-screen" style={{ background: "var(--app-bg)" }}>
-        <StudioHeader
-          topTab={topTab}
-          colorTab={colorTab}
-          theme={theme}
-          shareUrl={shareUrl}
-          onSwitchTab={switchTopTab}
-          onNavigateHome={() => navigateToPath("/")}
-          onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
-          toolNavigationActive={showingTool}
-        />
-
-        <main className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-          {showingTool ? (
-            <>
-              {topTab === "color" && (
-                <nav
-                  className="-mx-4 flex items-stretch gap-1 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
-                  style={{ borderColor: "var(--border)" }}
-                  role="tablist"
-                  aria-label="Alat warna"
-                >
-                  {COLOR_TABS.map((t) => {
-                    const active = colorTab === t.id;
-                    return (
-                      <a
-                        key={t.id}
-                        href={findPageForModule("color", t.id).path}
-                        role="tab"
-                        aria-selected={active}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          switchColorTab(t.id);
-                        }}
-                        className="relative shrink-0 px-3 py-4 text-left text-xs font-semibold transition sm:px-4"
-                        style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
-                        title={t.desc}
-                      >
-                        {t.label}
-                        {active && (
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-x-3 bottom-0 h-0.5 sm:inset-x-4"
-                            style={{ backgroundColor: "var(--accent)" }}
-                          />
-                        )}
-                      </a>
-                    );
-                  })}
-                </nav>
-              )}
-              <ToolPageIntro page={currentPage} />
-              <AdvertisingSlot />
-              <Suspense fallback={<ModuleLoading />}>
-                {/* ── Color Module ── */}
-                {topTab === "color" && (
-                  <div className="space-y-6 animate-fade-in">
-                    {colorTab === "pattern" && <PatternModule />}
-                    {colorTab === "matching" && <MatchingModule />}
-                    {colorTab === "experiment" && <ExperimentModule />}
-                    {colorTab === "gradient" && <GradientModule />}
-                    {colorTab === "shades" && <ShadeModule />}
-                    {colorTab === "image" && <ImageModule />}
-                    {colorTab === "a11y" && <AccessibilityModule />}
-                    {colorTab === "contrast" && <ContrastModule />}
-                  </div>
-                )}
-
-                {/* ── Font Module ── */}
-                {topTab === "font" && <FontModule />}
-
-                {/* ── Design System Module ── */}
-                {topTab === "design" && <DesignSystemModule />}
-
-                {/* ── Brand Kit Module ── */}
-                {topTab === "brand" && <BrandKitModule />}
-              </Suspense>
-              <Suspense fallback={null}>
-                <ToolGuideView page={currentPage} onNavigate={navigateToPath} />
-              </Suspense>
-            </>
-          ) : showingHome ? (
-            <div className="py-8 sm:py-10">
-              <Suspense fallback={<ModuleLoading />}>
-                <HomePageView onNavigate={navigateToPath} />
-              </Suspense>
-            </div>
-          ) : (
-            <div className="py-8 sm:py-10">
-              <Suspense fallback={<ModuleLoading />}>
-                <TrustPageView page={currentPage} />
-              </Suspense>
-            </div>
-          )}
-        </main>
-
-        <AppFooter onNavigate={navigateToPath} />
-
-        {/* Recent colors bar */}
-        {showingTool && colorHistory.length > 0 && (
-          <HistoryBar
-            colors={colorHistory}
-            onPick={(rgb) => {
-              setSelectedColor(rgb);
-              pushColorHistory(rgb);
-            }}
-            activeHex={rgbToHex(selectedColor)}
+      <LocaleProvider locale={currentPage.locale}>
+        <div className="min-h-screen" style={{ background: "var(--app-bg)" }}>
+          <StudioHeader
+            topTab={topTab}
+            colorTab={colorTab}
+            theme={theme}
+            shareUrl={shareUrl}
+            onSwitchTab={switchTopTab}
+            locale={currentPage.locale}
+            onNavigateHome={() => navigateToPath(currentPage.locale === "en" ? "/en" : "/")}
+            onSwitchLocale={switchLocale}
+            onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+            toolNavigationActive={showingTool}
           />
-        )}
-      </div>
+
+          <main className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            {showingTool ? (
+              <>
+                {topTab === "color" && (
+                  <nav
+                    className="-mx-4 flex items-stretch gap-1 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+                    style={{ borderColor: "var(--border)" }}
+                    role="tablist"
+                    aria-label={currentPage.locale === "en" ? "Color tools" : "Alat warna"}
+                  >
+                    {COLOR_TABS.map((t) => {
+                      const active = colorTab === t.id;
+                      return (
+                        <a
+                          key={t.id}
+                          href={findPageForModule("color", t.id, currentPage.locale).path}
+                          role="tab"
+                          aria-selected={active}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            switchColorTab(t.id);
+                          }}
+                          className="relative shrink-0 px-3 py-4 text-left text-xs font-semibold transition sm:px-4"
+                          style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+                          title={
+                            currentPage.locale === "en"
+                              ? (
+                                  {
+                                    pattern: "Curated palettes",
+                                    matching: "Color harmony",
+                                    experiment: "Mix colors",
+                                    gradient: "CSS gradients",
+                                    shades: "50–950 scale",
+                                    image: "Extract from image",
+                                    a11y: "Color blindness",
+                                    contrast: "WCAG checker",
+                                  } as Record<ColorTab, string>
+                                )[t.id]
+                              : t.desc
+                          }
+                        >
+                          {currentPage.locale === "en" && t.id === "a11y"
+                            ? "Accessibility"
+                            : t.label}
+                          {active && (
+                            <span
+                              aria-hidden="true"
+                              className="absolute inset-x-3 bottom-0 h-0.5 sm:inset-x-4"
+                              style={{ backgroundColor: "var(--accent)" }}
+                            />
+                          )}
+                        </a>
+                      );
+                    })}
+                  </nav>
+                )}
+                <ToolPageIntro page={currentPage} />
+                <AdvertisingSlot />
+                <Suspense fallback={<ModuleLoading />}>
+                  {/* ── Color Module ── */}
+                  {topTab === "color" && (
+                    <div className="space-y-6 animate-fade-in">
+                      {colorTab === "pattern" && <PatternModule />}
+                      {colorTab === "matching" && <MatchingModule />}
+                      {colorTab === "experiment" && <ExperimentModule />}
+                      {colorTab === "gradient" && <GradientModule />}
+                      {colorTab === "shades" && <ShadeModule />}
+                      {colorTab === "image" && <ImageModule />}
+                      {colorTab === "a11y" && <AccessibilityModule />}
+                      {colorTab === "contrast" && <ContrastModule />}
+                    </div>
+                  )}
+
+                  {/* ── Font Module ── */}
+                  {topTab === "font" && <FontModule />}
+
+                  {/* ── Design System Module ── */}
+                  {topTab === "design" && <DesignSystemModule />}
+
+                  {/* ── Brand Kit Module ── */}
+                  {topTab === "brand" && <BrandKitModule />}
+                </Suspense>
+                <Suspense fallback={null}>
+                  <ToolGuideView page={currentPage} onNavigate={navigateToPath} />
+                </Suspense>
+              </>
+            ) : showingHome ? (
+              <div className="py-8 sm:py-10">
+                <Suspense fallback={<ModuleLoading />}>
+                  <HomePageView onNavigate={navigateToPath} />
+                </Suspense>
+              </div>
+            ) : (
+              <div className="py-8 sm:py-10">
+                <Suspense fallback={<ModuleLoading />}>
+                  <TrustPageView page={currentPage} />
+                </Suspense>
+              </div>
+            )}
+          </main>
+
+          <AppFooter locale={currentPage.locale} onNavigate={navigateToPath} />
+
+          {/* Recent colors bar */}
+          {showingTool && colorHistory.length > 0 && (
+            <HistoryBar
+              colors={colorHistory}
+              onPick={(rgb) => {
+                setSelectedColor(rgb);
+                pushColorHistory(rgb);
+              }}
+              activeHex={rgbToHex(selectedColor)}
+            />
+          )}
+        </div>
+      </LocaleProvider>
     </AppProviders>
   );
 }

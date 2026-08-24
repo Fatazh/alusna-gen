@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { rgbToHex, type RGB } from "../../model/color";
+import { useLocale } from "../../../../shared/i18n";
 import {
   COLOR_RECIPE_QUALITY_LABELS,
   evaluateColorRecipe,
@@ -20,12 +21,42 @@ function formatPercentage(value: number): string {
 }
 
 export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditorProps) {
+  const { locale, text } = useLocale();
   const [ingredients, setIngredients] = useState<ColorRecipeIngredient[]>(recipe.ingredients);
   const adjustedRecipe = useMemo(
     () => evaluateColorRecipe(target, ingredients, recipe.measurement),
     [ingredients, recipe.measurement, target],
   );
-  const controlName = recipe.measurement === "intensity" ? "Intensitas" : "Cakupan";
+  const controlName =
+    recipe.measurement === "intensity"
+      ? text("Intensitas", "Intensity")
+      : text("Cakupan", "Coverage");
+  const ingredientName = (name: string) =>
+    locale === "en"
+      ? ((
+          {
+            Merah: "Red",
+            Hijau: "Green",
+            Biru: "Blue",
+            Kuning: "Yellow",
+            Hitam: "Black",
+            "Putih dasar": "White base",
+            "Tanpa cahaya": "No light",
+          } as Record<string, string>
+        )[name] ?? name)
+      : name;
+  const qualityLabel =
+    locale === "en"
+      ? (
+          {
+            exact: "Exact",
+            "very-close": "Very close",
+            close: "Close",
+            different: "Different",
+            far: "Very different",
+          } as const
+        )[adjustedRecipe.quality]
+      : COLOR_RECIPE_QUALITY_LABELS[adjustedRecipe.quality];
   const isDirty = ingredients.some(
     (ingredient, index) => ingredient.ratio !== recipe.ingredients[index]?.ratio,
   );
@@ -51,7 +82,10 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           </p>
           <p className="mt-1 font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
             {adjustedRecipe.ingredients
-              .map((ingredient) => `${ingredient.name} ${formatPercentage(ingredient.ratio)}%`)
+              .map(
+                (ingredient) =>
+                  `${ingredientName(ingredient.name)} ${formatPercentage(ingredient.ratio)}%`,
+              )
               .join(" · ")}
           </p>
         </div>
@@ -60,7 +94,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           className="rounded-full px-2 py-1 text-[10px] font-semibold"
           style={{ backgroundColor: "var(--chip-active-bg)", color: "var(--accent)" }}
         >
-          {adjustedRecipe.similarity}% · {COLOR_RECIPE_QUALITY_LABELS[adjustedRecipe.quality]}
+          {adjustedRecipe.similarity}% · {qualityLabel}
         </span>
       </div>
 
@@ -82,15 +116,15 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
                     }}
                     aria-hidden="true"
                   />
-                  {ingredient.name}
+                  {ingredientName(ingredient.name)}
                 </label>
                 <code className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
                   {rgbToHex(ingredient.color)}
                 </code>
                 <CopyButton
                   value={rgbToHex(ingredient.color)}
-                  label="Salin"
-                  ariaLabel={`Salin HEX ${ingredient.name} ${rgbToHex(ingredient.color)}`}
+                  label={text("Salin", "Copy")}
+                  ariaLabel={`${text("Salin HEX", "Copy HEX")} ${ingredientName(ingredient.name)} ${rgbToHex(ingredient.color)}`}
                   className="px-1.5 py-1 text-[10px]"
                 />
               </div>
@@ -109,7 +143,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
                     backgroundColor: "var(--input-bg)",
                     color: "var(--input-text)",
                   }}
-                  aria-label={`${controlName} ${ingredient.name} (%)`}
+                  aria-label={`${controlName} ${ingredientName(ingredient.name)} (%)`}
                 />
                 <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                   %
@@ -125,7 +159,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
               onChange={(event) => updatePercentage(index, Number(event.target.value))}
               className="mt-2 w-full"
               style={{ accentColor: rgbToHex(ingredient.color) }}
-              aria-label={`Atur ${controlName.toLowerCase()} ${ingredient.name}`}
+              aria-label={`${text("Atur", "Adjust")} ${controlName.toLowerCase()} ${ingredientName(ingredient.name)}`}
             />
           </div>
         ))}
@@ -140,18 +174,18 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
             className="text-[10px] uppercase tracking-[0.12em]"
             style={{ color: "var(--text-muted)" }}
           >
-            Hasil formula
+            {text("Hasil formula", "Formula result")}
           </p>
           <p className="mt-1 font-mono text-xs" style={{ color: "var(--text-primary)" }}>
             {adjustedRecipe.resultHex}
           </p>
           <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
-            Jarak perceptual {adjustedRecipe.distance.toFixed(2)}
+            {text("Jarak perceptual", "Perceptual distance")} {adjustedRecipe.distance.toFixed(2)}
           </p>
           <CopyButton
             value={adjustedRecipe.resultHex}
-            label="Salin hasil"
-            ariaLabel={`Salin HEX hasil ${adjustedRecipe.resultHex}`}
+            label={text("Salin hasil", "Copy result")}
+            ariaLabel={`${text("Salin HEX hasil", "Copy result HEX")} ${adjustedRecipe.resultHex}`}
             className="mt-1 -ml-1.5 px-1.5 py-1 text-[10px]"
           />
         </div>
@@ -161,7 +195,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
             backgroundColor: adjustedRecipe.resultHex,
             borderColor: "var(--border)",
           }}
-          title={`Hasil ${adjustedRecipe.resultHex}`}
+          title={`${text("Hasil", "Result")} ${adjustedRecipe.resultHex}`}
         />
       </div>
 
@@ -181,9 +215,9 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           onClick={() => onApply(adjustedRecipe)}
           className="rounded-md px-2.5 py-1.5 text-[11px] font-bold"
           style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
-          aria-label={`Gunakan formula: ${adjustedRecipe.ingredients.map((ingredient) => ingredient.name).join(" dan ")}`}
+          aria-label={`${text("Gunakan formula", "Use formula")}: ${adjustedRecipe.ingredients.map((ingredient) => ingredientName(ingredient.name)).join(text(" dan ", " and "))}`}
         >
-          Gunakan formula
+          {text("Gunakan formula", "Use formula")}
         </button>
       </div>
     </article>

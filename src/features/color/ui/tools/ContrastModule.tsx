@@ -7,6 +7,7 @@ import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "../../model/color";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
+import { useLocale } from "../../../../shared/i18n";
 import { cn } from "../../../../shared/lib/cn";
 
 type WCAGLevel = "AA" | "AAA" | "AALarge" | "Fail";
@@ -37,6 +38,7 @@ const PRESETS: { label: string; fg: RGB; bg: RGB }[] = [
 ];
 
 export function ContrastModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
 
   const [bgColor, setBgColor] = useState<RGB>({ r: 255, g: 255, b: 255 });
@@ -56,7 +58,10 @@ export function ContrastModule() {
         <Card>
           <CardHeader
             title="Color Contrast Checker"
-            subtitle="Periksa kontras warna untuk WCAG 2.1 compliance"
+            subtitle={text(
+              "Periksa kontras warna untuk kepatuhan WCAG 2.1",
+              "Check color contrast for WCAG 2.1 compliance",
+            )}
           />
           <CardBody className="space-y-5">
             {/* Quick presets */}
@@ -94,7 +99,7 @@ export function ContrastModule() {
                 className="mb-2 text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
-                Gunakan Warna Aktif Sebagai
+                {text("Gunakan Warna Aktif Sebagai", "Use active color as")}
               </p>
               <div className="flex gap-2">
                 <button
@@ -205,14 +210,19 @@ export function ContrastModule() {
                 style={{ borderColor: "var(--border)", backgroundColor: bgHex }}
               >
                 <p className="text-2xl font-bold" style={{ color: fgHex }}>
-                  Heading Contoh
+                  {text("Heading Contoh", "Sample heading")}
                 </p>
                 <p className="text-base" style={{ color: fgHex }}>
-                  Ini adalah contoh paragraf teks dengan ukuran normal. Pastikan kontras yang cukup
-                  untuk keterbacaan yang baik.
+                  {text(
+                    "Ini adalah contoh paragraf teks dengan ukuran normal. Pastikan kontras yang cukup untuk keterbacaan.",
+                    "This is a normal-sized sample paragraph. Make sure the contrast is sufficient for readability.",
+                  )}
                 </p>
                 <p className="text-sm" style={{ color: fgHex }}>
-                  Teks kecil (14px): Perhatikan kontras untuk ukuran ini.
+                  {text(
+                    "Teks kecil (14px): Perhatikan kontras untuk ukuran ini.",
+                    "Small text (14px): Check contrast at this size.",
+                  )}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -223,7 +233,7 @@ export function ContrastModule() {
                       color: bgHex,
                     }}
                   >
-                    Tombol Primer
+                    {text("Tombol Primer", "Primary button")}
                   </button>
                   <button
                     type="button"
@@ -246,7 +256,7 @@ export function ContrastModule() {
       {/* Right: Results */}
       <div className="space-y-6">
         <Card className="h-fit">
-          <CardHeader title="Hasil Pemeriksaan" />
+          <CardHeader title={text("Hasil Pemeriksaan", "Check results")} />
           <CardBody className="space-y-4">
             {/* Contrast ratio */}
             <div
@@ -318,9 +328,17 @@ export function ContrastModule() {
                         {req.min}:1
                       </span>
                       {pass ? (
-                        <CheckCircle size={18} className="text-emerald-500" aria-label="Lulus" />
+                        <CheckCircle
+                          size={18}
+                          className="text-emerald-500"
+                          aria-label={text("Lulus", "Pass")}
+                        />
                       ) : (
-                        <XCircle size={18} className="text-rose-500" aria-label="Tidak lulus" />
+                        <XCircle
+                          size={18}
+                          className="text-rose-500"
+                          aria-label={text("Tidak lulus", "Fail")}
+                        />
                       )}
                     </div>
                   </div>

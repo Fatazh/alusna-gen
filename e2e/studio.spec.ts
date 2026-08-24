@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { HOME_PAGE, SEO_PAGES, TRUST_PAGES } from "../src/app/router/routes";
+import {
+  ENGLISH_HOME_PAGE,
+  ENGLISH_SEO_PAGES,
+  HOME_PAGE,
+  SEO_PAGES,
+  TRUST_PAGES,
+} from "../src/app/router/routes";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   LEGACY_STUDIO_STORAGE_KEY,
@@ -54,6 +60,29 @@ test("homepage starts a tool workflow without a full reload", async ({ page }) =
   ).toBeVisible();
 });
 
+test("language switch preserves the tool and updates bilingual SEO metadata", async ({ page }) => {
+  await page.goto("/color-mixer");
+  await page.getByRole("button", { name: "Use English" }).click();
+
+  await expect(page).toHaveURL(/\/en\/color-mixer$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("heading", { name: "Online Color Mixer", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Find a Color Recipe" })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /\/en\/color-mixer$/);
+  await expect(page.locator('link[rel="alternate"][hreflang="id"]')).toHaveAttribute(
+    "href",
+    /\/color-mixer$/,
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+    "href",
+    /\/en\/color-mixer$/,
+  );
+
+  await page.getByRole("button", { name: "Gunakan Bahasa Indonesia" }).click();
+  await expect(page).toHaveURL(/\/color-mixer$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "id");
+});
+
 test("built pages expose useful content without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
@@ -69,6 +98,20 @@ test("built pages expose useful content without JavaScript", async ({ browser })
     page.getByRole("heading", { name: `Cara menggunakan ${SEO_PAGES[0].heading}` }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Alat terkait" })).toBeVisible();
+
+  await page.goto("/en/");
+  await expect(
+    page.getByRole("heading", { name: ENGLISH_HOME_PAGE.heading, level: 1 }),
+  ).toBeVisible();
+  for (const route of ENGLISH_SEO_PAGES) {
+    await expect(page.getByRole("link", { name: route.heading, exact: true })).toBeVisible();
+  }
+
+  await page.goto(`${ENGLISH_SEO_PAGES[0].path}/`);
+  await expect(
+    page.getByRole("heading", { name: `How to use ${ENGLISH_SEO_PAGES[0].heading}` }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Related tools" })).toBeVisible();
 
   await context.close();
 });

@@ -11,6 +11,7 @@ import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../Swatch";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
+import { useLocale } from "../../../../shared/i18n";
 import { ColorRecipeEditor } from "./ColorRecipeEditor";
 
 type Slot = { id: number; hex: string; weight: number };
@@ -38,8 +39,23 @@ const LOCALIZED_TARGET_LABELS: Record<string, string> = {
   "#8000FF": "Ungu",
 };
 
-function getTargetColorLabel(color: RGB): string {
-  return LOCALIZED_TARGET_LABELS[rgbToHex(color)] ?? getColorName(color).label;
+function getTargetColorLabel(color: RGB, english: boolean): string {
+  const hex = rgbToHex(color);
+  if (english) {
+    return (
+      (
+        {
+          "#FF0000": "Red",
+          "#00FF00": "Lime",
+          "#0000FF": "Blue",
+          "#FFFF00": "Yellow",
+          "#FF8000": "Orange",
+          "#8000FF": "Purple",
+        } as Record<string, string>
+      )[hex] ?? getColorName(color).label
+    );
+  }
+  return LOCALIZED_TARGET_LABELS[hex] ?? getColorName(color).label;
 }
 
 const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: string }> = {
@@ -56,6 +72,8 @@ const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: st
 };
 
 export function ExperimentModule() {
+  const { locale, text } = useLocale();
+  const english = locale === "en";
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const selectedAlpha = useStudio((s) => s.selectedAlpha);
@@ -150,8 +168,11 @@ export function ExperimentModule() {
       <div className="space-y-6">
         <Card>
           <CardHeader
-            title="Cari Resep Warna"
-            subtitle="Pilih warna target untuk memperoleh formula RGB atau cakupan CMYK"
+            title={text("Cari Resep Warna", "Find a Color Recipe")}
+            subtitle={text(
+              "Pilih warna target untuk memperoleh formula RGB atau cakupan CMYK",
+              "Choose a target color to derive an RGB formula or CMYK coverage",
+            )}
           />
           <CardBody className="space-y-5">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
@@ -161,7 +182,7 @@ export function ExperimentModule() {
                   className="text-[11px] font-semibold uppercase tracking-[0.14em]"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Warna target
+                  {text("Warna target", "Target color")}
                 </label>
                 <div className="mt-2 flex items-center gap-2">
                   <input
@@ -170,7 +191,7 @@ export function ExperimentModule() {
                     onChange={(event) => setTargetHex(event.target.value.toUpperCase())}
                     className="h-11 w-14 rounded-md border"
                     style={{ borderColor: "var(--input-border)" }}
-                    aria-label="Pilih warna target"
+                    aria-label={text("Pilih warna target", "Choose target color")}
                   />
                   <input
                     id="recipe-target-hex"
@@ -196,10 +217,12 @@ export function ExperimentModule() {
                       className="text-xs font-semibold"
                       style={{ color: "var(--text-primary)" }}
                     >
-                      {targetRgb ? getTargetColorLabel(targetRgb) : "HEX belum lengkap"}
+                      {targetRgb
+                        ? getTargetColorLabel(targetRgb, english)
+                        : text("HEX belum lengkap", "Incomplete HEX")}
                     </p>
                     <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
-                      Target pencarian
+                      {text("Target pencarian", "Search target")}
                     </p>
                   </div>
                 </div>
@@ -219,7 +242,16 @@ export function ExperimentModule() {
                       style={{ backgroundColor: preset.hex, borderColor: "var(--border)" }}
                       aria-hidden="true"
                     />
-                    {preset.label}
+                    {english
+                      ? (
+                          {
+                            Kuning: "Yellow",
+                            Oranye: "Orange",
+                            Hijau: "Green",
+                            Ungu: "Purple",
+                          } as Record<string, string>
+                        )[preset.label]
+                      : preset.label}
                   </button>
                 ))}
               </div>
@@ -230,7 +262,7 @@ export function ExperimentModule() {
                 className="text-[11px] font-semibold uppercase tracking-[0.14em]"
                 style={{ color: "var(--text-muted)" }}
               >
-                Model campuran
+                {text("Model campuran", "Mixing model")}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {(Object.keys(RECIPE_MODE_META) as ColorRecipeMode[]).map((recipeModeId) => (
@@ -242,12 +274,20 @@ export function ExperimentModule() {
                     style={getChipStyle(recipeMode === recipeModeId)}
                     aria-pressed={recipeMode === recipeModeId}
                   >
-                    {RECIPE_MODE_META[recipeModeId].label}
+                    {english
+                      ? recipeModeId === "additive"
+                        ? "RGB Light"
+                        : "Paint / ink"
+                      : RECIPE_MODE_META[recipeModeId].label}
                   </button>
                 ))}
               </div>
               <p className="mt-2 text-[11px] leading-5" style={{ color: "var(--text-muted)" }}>
-                {RECIPE_MODE_META[recipeMode].description}
+                {english
+                  ? recipeMode === "additive"
+                    ? "RGB channel intensity formula. Each percentage is independent and does not need to total 100%."
+                    : "Idealized CMYK coverage formula. Each ink percentage is independent and does not need to total 100%."
+                  : RECIPE_MODE_META[recipeMode].description}
               </p>
             </div>
 
@@ -272,9 +312,10 @@ export function ExperimentModule() {
                   aria-hidden="true"
                 />
                 <p className="text-[11px] leading-5 text-amber-800 dark:text-amber-300">
-                  Formula ini memakai cakupan CMYK di atas dasar putih. Hasil layar mendekati
-                  target, tetapi cat atau tinta nyata tetap dapat berbeda karena pigmen, opasitas,
-                  dan bahan permukaan.
+                  {text(
+                    "Formula ini memakai cakupan CMYK di atas dasar putih. Hasil layar mendekati target, tetapi cat atau tinta nyata tetap dapat berbeda karena pigmen, opasitas, dan bahan permukaan.",
+                    "This formula uses idealized CMYK coverage over white. Screen results can approach the target, but real paint or ink varies with pigment, opacity, and surface material.",
+                  )}
                 </p>
               </div>
             )}
@@ -284,7 +325,10 @@ export function ExperimentModule() {
         <Card>
           <CardHeader
             title="Experiment Color"
-            subtitle="Campurkan 2 atau lebih warna dan lihat hasilnya"
+            subtitle={text(
+              "Campurkan 2 atau lebih warna dan lihat hasilnya",
+              "Mix two or more colors and inspect the result",
+            )}
           />
           <CardBody className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
@@ -295,7 +339,18 @@ export function ExperimentModule() {
                   onClick={() => setMode(m.id)}
                   className={chipClass}
                   style={getChipStyle(mode === m.id)}
-                  title={m.desc}
+                  title={
+                    english
+                      ? (
+                          {
+                            average: "Simple average",
+                            weighted: "Weighted by input",
+                            additive: "RGB light",
+                            subtractive: "CMYK ink / paint",
+                          } as Record<MixMode, string>
+                        )[m.id]
+                      : m.desc
+                  }
                   aria-pressed={mode === m.id}
                 >
                   {m.label}
@@ -336,9 +391,10 @@ export function ExperimentModule() {
                   aria-hidden="true"
                 />
                 <p className="text-[11px] text-amber-700 dark:text-amber-300/90">
-                  Mode <span className="font-semibold">Average</span> menggunakan rata-rata sama
-                  rata — bobot yang kamu atur diabaikan. Gunakan mode{" "}
-                  <span className="font-semibold">Weighted</span> agar bobot berpengaruh.
+                  {text(
+                    "Mode Average menggunakan rata-rata sama—bobot yang kamu atur diabaikan. Gunakan mode Weighted agar bobot berpengaruh.",
+                    "Average mode uses equal proportions—the weights you set are ignored. Use Weighted mode to apply them.",
+                  )}
                 </p>
               </div>
             )}
@@ -364,7 +420,7 @@ export function ExperimentModule() {
                         className="text-xs hover:text-rose-400"
                         style={{ color: "var(--text-muted)" }}
                       >
-                        Hapus
+                        {text("Hapus", "Remove")}
                       </button>
                     )}
                   </div>
@@ -389,10 +445,10 @@ export function ExperimentModule() {
                     >
                       <span>
                         {mode === "additive"
-                          ? "Intensitas"
+                          ? text("Intensitas", "Intensity")
                           : mode === "subtractive"
-                            ? "Cakupan"
-                            : "Bobot"}
+                            ? text("Cakupan", "Coverage")
+                            : text("Bobot", "Weight")}
                       </span>
                       <span className="font-mono">
                         {mode === "additive" || mode === "subtractive"
@@ -421,7 +477,7 @@ export function ExperimentModule() {
                   style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 >
                   <Plus size={15} className="mr-1" aria-hidden="true" />
-                  Tambah warna
+                  {text("Tambah warna", "Add color")}
                 </button>
               )}
             </div>
@@ -433,7 +489,7 @@ export function ExperimentModule() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                    Hasil perpaduan
+                    {text("Hasil perpaduan", "Mixed result")}
                   </p>
                   <p
                     className="mt-0.5 text-base font-semibold"
@@ -446,7 +502,7 @@ export function ExperimentModule() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CopyButton value={rgbToHex(result)} label="Salin HEX" />
+                  <CopyButton value={rgbToHex(result)} label={text("Salin HEX", "Copy HEX")} />
                   <button
                     type="button"
                     onClick={() => {
@@ -459,7 +515,7 @@ export function ExperimentModule() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    Jadikan aktif
+                    {text("Jadikan aktif", "Set as active")}
                   </button>
                 </div>
               </div>
@@ -470,7 +526,7 @@ export function ExperimentModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Detail Hasil" />
+        <CardHeader title={text("Detail Hasil", "Result details")} />
         <CardBody className="space-y-4">
           <Swatch rgb={result} size="lg" showCode={false} />
           <ColorDetail rgb={result} alpha={selectedAlpha} showAlpha />
@@ -480,7 +536,7 @@ export function ExperimentModule() {
             className="w-full rounded-lg px-3 py-2 text-xs font-medium transition"
             style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
-            Simpan ke palet
+            {text("Simpan ke palet", "Save to palette")}
           </button>
         </CardBody>
       </Card>

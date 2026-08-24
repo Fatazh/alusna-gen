@@ -1,6 +1,7 @@
 import { type ToolPage } from "../router/routes";
 
 export function ToolPageIntro({ page }: { page: ToolPage }) {
+  const english = page.locale === "en";
   return (
     <section aria-labelledby="tool-page-title" className="px-1 py-7 sm:py-9">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -29,11 +30,11 @@ export function ToolPageIntro({ page }: { page: ToolPage }) {
           className="shrink-0 border-l-2 pl-3 text-[11px] leading-5"
           style={{ color: "var(--text-muted)", borderColor: "var(--amber)" }}
         >
-          Gratis
+          {english ? "Free" : "Gratis"}
           <br />
-          Tanpa akun
+          {english ? "No account" : "Tanpa akun"}
           <br />
-          Diproses di browser
+          {english ? "Processed in-browser" : "Diproses di browser"}
         </p>
       </div>
     </section>

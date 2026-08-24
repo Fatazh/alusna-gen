@@ -4,6 +4,7 @@ import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
+import { useLocale } from "../../../../shared/i18n";
 
 type Stop = { id: number; hex: string; pos: number };
 type GradientType = "linear" | "radial" | "conic";
@@ -15,6 +16,7 @@ const TYPES: { id: GradientType; label: string }[] = [
 ];
 
 export function GradientModule() {
+  const { text } = useLocale();
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const saveColor = useStudio((s) => s.saveColor);
@@ -61,7 +63,13 @@ export function GradientModule() {
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
         <Card>
-          <CardHeader title="Generator Gradien" subtitle="Susun stop warna lalu salin CSS-nya" />
+          <CardHeader
+            title={text("Generator Gradien", "Gradient Generator")}
+            subtitle={text(
+              "Susun stop warna lalu salin CSS-nya",
+              "Arrange color stops and copy the CSS",
+            )}
+          />
           <CardBody className="space-y-5">
             <div className="flex flex-wrap gap-2">
               {TYPES.map((t) => (
@@ -81,7 +89,7 @@ export function GradientModule() {
                   style={{ borderColor: "var(--border)" }}
                 >
                   <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                    Sudut
+                    {text("Sudut", "Angle")}
                   </span>
                   <input
                     type="range"
@@ -153,7 +161,7 @@ export function GradientModule() {
                       className="text-xs hover:text-rose-400"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      Hapus
+                      {text("Hapus", "Remove")}
                     </button>
                   )}
                 </div>
@@ -165,7 +173,7 @@ export function GradientModule() {
                   className="flex w-full items-center justify-center rounded-xl border border-dashed py-2.5 text-sm transition"
                   style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 >
-                  + Tambah stop
+                  + {text("Tambah stop", "Add stop")}
                 </button>
               )}
             </div>
@@ -181,7 +189,7 @@ export function GradientModule() {
                 <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   CSS
                 </span>
-                <CopyButton value={css} label="Salin CSS" />
+                <CopyButton value={css} label={text("Salin CSS", "Copy CSS")} />
               </div>
               <pre
                 className="overflow-x-auto whitespace-pre-wrap text-[11px]"
@@ -195,7 +203,7 @@ export function GradientModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Stop Warna" />
+        <CardHeader title={text("Stop Warna", "Color stops")} />
         <CardBody className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
             {sortedStops.map((s) => {
@@ -244,7 +252,7 @@ export function GradientModule() {
             }}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
           >
-            Simpan semua ke palet
+            {text("Simpan semua ke palet", "Save all to palette")}
           </button>
         </CardBody>
       </Card>

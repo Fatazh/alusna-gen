@@ -3,6 +3,7 @@ import { getColorName } from "../model/colorNames";
 import { CopyButton } from "../../../shared/ui/CopyButton";
 import { cn } from "../../../shared/lib/cn";
 import { useToast } from "../../../shared/ui/toastContext";
+import { useLocale } from "../../../shared/i18n";
 
 // ---------------------------------------------------------------------------
 // ColorDetail — shows color name + all code formats
@@ -15,6 +16,7 @@ type ColorDetailProps = {
 };
 
 export function ColorDetail({ rgb, alpha = 1, showAlpha = false, className }: ColorDetailProps) {
+  const { text } = useLocale();
   const info = describe(rgb);
   const colorInfo = getColorName(rgb);
   const rgba = formatRgba({ ...rgb, a: alpha });
@@ -45,7 +47,7 @@ export function ColorDetail({ rgb, alpha = 1, showAlpha = false, className }: Co
               : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300",
           )}
         >
-          {colorInfo.isVariant ? "Varian" : "Tepat"}
+          {colorInfo.isVariant ? text("Varian", "Variant") : text("Tepat", "Exact")}
         </span>
       </div>
 
@@ -107,6 +109,7 @@ export function Swatch({
   const textColor = bestTextOn(rgb);
   const dims = size === "sm" ? "h-20" : size === "lg" ? "h-40" : "h-28";
   const { show } = useToast();
+  const { text } = useLocale();
 
   // Auto-resolve name when no explicit label is provided.
   const colorInfo = getColorName(rgb);
@@ -116,7 +119,7 @@ export function Swatch({
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(hex);
-      show(`✓ ${hex} berhasil disalin!`);
+      show(text(`✓ ${hex} berhasil disalin!`, `✓ ${hex} copied!`));
     } catch {
       // fail silently
     }
@@ -163,8 +166,8 @@ export function Swatch({
             backgroundColor:
               textColor === "#FFFFFF" ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.25)",
           }}
-          aria-label={`Salin ${hex}`}
-          title="Klik untuk salin HEX"
+          aria-label={`${text("Salin", "Copy")} ${hex}`}
+          title={text("Klik untuk salin HEX", "Click to copy HEX")}
         >
           {hex}
         </button>
@@ -177,7 +180,7 @@ export function Swatch({
           onClick={onAdd}
           className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full opacity-100 shadow transition focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
           style={{ backgroundColor: "var(--surface)", color: "var(--text-primary)" }}
-          title="Tambah ke palet tersimpan"
+          title={text("Tambah ke palet tersimpan", "Add to saved palette")}
         >
           +
         </button>

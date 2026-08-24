@@ -8,9 +8,11 @@ import {
 import { getColorName } from "../../model/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
+import { useLocale } from "../../../../shared/i18n";
 import { Swatch } from "../Swatch";
 
 export function AccessibilityModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
   const savedColors = useStudio((s) => s.savedColors);
 
@@ -46,8 +48,11 @@ export function AccessibilityModule() {
       <div className="space-y-6">
         <Card>
           <CardHeader
-            title="Simulasi Buta Warna"
-            subtitle="Lihat palet seperti yang dilihat berbagai tipa penglihatan"
+            title={text("Simulasi Buta Warna", "Color Blindness Simulator")}
+            subtitle={text(
+              "Lihat palet seperti yang dilihat berbagai tipe penglihatan",
+              "Preview your palette across several color-vision conditions",
+            )}
           />
           <CardBody className="space-y-5">
             <div className="flex flex-wrap gap-2">
@@ -124,7 +129,10 @@ export function AccessibilityModule() {
                   className="mt-1 text-sm"
                   style={{ color: rgbToHex(sim({ r: 240, g: 240, b: 240 })) }}
                 >
-                  Contoh teks pada latar warna terpilih.
+                  {text(
+                    "Contoh teks pada latar warna terpilih.",
+                    "Sample text on the selected color background.",
+                  )}
                 </p>
                 <div
                   className="mt-4 rounded-lg px-4 py-1.5 text-sm font-semibold"
@@ -142,10 +150,13 @@ export function AccessibilityModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Keterbacaan" />
+        <CardHeader title={text("Keterbacaan", "Distinguishability")} />
         <CardBody className="space-y-3">
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Kontras terendah antar-warna palet di bawah simulasi:
+            {text(
+              "Kontras terendah antar-warna palet di bawah simulasi:",
+              "Lowest contrast between palette colors under this simulation:",
+            )}
           </p>
           <div
             className="flex items-center justify-between rounded-lg px-3 py-2"
@@ -162,7 +173,10 @@ export function AccessibilityModule() {
             </span>
           </div>
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Semakin rendah, semakin sulit membedakan warna bagi tipe penglihatan tersebut.
+            {text(
+              "Semakin rendah, semakin sulit membedakan warna bagi tipe penglihatan tersebut.",
+              "Lower values indicate that the colors are harder to distinguish for this vision type.",
+            )}
           </p>
         </CardBody>
       </Card>

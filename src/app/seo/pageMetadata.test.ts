@@ -33,4 +33,10 @@ describe("page metadata", () => {
     expect(data["@type"]).toBe("WebSite");
     expect(data.name).toBe("ALUSNA");
   });
+
+  it("uses the page locale in English structured data", () => {
+    const englishPage = findSeoPage("/en/contrast-checker");
+    const data = createStructuredData(englishPage, "https://alusna.id/en/contrast-checker");
+    expect(data.inLanguage).toBe("en-US");
+  });
 });

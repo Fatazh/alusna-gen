@@ -29,6 +29,7 @@ import { AccessibilityTab } from "./AccessibilityTab";
 import { ExportTab } from "./ExportTab";
 import { generateBrandKit, TONE_PROFILES, type BrandKit, type BrandTone } from "../model/brandKit";
 import { brandKitToHtml } from "../services/htmlSerializer";
+import { useLocale } from "../../../shared/i18n";
 
 const TONE_OPTIONS = (["modern", "classic", "playful", "minimal", "bold"] as const).map(
   (id) => TONE_PROFILES[id],
@@ -43,6 +44,7 @@ const TONE_ICONS: Record<BrandTone, Icon> = {
 };
 
 export function BrandKitModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
   const { show } = useToast();
   const savedBrandKits = useStudio((s) => s.savedBrandKits);
@@ -116,29 +118,37 @@ export function BrandKitModule() {
     async (file: File) => {
       // Type validation (SVG excluded — external resource / tracking concerns).
       if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-        show("Format logo tidak didukung. Gunakan PNG, JPG, atau WebP.");
+        show(
+          text(
+            "Format logo tidak didukung. Gunakan PNG, JPG, atau WebP.",
+            "Unsupported logo format. Use PNG, JPG, or WebP.",
+          ),
+        );
         return;
       }
       // Size validation (max 2MB — the logo is embedded as a base64 data URL).
       const MAX_LOGO_SIZE = 2 * 1024 * 1024;
       if (file.size > MAX_LOGO_SIZE) {
-        show("Logo terlalu besar. Maksimal 2MB.");
+        show(
+          text("Logo terlalu besar. Maksimal 2MB.", "The logo is too large. Maximum size is 2 MB."),
+        );
         return;
       }
       try {
         const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
-          reader.onerror = () => reject(reader.error ?? new Error("Gagal membaca file"));
+          reader.onerror = () =>
+            reject(reader.error ?? new Error(text("Gagal membaca file", "Failed to read file")));
           reader.readAsDataURL(file);
         });
         setLogoDataUrl(dataUrl);
-        show("✓ Logo berhasil diunggah!");
+        show(text("✓ Logo berhasil diunggah!", "✓ Logo uploaded!"));
       } catch {
-        show("Gagal mengunggah logo");
+        show(text("Gagal mengunggah logo", "Failed to upload logo"));
       }
     },
-    [show],
+    [show, text],
   );
 
   const handleLogoUpload = useCallback(
@@ -300,7 +310,7 @@ export function BrandKitModule() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              title="Klik atau drag & drop logo"
+              title={text("Klik atau drag & drop logo", "Click or drag and drop a logo")}
             >
               {logoDataUrl ? (
                 <img src={logoDataUrl} alt="Logo" className="h-full w-full object-contain" />
@@ -441,7 +451,7 @@ export function BrandKitModule() {
                   className="mb-2 flex w-full items-center justify-center rounded-lg border px-3 py-2 text-xs font-medium transition"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
-                  Impor JSON
+                  {text("Impor JSON", "Import JSON")}
                 </button>
                 <button
                   type="button"
@@ -464,9 +474,9 @@ export function BrandKitModule() {
       >
         {(
           [
-            { id: "palette" as const, label: "Palet", icon: Palette },
-            { id: "typography" as const, label: "Tipografi", icon: TextAa },
-            { id: "guidelines" as const, label: "Panduan", icon: FileText },
+            { id: "palette" as const, label: text("Palet", "Palette"), icon: Palette },
+            { id: "typography" as const, label: text("Tipografi", "Typography"), icon: TextAa },
+            { id: "guidelines" as const, label: text("Panduan", "Guidelines"), icon: FileText },
             { id: "export" as const, label: "Export", icon: BracketsCurly },
           ] satisfies { id: typeof activeTab; label: string; icon: Icon }[]
         ).map((tab) => {
@@ -499,7 +509,7 @@ export function BrandKitModule() {
           }
         >
           <Wheelchair size={15} aria-hidden="true" />
-          Aksesibilitas
+          {text("Aksesibilitas", "Accessibility")}
         </button>
       </div>
 

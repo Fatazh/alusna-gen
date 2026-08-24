@@ -6,8 +6,10 @@ import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { extractPalette } from "../../services/imagePalette";
 import { useToast } from "../../../../shared/ui/toastContext";
 import { APP_BRAND } from "../../../../shared/config/brand";
+import { useLocale } from "../../../../shared/i18n";
 
 export function ImageModule() {
+  const { text } = useLocale();
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const saveColor = useStudio((s) => s.saveColor);
@@ -55,7 +57,11 @@ export function ImageModule() {
       const palette = await extractPalette(file, 6);
       setColors(palette);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengekstrak palet");
+      setError(
+        err instanceof Error
+          ? err.message
+          : text("Gagal mengekstrak palet", "Failed to extract palette"),
+      );
       setColors([]);
     } finally {
       setLoading(false);
@@ -78,8 +84,11 @@ export function ImageModule() {
       <div className="space-y-6">
         <Card>
           <CardHeader
-            title="Ekstrak Palet dari Gambar"
-            subtitle={`Upload foto, ${APP_BRAND.name} mengekstrak warna dominan. Klik HEX untuk menyalin.`}
+            title={text("Ekstrak Palet dari Gambar", "Extract a Palette from an Image")}
+            subtitle={text(
+              `Upload foto, ${APP_BRAND.name} mengekstrak warna dominan. Klik HEX untuk menyalin.`,
+              `Upload a photo and ${APP_BRAND.name} will extract dominant colors. Click HEX to copy.`,
+            )}
           />
           <CardBody className="space-y-5">
             <input
@@ -96,7 +105,9 @@ export function ImageModule() {
               className="w-full rounded-xl border border-dashed px-4 py-8 text-sm transition"
               style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
             >
-              {loading ? "Mengekstrak…" : "Pilih gambar…"}
+              {loading
+                ? text("Mengekstrak…", "Extracting…")
+                : text("Pilih gambar…", "Choose image…")}
             </button>
             {error && (
               <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-xs text-rose-600 dark:text-rose-300">
@@ -127,7 +138,7 @@ export function ImageModule() {
                         }}
                         className="block h-20 w-full"
                         style={{ backgroundColor: hex }}
-                        aria-label={`Pilih ${getColorName(rgb).label}`}
+                        aria-label={`${text("Pilih", "Choose")} ${getColorName(rgb).label}`}
                       />
                       <div
                         className="flex items-center justify-between px-2 py-1.5"
@@ -138,8 +149,8 @@ export function ImageModule() {
                           onClick={(e) => copyHex(hex, e)}
                           className="cursor-pointer font-mono text-[10px] transition hover:underline"
                           style={{ color: "var(--text-secondary)" }}
-                          aria-label={`Salin ${hex}`}
-                          title="Klik untuk salin HEX"
+                          aria-label={`${text("Salin", "Copy")} ${hex}`}
+                          title={text("Klik untuk salin HEX", "Click to copy HEX")}
                         >
                           {hex}
                         </button>
@@ -157,7 +168,7 @@ export function ImageModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Aksi" />
+        <CardHeader title={text("Aksi", "Actions")} />
         <CardBody className="space-y-3">
           <button
             type="button"
@@ -165,10 +176,13 @@ export function ImageModule() {
             disabled={colors.length === 0}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
           >
-            Simpan semua ke palet
+            {text("Simpan semua ke palet", "Save all to palette")}
           </button>
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Klik salah satu warna untuk menjadikannya warna aktif.
+            {text(
+              "Klik salah satu warna untuk menjadikannya warna aktif.",
+              "Choose a color to make it active.",
+            )}
           </p>
         </CardBody>
       </Card>

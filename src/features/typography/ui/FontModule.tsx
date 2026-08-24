@@ -5,6 +5,7 @@ import { useStudio } from "../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
 import { ColorPicker, rgbToHex, formatRgba } from "../../color";
 import { CopyButton } from "../../../shared/ui/CopyButton";
+import { useLocale } from "../../../shared/i18n";
 
 type SampleText = {
   label: string;
@@ -32,6 +33,7 @@ const CATEGORIES: { id: FontCategory | "all"; label: string }[] = [
 ];
 
 export function FontModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const selectedAlpha = useStudio((s) => s.selectedAlpha);
@@ -47,7 +49,32 @@ export function FontModule() {
   const [size, setSize] = useState(32);
   const [bgMode, setBgMode] = useState<"surface" | "color">("surface");
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [samples, setSamples] = useState<SampleText[]>(SAMPLE_TEXTS);
+  const [samples, setSamples] = useState<SampleText[]>(() =>
+    SAMPLE_TEXTS.map((sample) => ({
+      ...sample,
+      label: text(
+        sample.label,
+        (
+          {
+            Headline: "Headline",
+            Subheadline: "Subheadline",
+            Paragraf: "Paragraph",
+            Angka: "Numbers",
+            Alfabet: "Alphabet",
+          } as Record<string, string>
+        )[sample.label] ?? sample.label,
+      ),
+      text: text(
+        sample.text,
+        (
+          {
+            "Desain yang bermakna": "Design with meaning",
+            "Tipografi memberi nada pada pesanmu": "Typography gives your message a voice",
+          } as Record<string, string>
+        )[sample.text] ?? sample.text,
+      ),
+    })),
+  );
   const [pairing, setPairing] = useState<{ heading: string; body: string } | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -119,7 +146,12 @@ export function FontModule() {
     for (const file of Array.from(files)) {
       // Validate file size
       if (file.size > MAX_FONT_SIZE) {
-        setUploadError(`File ${file.name} terlalu besar. Maksimal ukuran font adalah 5MB.`);
+        setUploadError(
+          text(
+            `File ${file.name} terlalu besar. Maksimal ukuran font adalah 5MB.`,
+            `${file.name} is too large. The maximum font size is 5 MB.`,
+          ),
+        );
         continue;
       }
 
@@ -127,7 +159,12 @@ export function FontModule() {
       const validExtensions = [".ttf", ".otf", ".woff", ".woff2"];
       const fileName = file.name.toLowerCase();
       if (!validExtensions.some((ext) => fileName.endsWith(ext))) {
-        setUploadError(`File ${file.name} bukan format font yang didukung.`);
+        setUploadError(
+          text(
+            `File ${file.name} bukan format font yang didukung.`,
+            `${file.name} is not a supported font format.`,
+          ),
+        );
         continue;
       }
 
@@ -137,7 +174,10 @@ export function FontModule() {
         selectFont(family);
       } catch (err) {
         setUploadError(
-          `Gagal memuat ${file.name}: ${err instanceof Error ? err.message : "format tidak didukung"}`,
+          text(
+            `Gagal memuat ${file.name}: ${err instanceof Error ? err.message : "format tidak didukung"}`,
+            `Failed to load ${file.name}: ${err instanceof Error ? err.message : "unsupported format"}`,
+          ),
         );
       }
     }
@@ -171,8 +211,11 @@ export function FontModule() {
         {/* Upload + search */}
         <Card>
           <CardHeader
-            title="Pilih Font"
-            subtitle="Upload font sendiri atau pilih dari Google Fonts"
+            title={text("Pilih Font", "Choose a Font")}
+            subtitle={text(
+              "Upload font sendiri atau pilih dari Google Fonts",
+              "Upload your own font or choose one from Google Fonts",
+            )}
           />
           <CardBody className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
@@ -190,11 +233,11 @@ export function FontModule() {
                 onClick={() => fileRef.current?.click()}
                 className="rounded-lg bg-indigo-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
               >
-                Upload Font (.ttf/.otf/.woff/.woff2)
+                {text("Upload Font", "Upload Font")} (.ttf/.otf/.woff/.woff2)
               </button>
               {uploadedFonts.length > 0 && (
                 <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  {uploadedFonts.length} font terupload
+                  {uploadedFonts.length} {text("font terupload", "uploaded fonts")}
                 </span>
               )}
             </div>
@@ -290,8 +333,11 @@ export function FontModule() {
         {/* Font pairing suggestions */}
         <Card>
           <CardHeader
-            title="Saran Pasangan Font"
-            subtitle="Kombinasi heading & body yang selaras"
+            title={text("Saran Pasangan Font", "Font Pairing Suggestions")}
+            subtitle={text(
+              "Kombinasi heading & body yang selaras",
+              "Harmonious heading and body combinations",
+            )}
             action={
               pairing ? (
                 <button
@@ -308,7 +354,7 @@ export function FontModule() {
           <CardBody>
             {pairing && (
               <p className="mb-3 text-xs" style={{ color: "var(--text-secondary)" }}>
-                Aktif:{" "}
+                {text("Aktif", "Active")}:{" "}
                 <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
                   {pairing.heading}
                 </span>{" "}
@@ -354,8 +400,11 @@ export function FontModule() {
         {/* Live preview */}
         <Card>
           <CardHeader
-            title="Preview Implementasi"
-            subtitle="Lihat hasil untuk web & desain dengan warna terpilih"
+            title={text("Preview Implementasi", "Implementation Preview")}
+            subtitle={text(
+              "Lihat hasil untuk web & desain dengan warna terpilih",
+              "Preview the selected typography and color in a real layout",
+            )}
             action={
               <div className="flex flex-wrap gap-1.5">
                 <div className="flex gap-1.5">
@@ -369,7 +418,7 @@ export function FontModule() {
                         : { color: "var(--text-secondary)" }
                     }
                   >
-                    Pada surface
+                    {text("Pada surface", "On surface")}
                   </button>
                   <button
                     type="button"
@@ -381,7 +430,7 @@ export function FontModule() {
                         : { color: "var(--text-secondary)" }
                     }
                   >
-                    Pada warna
+                    {text("Pada warna", "On color")}
                   </button>
                 </div>
                 <div className="flex gap-1.5">
@@ -474,7 +523,7 @@ export function FontModule() {
                             prev.map((p, idx) => (idx === i ? { ...p, text: e.target.value } : p)),
                           )
                         }
-                        aria-label={`Teks contoh ${s.label}`}
+                        aria-label={`${text("Teks contoh", "Sample text")} ${s.label}`}
                         className="mb-1 w-full rounded-md border px-2 py-1 text-[11px] outline-none"
                         style={{
                           borderColor: "var(--input-border)",
@@ -491,7 +540,7 @@ export function FontModule() {
                               ? size * 1.6
                               : s.label === "Subheadline"
                                 ? size
-                                : s.label === "Paragraf"
+                                : s.label === "Paragraf" || s.label === "Paragraph"
                                   ? Math.max(14, size * 0.5)
                                   : size * 0.8,
                           color: textColor,
@@ -511,7 +560,7 @@ export function FontModule() {
                 <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   CSS snippet
                 </span>
-                <CopyButton value={cssSnippet} label="Salin CSS" />
+                <CopyButton value={cssSnippet} label={text("Salin CSS", "Copy CSS")} />
               </div>
               <pre
                 className="overflow-x-auto whitespace-pre-wrap text-[11px]"
@@ -525,7 +574,13 @@ export function FontModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Warna Teks" subtitle="Warna dari modul warna dipakai di sini" />
+        <CardHeader
+          title={text("Warna Teks", "Text Color")}
+          subtitle={text(
+            "Warna dari modul warna dipakai di sini",
+            "The active color from the color tools is used here",
+          )}
+        />
         <CardBody className="space-y-4">
           <div
             className="h-20 rounded-xl border"

@@ -1,26 +1,58 @@
 import { APP_BRAND } from "../../shared/config/brand";
-import { TRUST_PAGES } from "../router/routes";
+import { type Locale } from "../../shared/i18n";
+import { ENGLISH_TRUST_PAGES, TRUST_PAGES } from "../router/routes";
 
-export function AppFooter({ onNavigate }: { onNavigate: (path: string) => void }) {
+const FOOTER_LABELS = {
+  id: {
+    home: "Beranda",
+    about: "Tentang",
+    privacy: "Privasi",
+    terms: "Ketentuan",
+    advertising: "Kebijakan iklan",
+  },
+  en: {
+    home: "Home",
+    about: "About",
+    privacy: "Privacy",
+    terms: "Terms",
+    advertising: "Advertising policy",
+  },
+} as const;
+
+export function AppFooter({
+  locale,
+  onNavigate,
+}: {
+  locale: Locale;
+  onNavigate: (path: string) => void;
+}) {
+  const pages = locale === "en" ? ENGLISH_TRUST_PAGES : TRUST_PAGES;
+  const labels = FOOTER_LABELS[locale];
+  const homePath = locale === "en" ? "/en" : "/";
+
   return (
     <footer className="border-t" style={{ borderColor: "var(--border)" }}>
       <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-7 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p style={{ color: "var(--text-muted)" }}>
-          © {new Date().getFullYear()} {APP_BRAND.name} · {APP_BRAND.slogan}
+          © {new Date().getFullYear()} {APP_BRAND.name} ·{" "}
+          {locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}
         </p>
-        <nav aria-label="Informasi dan kebijakan" className="flex flex-wrap gap-x-4 gap-y-2">
+        <nav
+          aria-label={locale === "en" ? "Information and policies" : "Informasi dan kebijakan"}
+          className="flex flex-wrap gap-x-4 gap-y-2"
+        >
           <a
-            href="/"
+            href={homePath}
             onClick={(event) => {
               event.preventDefault();
-              onNavigate("/");
+              onNavigate(homePath);
             }}
             className="inline-flex min-h-6 items-center transition hover:underline"
             style={{ color: "var(--text-secondary)" }}
           >
-            Beranda
+            {labels.home}
           </a>
-          {TRUST_PAGES.map((page) => (
+          {pages.map((page) => (
             <a
               key={page.id}
               href={page.path}
@@ -31,13 +63,7 @@ export function AppFooter({ onNavigate }: { onNavigate: (path: string) => void }
               className="inline-flex min-h-6 items-center transition hover:underline"
               style={{ color: "var(--text-secondary)" }}
             >
-              {page.id === "about"
-                ? "Tentang"
-                : page.id === "privacy"
-                  ? "Privasi"
-                  : page.id === "terms"
-                    ? "Ketentuan"
-                    : "Kebijakan iklan"}
+              {labels[page.id]}
             </a>
           ))}
         </nav>

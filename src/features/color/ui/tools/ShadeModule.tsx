@@ -12,8 +12,10 @@ import {
   type Shade,
 } from "../../model/shades";
 import { useToast } from "../../../../shared/ui/toastContext";
+import { useLocale } from "../../../../shared/i18n";
 
 export function ShadeModule() {
+  const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
@@ -42,7 +44,7 @@ export function ShadeModule() {
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(hex);
-      show(`✓ ${hex} berhasil disalin!`);
+      show(text(`✓ ${hex} berhasil disalin!`, `✓ ${hex} copied!`));
     } catch {
       // fail silently
     }
@@ -53,13 +55,18 @@ export function ShadeModule() {
       <div className="space-y-6">
         <Card>
           <CardHeader
-            title="Generator Shade"
-            subtitle="Dari 1 warna, hasilkan skala 50–950 seperti Tailwind"
+            title={text("Generator Shade", "Shade Generator")}
+            subtitle={text(
+              "Dari 1 warna, hasilkan skala 50–950 seperti Tailwind",
+              "Generate a Tailwind-like 50–950 scale from one color",
+            )}
           />
           <CardBody className="space-y-5">
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Skala diambil dari warna aktif (hue & saturation dipertahankan, lightness bervariasi).
-              Klik HEX untuk menyalin.
+              {text(
+                "Skala diambil dari warna aktif (hue & saturation dipertahankan, lightness bervariasi). Klik HEX untuk menyalin.",
+                "The scale is derived from the active color while preserving hue and saturation. Click a HEX code to copy it.",
+              )}
             </p>
             <div className="space-y-1">
               {shades
@@ -78,7 +85,7 @@ export function ShadeModule() {
                         type="button"
                         onClick={() => pick(sh.rgb)}
                         className="flex flex-1 items-center gap-3 text-left"
-                        aria-label={`Pilih shade ${sh.step}`}
+                        aria-label={`${text("Pilih shade", "Choose shade")} ${sh.step}`}
                       >
                         <span
                           className={
@@ -104,8 +111,8 @@ export function ShadeModule() {
                             ? "text-white/80 hover:text-white"
                             : "text-zinc-900/70 hover:text-zinc-900")
                         }
-                        aria-label={`Salin ${hex}`}
-                        title="Klik untuk salin HEX"
+                        aria-label={`${text("Salin", "Copy")} ${hex}`}
+                        title={text("Klik untuk salin HEX", "Click to copy HEX")}
                       >
                         {hex}
                       </button>
@@ -118,11 +125,11 @@ export function ShadeModule() {
       </div>
 
       <Card className="h-fit">
-        <CardHeader title="Ekspor Skala" />
+        <CardHeader title={text("Ekspor Skala", "Export scale")} />
         <CardBody className="space-y-4">
           <div>
             <label className="mb-1 block text-[11px]" style={{ color: "var(--text-muted)" }}>
-              Nama palet
+              {text("Nama palet", "Palette name")}
             </label>
             <input
               type="text"
@@ -169,9 +176,9 @@ export function ShadeModule() {
           <div className="rounded-xl p-4" style={{ backgroundColor: "var(--chip-bg)" }}>
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                Kode
+                {text("Kode", "Code")}
               </span>
-              <CopyButton value={exportText} label="Salin" />
+              <CopyButton value={exportText} label={text("Salin", "Copy")} />
             </div>
             <pre
               className="max-h-64 overflow-x-auto whitespace-pre-wrap text-[11px]"
@@ -185,7 +192,7 @@ export function ShadeModule() {
             onClick={() => shades.forEach((sh) => saveColor(sh.rgb, `${name} ${sh.step}`))}
             className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
           >
-            Simpan skala ke palet
+            {text("Simpan skala ke palet", "Save scale to palette")}
           </button>
         </CardBody>
       </Card>
