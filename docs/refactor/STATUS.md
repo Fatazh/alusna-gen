@@ -1,11 +1,11 @@
 # Refactor Status
 
-Last updated: 2026-08-22
+Last updated: 2026-08-24
 
 ## Current objective
 
-The post-Phase 7 Swiss Modular visual-system refresh is complete and verified. Production launch
-configuration remains the next objective.
+The Experiment color-recipe finder is complete and verified. Production launch configuration
+remains the next objective.
 
 ## Completed
 
@@ -97,6 +97,16 @@ configuration remains the next objective.
 - The final local gate passes with 118 unit and contract tests, 25 required browser scenarios,
   one intentionally skipped sponsor scenario, a production build, and 0 production dependency
   vulnerabilities.
+- Experiment can now rank two-color recipes for a target using separate Cahaya RGB and Cat/Tinta
+  simulation models, then load a selected recipe and its proportions into the existing mixer.
+- The default yellow target resolves to 50% red plus 50% green light with 100% similarity.
+- Low-confidence pigment results display an explicit warning that the screen model is not a
+  production paint formula.
+- Recipe search is framework-independent and covered by four unit tests; the full suite now has 122
+  passing tests across 18 files.
+- Browser coverage now has 26 required passing scenarios plus one intentionally skipped configured
+  sponsor scenario, including the complete yellow-recipe workflow.
+- The final production dependency audit still reports 0 vulnerabilities.
 
 ## In progress
 
@@ -118,6 +128,11 @@ configuration remains the next objective.
   shared icon runtime and redesigned shell.
 - Manrope and IBM Plex Mono load from Google Fonts; self-hosting remains an option for stricter CSP,
   privacy, and offline resilience.
+- Color-recipe similarity currently uses RGB distance rather than perceptual Delta E scoring.
+- Cat/Tinta recipes are idealized simulations; real pigments, opacity, substrate, and material
+  chemistry can produce different results.
+- Recipe search is intentionally limited to two colors from a curated source catalog. Three-color
+  and manufacturer-specific pigment recipes require a separate product decision.
 
 ## Next task
 

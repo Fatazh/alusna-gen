@@ -2,8 +2,11 @@ import { useMemo, useRef, useState } from "react";
 import { Warning } from "@phosphor-icons/react/Warning";
 import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
+import { Lightbulb } from "@phosphor-icons/react/Lightbulb";
+import { Plus } from "@phosphor-icons/react/Plus";
 import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "../../model/color";
 import { getColorName } from "../../model/colorNames";
+import { findColorRecipes, type ColorRecipe, type ColorRecipeMode } from "../../model/colorRecipes";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../Swatch";
@@ -17,6 +20,24 @@ const MODES: { id: MixMode; label: string; desc: string }[] = [
   { id: "additive", label: "Additive", desc: "Cahaya (RGB +)" },
   { id: "subtractive", label: "Subtractive", desc: "Tinta/Cat (CMYK)" },
 ];
+
+const TARGET_PRESETS = [
+  { label: "Kuning", hex: "#FFFF00" },
+  { label: "Oranye", hex: "#FF8000" },
+  { label: "Hijau", hex: "#00FF00" },
+  { label: "Ungu", hex: "#8000FF" },
+] as const;
+
+const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: string }> = {
+  additive: {
+    label: "Cahaya RGB",
+    description: "Untuk layar dan cahaya. Contoh: merah + hijau menghasilkan kuning.",
+  },
+  subtractive: {
+    label: "Cat / tinta",
+    description: "Simulasi pigmen ideal. Hasil cat nyata dapat berbeda karena bahan dan opasitas.",
+  },
+};
 
 export function ExperimentModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
@@ -32,6 +53,8 @@ export function ExperimentModule() {
     { id: 2, hex: "#4ECDC4", weight: 1 },
   ]);
   const [mode, setMode] = useState<MixMode>("average");
+  const [targetHex, setTargetHex] = useState("#FFFF00");
+  const [recipeMode, setRecipeMode] = useState<ColorRecipeMode>("additive");
   const [past, setPast] = useState<Slot[][]>([]);
   const [future, setFuture] = useState<Slot[][]>([]);
 
@@ -65,6 +88,12 @@ export function ExperimentModule() {
     return mixColors(inputs, mode);
   }, [slots, mode]);
 
+  const targetRgb = useMemo(() => hexToRgb(targetHex), [targetHex]);
+  const targetRecipes = useMemo(
+    () => (targetRgb ? findColorRecipes(targetRgb, recipeMode, 4) : []),
+    [targetRgb, recipeMode],
+  );
+
   const updateSlot = (id: number, partial: Partial<Slot>) => {
     pushHistory(slots.map((s) => (s.id === id ? { ...s, ...partial } : s)));
   };
@@ -78,21 +107,220 @@ export function ExperimentModule() {
     pushHistory(slots.filter((s) => s.id !== id));
   };
 
+  const applyRecipe = (recipe: ColorRecipe) => {
+    const next = recipe.ingredients.map((ingredient) => ({
+      id: nextId.current++,
+      hex: rgbToHex(ingredient.color),
+      weight: ingredient.ratio / 20,
+    }));
+    pushHistory(next);
+    setMode(recipeMode);
+  };
+
   const hasCustomWeights = slots.some((s) => s.weight !== 1);
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
   const getChipStyle = (active: boolean): React.CSSProperties =>
     active
       ? {
-          borderColor: "rgba(99,102,241,0.5)",
-          backgroundColor: "rgba(99,102,241,0.15)",
-          color: "#6366f1",
+          borderColor: "var(--accent)",
+          backgroundColor: "var(--chip-active-bg)",
+          color: "var(--accent)",
         }
       : { borderColor: "var(--border)", color: "var(--text-secondary)" };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
+        <Card>
+          <CardHeader
+            title="Cari Resep Warna"
+            subtitle="Pilih warna target untuk menemukan dua warna pembentuk terdekat"
+          />
+          <CardBody className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div>
+                <label
+                  htmlFor="recipe-target-hex"
+                  className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Warna target
+                </label>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={targetRgb ? rgbToHex(targetRgb) : "#FFFF00"}
+                    onChange={(event) => setTargetHex(event.target.value.toUpperCase())}
+                    className="h-11 w-14 rounded-md border"
+                    style={{ borderColor: "var(--input-border)" }}
+                    aria-label="Pilih warna target"
+                  />
+                  <input
+                    id="recipe-target-hex"
+                    type="text"
+                    value={targetHex}
+                    onChange={(event) => {
+                      const value = event.target.value.toUpperCase();
+                      if (/^#?[0-9A-F]{0,6}$/.test(value)) {
+                        setTargetHex(value.startsWith("#") ? value : `#${value}`);
+                      }
+                    }}
+                    className="min-w-0 flex-1 rounded-md border px-3 py-2.5 font-mono text-sm outline-none"
+                    style={{
+                      borderColor: targetRgb ? "var(--input-border)" : "var(--magenta)",
+                      backgroundColor: "var(--input-bg)",
+                      color: "var(--input-text)",
+                    }}
+                    aria-invalid={!targetRgb}
+                  />
+                  <div className="hidden min-w-32 sm:block">
+                    <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                      {targetRgb ? getColorName(targetRgb).label : "HEX belum lengkap"}
+                    </p>
+                    <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
+                      Target pencarian
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {TARGET_PRESETS.map((preset) => (
+                  <button
+                    key={preset.hex}
+                    type="button"
+                    onClick={() => setTargetHex(preset.hex)}
+                    className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-medium"
+                    style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                  >
+                    <span
+                      className="h-3 w-3 rounded-full border"
+                      style={{ backgroundColor: preset.hex, borderColor: "var(--border)" }}
+                      aria-hidden="true"
+                    />
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p
+                className="text-[11px] font-semibold uppercase tracking-[0.14em]"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Model campuran
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(Object.keys(RECIPE_MODE_META) as ColorRecipeMode[]).map((recipeModeId) => (
+                  <button
+                    key={recipeModeId}
+                    type="button"
+                    onClick={() => setRecipeMode(recipeModeId)}
+                    className={chipClass}
+                    style={getChipStyle(recipeMode === recipeModeId)}
+                    aria-pressed={recipeMode === recipeModeId}
+                  >
+                    {RECIPE_MODE_META[recipeModeId].label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] leading-5" style={{ color: "var(--text-muted)" }}>
+                {RECIPE_MODE_META[recipeMode].description}
+              </p>
+            </div>
+
+            {targetRecipes.length > 0 && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {targetRecipes.map((recipe, index) => (
+                  <article
+                    key={`${recipe.ingredients[0].name}-${recipe.ingredients[1].name}`}
+                    className="rounded-lg border p-4"
+                    style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
+                          {recipe.ingredients[0].name} + {recipe.ingredients[1].name}
+                        </p>
+                        <p
+                          className="mt-1 font-mono text-[10px]"
+                          style={{ color: "var(--text-muted)" }}
+                        >
+                          {recipe.ingredients[0].ratio}% / {recipe.ingredients[1].ratio}%
+                        </p>
+                      </div>
+                      <span
+                        className="rounded-full px-2 py-1 text-[10px] font-semibold"
+                        style={{
+                          backgroundColor: "var(--chip-active-bg)",
+                          color: "var(--accent)",
+                        }}
+                      >
+                        {recipe.similarity}% mirip
+                      </span>
+                    </div>
+                    <div
+                      className="mt-3 grid grid-cols-[1fr_1fr_0.8fr] overflow-hidden rounded-md border"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      {recipe.ingredients.map((ingredient) => (
+                        <div
+                          key={ingredient.name}
+                          className="h-12"
+                          style={{ backgroundColor: rgbToHex(ingredient.color) }}
+                          title={`${ingredient.name} ${ingredient.ratio}%`}
+                        />
+                      ))}
+                      <div
+                        className="h-12 border-l-2"
+                        style={{ backgroundColor: recipe.resultHex, borderColor: "var(--app-bg)" }}
+                        title={`Hasil ${recipe.resultHex}`}
+                      />
+                    </div>
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <span
+                        className="font-mono text-[10px]"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        Hasil {recipe.resultHex}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => applyRecipe(recipe)}
+                        className="rounded-md px-2.5 py-1.5 text-[11px] font-bold"
+                        style={{
+                          backgroundColor: "var(--accent)",
+                          color: "var(--accent-contrast)",
+                        }}
+                        aria-label={`Gunakan resep ${index + 1}: ${recipe.ingredients[0].name} dan ${recipe.ingredients[1].name}`}
+                      >
+                        Gunakan resep
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            {recipeMode === "subtractive" && targetRecipes[0]?.similarity < 90 && (
+              <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
+                <Lightbulb
+                  size={16}
+                  className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400"
+                  aria-hidden="true"
+                />
+                <p className="text-[11px] leading-5 text-amber-800 dark:text-amber-300">
+                  Tidak ada campuran dua pigmen dasar yang mendekati target dengan baik. Warna ini
+                  kemungkinan perlu dipakai sebagai pigmen dasar, lalu disesuaikan dengan putih atau
+                  hitam. Simulasi layar bukan formula cat produksi.
+                </p>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+
         <Card>
           <CardHeader
             title="Experiment Color"
@@ -108,6 +336,7 @@ export function ExperimentModule() {
                   className={chipClass}
                   style={getChipStyle(mode === m.id)}
                   title={m.desc}
+                  aria-pressed={mode === m.id}
                 >
                   {m.label}
                 </button>
@@ -221,7 +450,8 @@ export function ExperimentModule() {
                   className="flex min-h-[120px] items-center justify-center rounded-xl border border-dashed text-sm transition"
                   style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 >
-                  + Tambah warna
+                  <Plus size={15} className="mr-1" aria-hidden="true" />
+                  Tambah warna
                 </button>
               )}
             </div>
@@ -277,7 +507,8 @@ export function ExperimentModule() {
           <button
             type="button"
             onClick={() => saveColor(result, getColorName(result).label)}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
             Simpan ke palet
           </button>

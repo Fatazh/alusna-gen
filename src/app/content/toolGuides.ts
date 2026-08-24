@@ -41,15 +41,15 @@ export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
   },
   "/color-mixer": {
     overview:
-      "Color Mixer memperlihatkan hasil pencampuran dua warna dan proporsinya. Alat ini berguna saat Anda ingin memahami transisi warna, mencari warna tengah, atau membuat variasi yang tidak terasa acak.",
+      "Color Mixer memperlihatkan hasil pencampuran dua warna dan dapat mencari resep dua warna yang paling mendekati target. Gunakan model Cahaya RGB untuk layar atau simulasi Cat/Tinta untuk eksplorasi pigmen awal.",
     steps: [
-      "Pilih dua warna sumber yang ingin dibandingkan atau dicampurkan.",
-      "Atur proporsi sampai hasil memiliki hubungan visual yang sesuai dengan tujuan desain.",
+      "Pilih warna target untuk memperoleh rekomendasi bahan dan proporsi, atau tentukan dua warna sumber secara manual.",
+      "Pilih model campuran yang sesuai, lalu gunakan resep terdekat untuk memuat warna dan bobot ke eksperimen.",
       "Salin kode hasil dan bandingkan kembali terhadap warna sumber sebelum diterapkan.",
     ],
-    useCases: ["Warna transisi", "State hover", "Eksplorasi tint sederhana"],
+    useCases: ["Resep warna target", "Warna transisi", "Eksplorasi tint sederhana"],
     tips: [
-      "Campuran digital mengikuti ruang warna layar dan tidak selalu sama dengan campuran cat fisik.",
+      "Campuran cahaya RGB dan campuran cat bersifat berbeda; simulasi pigmen di layar bukan formula produksi.",
       "Untuk rangkaian terang-gelap yang sistematis, lanjutkan hasilnya ke Shade Generator.",
     ],
     relatedPaths: ["/gradient-generator", "/shade-generator", "/color-matching"],

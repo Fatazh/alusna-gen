@@ -210,6 +210,24 @@ test("Brand Kit exposes usable export previews", async ({ page }) => {
   await expect(page.getByText('"brandName": "My Brand"', { exact: false })).toBeVisible();
 });
 
+test("Experiment finds and applies a yellow light recipe", async ({ page }) => {
+  await page.goto("/color-mixer/");
+
+  await expect(page.getByRole("heading", { name: "Cari Resep Warna" })).toBeVisible();
+  await expect(page.getByText("Merah + Hijau", { exact: true })).toBeVisible();
+  await expect(page.getByText("100% mirip", { exact: true }).first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Gunakan resep 1: Merah dan Hijau" }).click();
+  await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.getByText("#FFFF00", { exact: true }).last()).toBeVisible();
+
+  await page.getByRole("button", { name: "Cat / tinta" }).click();
+  await expect(page.getByText(/Tidak ada campuran dua pigmen dasar/)).toBeVisible();
+});
+
 test("legacy CIKP storage migrates to ALUSNA without deleting the rollback copy", async ({
   page,
 }) => {
