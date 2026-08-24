@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { rgbToHex, type RGB } from "../../model/color";
 import {
+  COLOR_RECIPE_QUALITY_LABELS,
   evaluateColorRecipe,
   type ColorRecipe,
   type ColorRecipeIngredient,
@@ -58,7 +59,7 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           className="rounded-full px-2 py-1 text-[10px] font-semibold"
           style={{ backgroundColor: "var(--chip-active-bg)", color: "var(--accent)" }}
         >
-          {adjustedRecipe.similarity}% mirip
+          {adjustedRecipe.similarity}% · {COLOR_RECIPE_QUALITY_LABELS[adjustedRecipe.quality]}
         </span>
       </div>
 
@@ -131,6 +132,9 @@ export function ColorRecipeEditor({ target, recipe, onApply }: ColorRecipeEditor
           </p>
           <p className="mt-1 font-mono text-xs" style={{ color: "var(--text-primary)" }}>
             {adjustedRecipe.resultHex}
+          </p>
+          <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
+            Jarak perceptual {adjustedRecipe.distance.toFixed(2)}
           </p>
         </div>
         <div

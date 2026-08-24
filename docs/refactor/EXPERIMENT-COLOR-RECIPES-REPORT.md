@@ -39,18 +39,26 @@ this task.
   correctly identifies colors such as yellow as a direct pigment.
 - Model subtractive mixing as independent pigment coverage over a white substrate. A mixer weight
   from 0 to 5 maps to 0% to 100% coverage.
-- Reserve 100% similarity for an identical result; rounded but non-identical results are capped at
-  99%.
+- Score formula results in perceptual OKLab space rather than normalizing raw RGB distance against
+  the black-to-white diagonal. Reserve 100% for identical RGB output and cap non-identical results
+  at 99%.
+- Pair the calibrated score with explicit labels: Tepat, Sangat dekat, Mendekati, Berbeda, and
+  Berbeda jauh. The percentage remains a product-facing score, while the OKLab distance is shown
+  separately for transparency.
 - Display a material warning instead of presenting the idealized screen result as a production
   paint formula.
 - Keep target and recipe state local to the component; no persisted schema or migration is needed.
 
 ## Validation performed
 
-- Twelve focused recipe and mixing tests passed, including exact yellow light from 100% red and
+- Fourteen focused recipe and mixing tests passed, including exact yellow light from 100% red and
   100% green, `#0008FF` from 3.14% green plus 100% blue, manual formula re-evaluation and input
   clamping, partial single-light intensity, exact red from magenta and yellow, single-pigment
   coverage, and the reported Cerulean regression.
+- The reported Medium Blue case is covered directly: target `#2115C1` with Cyan, Magenta, and Hitam
+  all at 100% produces black, distance 45.59, and `9% · Berbeda jauh` instead of the misleading 55%.
+- Changing the same target regenerates Cyan 83%, Magenta 89%, and Hitam 24%, yielding `#2115C2` at
+  `99% · Sangat dekat`.
 - Browser checks passed at desktop and 390 x 844 mobile sizes with no document overflow or unnamed
   buttons.
 - Applying a recipe correctly loads one to four experiment slots, their intensity or coverage, and
@@ -61,7 +69,7 @@ this task.
   84.31% returns `#040BD7` at 100%. This flow passed both interactive browser and E2E checks.
 - Target `#0C7BC0` now produces Cyan 94%, Magenta 36%, and Hitam 25%, yielding `#0B7ABF` rather than
   collapsing to `#0000FF`.
-- `npm run check` passed with 130 tests across 18 files, no dependency-boundary violations, and a
+- `npm run check` passed with 132 tests across 18 files, no dependency-boundary violations, and a
   production build.
 - `npm run test:e2e` passed 26 required scenarios; one sponsor-configured scenario remained
   intentionally skipped.
@@ -69,17 +77,17 @@ this task.
 
 ## Remaining risks
 
-- Similarity uses RGB distance, which is deterministic and fast but not as perceptually accurate as
-  a Delta E calculation in a Lab-like color space.
+- The displayed percentage is a calibrated UX score derived from OKLab distance, not a standardized
+  scientific percentage. The underlying distance is displayed alongside the formula result.
 - The subtractive model assumes idealized CMYK channel coverage. Real paint, ink, printing
   substrate, opacity, and pigment chemistry can produce different results.
 - The adjustable percentages represent an idealized screen-light or CMYK coverage model; manual
   changes can reduce similarity and are not a physical pigment recipe.
 - Cat/Tinta supports up to four CMYK channels but not manufacturer-specific pigments.
-- The lazy Experiment chunk is 6.89 kB gzip; the main entry remains effectively unchanged at 66.24
+- The lazy Experiment chunk is 7.26 kB gzip; the main entry remains effectively unchanged at 66.25
   kB gzip.
 
 ## Next planned task
 
-Gather usage feedback before considering perceptual Delta E scoring or custom pigment libraries.
+Gather usage feedback before considering CIEDE2000 comparison or custom pigment libraries.
 Production launch configuration remains the broader project priority.

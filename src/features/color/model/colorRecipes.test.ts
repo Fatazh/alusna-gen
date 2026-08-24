@@ -65,7 +65,7 @@ describe("findColorRecipes", () => {
     ]);
     expect(recipe.resultHex).toBe("#0B7ABF");
     expect(recipe.similarity).toBe(99);
-    expect(recipe.quality).toBe("close");
+    expect(recipe.quality).toBe("very-close");
   });
 
   it("represents black as zero emitted light", () => {
@@ -102,5 +102,36 @@ describe("findColorRecipes", () => {
       "intensity",
     );
     expect(clamped.ingredients.map((ingredient) => ingredient.ratio)).toEqual([0, 100]);
+  });
+
+  it("scores a black CMYK result as perceptually far from medium blue", () => {
+    const target = { r: 33, g: 21, b: 193 };
+    const recipe = evaluateColorRecipe(
+      target,
+      [
+        { name: "Cyan", color: { r: 0, g: 255, b: 255 }, ratio: 100 },
+        { name: "Magenta", color: { r: 255, g: 0, b: 255 }, ratio: 100 },
+        { name: "Hitam", color: { r: 0, g: 0, b: 0 }, ratio: 100 },
+      ],
+      "coverage",
+    );
+
+    expect(recipe.resultHex).toBe("#000000");
+    expect(recipe.distance).toBe(45.59);
+    expect(recipe.similarity).toBe(9);
+    expect(recipe.quality).toBe("far");
+  });
+
+  it("derives the expected CMYK formula when the target changes to medium blue", () => {
+    const [recipe] = findColorRecipes({ r: 33, g: 21, b: 193 }, "subtractive", 1);
+
+    expect(recipe.ingredients.map(({ name, ratio }) => ({ name, ratio }))).toEqual([
+      { name: "Cyan", ratio: 83 },
+      { name: "Magenta", ratio: 89 },
+      { name: "Hitam", ratio: 24 },
+    ]);
+    expect(recipe.resultHex).toBe("#2115C2");
+    expect(recipe.similarity).toBe(99);
+    expect(recipe.quality).toBe("very-close");
   });
 });

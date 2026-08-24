@@ -4,7 +4,7 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The adjustable Experiment RGB and CMYK formulas are complete and verified. Production launch
+The perceptual Experiment formula scoring correction is complete and verified. Production launch
 configuration remains the next objective.
 
 ## Completed
@@ -127,6 +127,14 @@ configuration remains the next objective.
   84.31% yields the exact `#040BD7` at 100%.
 - The full suite now has 130 passing tests across 18 files; browser coverage remains 26 required
   passing scenarios plus one intentionally skipped configured sponsor scenario.
+- Formula similarity now uses perceptual OKLab distance instead of raw RGB diagonal normalization;
+  the UI shows both a calibrated score and an explicit quality label.
+- Target `#2115C1` against black now reports `9% · Berbeda jauh` with perceptual distance 45.59,
+  replacing the misleading 55% score.
+- The generated CMYK formula for `#2115C1` resets to Cyan 83%, Magenta 89%, and Hitam 24%, producing
+  `#2115C2` at `99% · Sangat dekat`.
+- The full suite now has 132 passing tests across 18 files; browser coverage remains 26 required
+  passing scenarios plus one intentionally skipped configured sponsor scenario.
 
 ## In progress
 
@@ -148,7 +156,8 @@ configuration remains the next objective.
   shared icon runtime and redesigned shell.
 - Manrope and IBM Plex Mono load from Google Fonts; self-hosting remains an option for stricter CSP,
   privacy, and offline resilience.
-- Color-recipe similarity currently uses RGB distance rather than perceptual Delta E scoring.
+- Formula percentage is a calibrated UX score derived from perceptual OKLab distance, not a
+  standardized scientific similarity percentage; the underlying distance is shown in the UI.
 - Cat/Tinta recipes are idealized simulations; real pigments, opacity, substrate, and material
   chemistry can produce different results.
 - Adjustable formulas are idealized screen simulations; Cat/Tinta still does not model
