@@ -37,6 +37,9 @@ this task.
   calculated result so source colors and output are not conflated.
 - Default the manual Experiment Color mixer to Additive so its initial model matches the Cahaya RGB
   recipe finder; Average remains available when the user explicitly wants arithmetic blending.
+- Localize exact RGB primary target labels while retaining CSS naming context. For example,
+  `#00FF00` is shown as `Hijau RGB (CSS: Lime)` so the target and Hijau recipe channel are visibly
+  consistent.
 - Model additive mixing as emitted-light intensity. A mixer weight from 0 to 5 maps to 0% to 100%,
   matching the existing control range and the recipe application flow.
 - Derive Cat/Tinta recipes from CMYK channel coverage. This supports one to four ingredients and
@@ -90,7 +93,7 @@ this task.
 - The adjustable percentages represent an idealized screen-light or CMYK coverage model; manual
   changes can reduce similarity and are not a physical pigment recipe.
 - Cat/Tinta supports up to four CMYK channels but not manufacturer-specific pigments.
-- The lazy Experiment chunk is 7.36 kB gzip; the main entry remains effectively unchanged at 66.27
+- The lazy Experiment chunk is 7.45 kB gzip; the main entry remains effectively unchanged at 66.26
   kB gzip.
 
 ## Next planned task

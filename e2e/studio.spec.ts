@@ -225,6 +225,11 @@ test("Experiment applies RGB intensities and derives a CMYK target", async ({ pa
   await expect(page.getByText("Merah 100% · Hijau 100%", { exact: true })).toBeVisible();
   await expect(page.getByText("100% · Tepat", { exact: true }).first()).toBeVisible();
 
+  await page.getByRole("button", { name: "Hijau", exact: true }).click();
+  await expect(page.getByText("Hijau RGB (CSS: Lime)", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hijau 100%", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Kuning", exact: true }).click();
+
   await page.getByRole("button", { name: "Gunakan formula: Merah dan Hijau" }).click();
   await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
     "aria-pressed",

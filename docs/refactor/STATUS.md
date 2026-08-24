@@ -4,8 +4,8 @@ Last updated: 2026-08-24
 
 ## Current objective
 
-The Experiment Additive default-mode correction is complete and verified. Production launch
-configuration remains the next objective.
+The Experiment target-name clarification is complete and verified. Production launch configuration
+remains the next objective.
 
 ## Completed
 
@@ -139,6 +139,8 @@ configuration remains the next objective.
   action; the calculated formula result also has its own copy action.
 - Experiment Color now opens with Additive selected by default, aligning its initial physical model
   with the default Cahaya RGB recipe finder while preserving Average as an explicit option.
+- Exact RGB/CSS primaries now use localized target labels with standards context; `#00FF00` appears
+  as `Hijau RGB (CSS: Lime)`, matching the Hijau recipe channel without hiding the CSS keyword.
 
 ## In progress
 

@@ -29,6 +29,19 @@ const TARGET_PRESETS = [
   { label: "Ungu", hex: "#8000FF" },
 ] as const;
 
+const LOCALIZED_TARGET_LABELS: Record<string, string> = {
+  "#FF0000": "Merah RGB (CSS: Red)",
+  "#00FF00": "Hijau RGB (CSS: Lime)",
+  "#0000FF": "Biru RGB (CSS: Blue)",
+  "#FFFF00": "Kuning (CSS: Yellow)",
+  "#FF8000": "Oranye",
+  "#8000FF": "Ungu",
+};
+
+function getTargetColorLabel(color: RGB): string {
+  return LOCALIZED_TARGET_LABELS[rgbToHex(color)] ?? getColorName(color).label;
+}
+
 const RECIPE_MODE_META: Record<ColorRecipeMode, { label: string; description: string }> = {
   additive: {
     label: "Cahaya RGB",
@@ -178,8 +191,12 @@ export function ExperimentModule() {
                     aria-invalid={!targetRgb}
                   />
                   <div className="hidden min-w-32 sm:block">
-                    <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {targetRgb ? getColorName(targetRgb).label : "HEX belum lengkap"}
+                    <p
+                      aria-live="polite"
+                      className="text-xs font-semibold"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {targetRgb ? getTargetColorLabel(targetRgb) : "HEX belum lengkap"}
                     </p>
                     <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
                       Target pencarian
