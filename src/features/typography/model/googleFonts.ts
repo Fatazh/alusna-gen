@@ -55,7 +55,11 @@ export const GOOGLE_FONTS: FontDef[] = GOOGLE_FONTS_CATALOG.map((font) => {
   };
 });
 
-export const GOOGLE_FONTS_META = GOOGLE_FONTS_CATALOG_META;
+export const GOOGLE_FONTS_META: {
+  source: "curated-fallback" | "google-fonts-developer-api";
+  generatedAt: string | null;
+  limit: number;
+} = GOOGLE_FONTS_CATALOG_META;
 export const FILTER_FONT_PAGE_SIZE = 40;
 
 export function findGoogleFont(family: string): FontDef | undefined {

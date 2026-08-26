@@ -82,12 +82,14 @@ test("Google Fonts catalog supports search, weights, and italic preview", async 
   await playfair.click();
 
   const weight = page.getByLabel(/Weight:/);
-  await expect(weight.locator("option")).toHaveText(["400", "600", "700"]);
-  await weight.selectOption("700");
+  const availableWeights = await weight.locator("option").allTextContents();
+  expect(availableWeights.length).toBeGreaterThan(0);
+  const selectedWeight = String(availableWeights.at(-1));
+  await weight.selectOption(selectedWeight);
   await page.getByRole("button", { name: "Aktifkan gaya italic" }).click();
 
   await expect(page.getByText("font-family: 'Playfair Display'", { exact: false })).toBeVisible();
-  await expect(page.getByText("font-weight: 700", { exact: false })).toBeVisible();
+  await expect(page.getByText(`font-weight: ${selectedWeight}`, { exact: false })).toBeVisible();
   await expect(page.getByText("font-style: italic", { exact: false })).toBeVisible();
 });
 

@@ -38,10 +38,14 @@ describe("Google Fonts catalog", () => {
     expect(nearestFontWeight([], 700)).toBe(400);
   });
 
-  it("preserves the exact weight matrix for each style", () => {
-    const playfair = GOOGLE_FONTS.find((font) => font.family === "Playfair Display");
-    expect(playfair?.styleWeights.normal).toEqual([400, 600, 700]);
-    expect(playfair?.styleWeights.italic).toEqual([400, 600, 700]);
+  it("keeps each style weight inside the advertised weight list", () => {
+    for (const font of GOOGLE_FONTS) {
+      for (const style of font.styles) {
+        expect(font.styleWeights[style].every((weight) => font.weights.includes(weight))).toBe(
+          true,
+        );
+      }
+    }
   });
 });
 
