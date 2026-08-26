@@ -15,7 +15,7 @@ export function ToolGuideView({
   return (
     <article
       data-evergreen-content={page.path}
-      className="mt-10 space-y-7 rounded-3xl border px-5 py-7 sm:px-8 sm:py-9"
+      className="mt-10 space-y-7 rounded-3xl border px-5 py-7 sm:px-8 sm:py-9 mb-5"
       style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
     >
       <header className="max-w-4xl">

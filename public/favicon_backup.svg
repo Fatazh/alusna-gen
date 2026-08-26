@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ALUSNA">
+  <defs>
+    <linearGradient id="alusna" x1="8" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="0.52" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#D946EF"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="58" height="58" rx="17" fill="url(#alusna)"/>
+  <path d="M18 46 29.3 17h5.4L46 46h-7.2l-2.2-6.3H27.2L25 46h-7Zm11.3-12.5h5.2L32 25.8l-2.7 7.7Z" fill="white"/>
+  <circle cx="49" cy="48" r="5" fill="#FCD34D"/>
+</svg>

@@ -300,7 +300,15 @@ export function BrandKitModule() {
               onChange={handleImportJson}
             />
             {/* Logo Preview */}
-            <div
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleLogoUpload}
+            />
+            <button
+              type="button"
               className={`flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 bg-black/[0.02] transition dark:bg-white/5 ${
                 isDragging
                   ? "border-indigo-500 bg-indigo-500/10 scale-105"
@@ -326,24 +334,17 @@ export function BrandKitModule() {
                   </div>
                 </div>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={handleLogoUpload}
-              />
-            </div>
+            </button>
 
             {/* Brand Info */}
             <div className="flex-1 space-y-3">
               <div>
-                <label
+                <p
                   className="text-[11px] font-medium uppercase tracking-wider"
                   style={{ color: "var(--text-muted)" }}
                 >
                   Brand Name
-                </label>
+                </p>
                 <input
                   type="text"
                   value={brandName}
@@ -357,12 +358,12 @@ export function BrandKitModule() {
                 />
               </div>
               <div>
-                <label
+                <p
                   className="text-[11px] font-medium uppercase tracking-wider"
                   style={{ color: "var(--text-muted)" }}
                 >
                   Tagline
-                </label>
+                </p>
                 <input
                   type="text"
                   value={tagline}
@@ -380,12 +381,12 @@ export function BrandKitModule() {
 
             {/* Brand Tone */}
             <div className="w-full sm:w-56">
-              <label
+              <p
                 className="text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
                 Tone
-              </label>
+              </p>
               <div className="mt-1 space-y-1">
                 {TONE_OPTIONS.map((t) => (
                   <button
@@ -438,12 +439,12 @@ export function BrandKitModule() {
 
             {/* Save Button */}
             <div className="w-full sm:w-32">
-              <label
+              <p
                 className="text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
                 Actions
-              </label>
+              </p>
               <div className="mt-1">
                 <button
                   type="button"

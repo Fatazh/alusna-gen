@@ -55,26 +55,16 @@ export function StudioHeader({
             event.preventDefault();
             onNavigateHome();
           }}
-          className="flex min-h-16 items-center gap-3 rounded-lg"
+          className="flex min-h-16 shrink-0 items-center rounded-lg"
         >
-          <div
-            className="relative flex h-9 w-9 items-center justify-center rounded-md text-base font-extrabold text-white"
-            style={{ backgroundColor: "var(--accent)" }}
-            aria-hidden="true"
-          >
-            A
-          </div>
-          <div className="flex items-baseline gap-4">
-            <div
-              className="text-lg font-extrabold tracking-[-0.035em]"
-              style={{ color: "var(--chrome-text)" }}
-            >
-              {APP_BRAND.name}
-            </div>
-            <p className="hidden text-xs lg:block" style={{ color: "var(--chrome-sub)" }}>
-              {locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}
-            </p>
-          </div>
+          <img
+            src="/logo.svg"
+            alt={`${APP_BRAND.name} — ${locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}`}
+            className="h-10 w-auto rounded-md object-contain sm:h-14"
+            style={
+              theme === "dark" ? { backgroundColor: "#ffffff", padding: "2px 4px" } : undefined
+            }
+          />
         </a>
 
         <div className="flex min-w-0 items-center gap-1 sm:gap-3">
