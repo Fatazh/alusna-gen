@@ -50,6 +50,18 @@ test("homepage introduces ALUSNA and links visibly to every tool", async ({ page
   expect(structuredData["@type"]).toBe("WebSite");
 });
 
+test("production HTML uses an external bootstrap and blocks inline scripts", async ({ page }) => {
+  await page.goto("/");
+
+  const policy = await page
+    .locator('meta[http-equiv="Content-Security-Policy"]')
+    .getAttribute("content");
+  expect(policy).toContain("script-src 'self';");
+  expect(policy).not.toContain("script-src 'self' 'unsafe-inline'");
+  await expect(page.locator('script[src="/boot.js"]')).toHaveCount(1);
+  await expect(page.locator("#boot-error")).toBeHidden();
+});
+
 test("homepage starts a tool workflow without a full reload", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Mulai dari palet warna" }).click();

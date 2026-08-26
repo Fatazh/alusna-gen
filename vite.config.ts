@@ -7,6 +7,16 @@ import { APP_BRAND } from "./src/shared/config/brand.ts";
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+function productionCsp(): Plugin {
+  return {
+    name: `${APP_BRAND.name.toLowerCase()}-production-csp`,
+    enforce: "post",
+    transformIndexHtml(html) {
+      return html.replace("script-src 'self' 'unsafe-inline';", "script-src 'self';");
+    },
+  };
+}
+
 function staticSeoPages(siteUrl: string): Plugin {
   const origin = siteUrl.replace(/\/+$/, "");
   return {
@@ -82,10 +92,14 @@ function staticSeoPages(siteUrl: string): Plugin {
   };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, ".", "VITE_");
   return {
-    plugins: [react(), staticSeoPages(env.VITE_SITE_URL ?? "")],
+    plugins: [
+      react(),
+      ...(command === "build" ? [productionCsp()] : []),
+      staticSeoPages(env.VITE_SITE_URL ?? ""),
+    ],
     server: { port: 5173 },
   };
 });

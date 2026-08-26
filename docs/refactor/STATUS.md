@@ -1,11 +1,11 @@
 # Refactor Status
 
-Last updated: 2026-08-24
+Last updated: 2026-08-26
 
 ## Current objective
 
-The ALUSNA v1.0.0 release metadata and bilingual changelog are complete and verified. Production
-launch configuration remains the next objective.
+ALUSNA production launch hardening is implemented. The remaining launch work requires the real
+HTTPS origin, public contact email, and verification against the selected host.
 
 ## Completed
 
@@ -154,6 +154,15 @@ launch configuration remains the next objective.
 - ALUSNA is marked as the `v1.0.0` public release in package metadata and the bilingual About page.
 - The About changelog records the initial toolset, browser-local behavior, bilingual URLs, SEO
   foundation, and pre-advertising trust pages; it is also emitted in static no-JavaScript HTML.
+- Node.js 22.x is now the explicit local and CI runtime contract.
+- `build:production` fails closed when the HTTPS origin or public contact is missing, invalid, or a
+  placeholder, then verifies sitemap, robots, canonical, and bilingual `hreflang` output.
+- Bootstrap error handling moved to a same-origin script, allowing production `script-src` to drop
+  `'unsafe-inline'` while retaining the looser development policy required by React Fast Refresh.
+- Static-host and Nginx security-header templates add frame, MIME-sniffing, referrer, permission,
+  opener, transport, and response-level CSP protections.
+- Browser coverage now has 29 required passing scenarios plus one optional sponsor scenario,
+  including enforcement of the external bootstrap and strict production script policy.
 
 ## In progress
 
@@ -183,9 +192,13 @@ launch configuration remains the next objective.
   manufacturer-specific pigment behavior.
 - Every new or changed user-facing message now requires both Indonesian and English copy; the
   translation catalog has no external localization platform or professional editorial review.
+- Inline React presentation styles still require `style-src 'unsafe-inline'`; removing it needs a
+  separate styling refactor and is not required to block executable script injection.
+- Security-header templates are platform-dependent and remain unverified until the real HTTPS host
+  is available.
 
 ## Next task
 
-Prepare production launch: configure the final origin and contact channel, verify nested URLs and
-indexing on the real host, then select an advertising provider and review its CSP, consent, privacy,
-and regional requirements before activation.
+Copy `.env.production.example` to `.env.production`, configure the final origin and contact channel,
+run `npm run build:production`, then verify nested URLs, response headers, and indexing on the real
+host before selecting an advertising provider.

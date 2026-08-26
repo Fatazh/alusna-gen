@@ -1,0 +1,18 @@
+# Include these directives in the HTTPS server block that serves ALUSNA's dist directory.
+add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'none'; frame-ancestors 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests" always;
+add_header Strict-Transport-Security "max-age=31536000" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+
+location /assets/ {
+    try_files $uri =404;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+# ALUSNA emits a real index.html inside every public route directory.
+location / {
+    try_files $uri $uri/ =404;
+}

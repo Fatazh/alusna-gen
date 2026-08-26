@@ -55,6 +55,17 @@ npm run test:e2e
 npm audit --omit=dev
 ```
 
+Release artifacts must use Node 22 and the stricter production gate:
+
+```sh
+npm run build:production
+```
+
+The command requires an HTTPS `VITE_SITE_URL` and a real `VITE_CONTACT_EMAIL`, then verifies every
+emitted HTML page has canonical and reciprocal language metadata. Apply `public/_headers` on hosts
+that support the headers-file convention, or adapt `deploy/nginx-security.conf.example` for Nginx.
+Always verify the resulting response headers on the live HTTPS origin.
+
 The optional configured-sponsor E2E should also run when sponsor environment variables change.
 
 ## Low-maintenance operating cadence
