@@ -14,3 +14,4 @@ dist-ssr
 vite.config.d.ts
 playwright-report
 test-results
+src/features/typography/data/*.tmp

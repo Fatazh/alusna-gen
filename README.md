@@ -37,7 +37,7 @@ npm audit --omit=dev
 npx playwright install chromium
 ```
 
-Saat ini terdapat 136 unit/contract test dan 29 browser E2E wajib. Satu E2E tambahan memvalidasi slot sponsor ketika konfigurasi sponsor tersedia. GitHub Actions menjalankan quality gate yang sama pada push dan pull request.
+Saat ini terdapat 145 unit/contract test dan 30 browser E2E wajib. Satu E2E tambahan memvalidasi slot sponsor ketika konfigurasi sponsor tersedia. GitHub Actions menjalankan quality gate yang sama pada push dan pull request.
 
 ## Struktur
 
@@ -54,6 +54,29 @@ Saat ini terdapat 136 unit/contract test dan 29 browser E2E wajib. Satu E2E tamb
 Warna, palet, tema, font upload, dan brand kit disimpan secara lokal di browser pada storage versioned `alusna-studio`. Data lama `cikp-studio` disalin secara aman ketika ALUSNA pertama kali dibuka dan tetap dipertahankan sebagai rollback copy. Gambar yang dipakai untuk ekstraksi palet tidak dikirim ke server. Font dan logo yang dipersistensikan disimpan sebagai base64 sehingga penggunaan banyak file besar dapat mencapai quota browser; aplikasi akan menampilkan peringatan apabila penyimpanan gagal.
 
 Google Fonts dimuat dari `fonts.googleapis.com` dan `fonts.gstatic.com` ketika font terkait dipilih. Hal ini memerlukan koneksi internet dan mengirim permintaan ke layanan Google.
+
+## Katalog Google Fonts
+
+ALUSNA memakai snapshot katalog lokal sehingga pencarian font tetap tersedia tanpa memanggil
+Developer API dari browser. Font yang dipilih dimuat melalui Google Fonts CSS API menggunakan weight
+dan style yang tersedia. Snapshot bawaan berisi 30 font populer dan dapat disinkronkan hingga 1.000
+family dari Google Fonts Developer API.
+
+Gunakan API key hanya di shell lokal atau CI secret. Jangan memakai nama yang diawali `VITE_` karena
+nilai tersebut akan masuk ke bundle browser.
+
+```powershell
+$env:GOOGLE_FONTS_API_KEY="API_KEY_ANDA"
+$env:GOOGLE_FONTS_LIMIT="300"
+npm run fonts:sync
+Remove-Item Env:GOOGLE_FONTS_API_KEY
+Remove-Item Env:GOOGLE_FONTS_LIMIT
+```
+
+Script memvalidasi family, category, weight, style, subset, dan variable-weight axis sebelum
+memperbarui `src/features/typography/data/googleFonts.generated.ts`. Jika API gagal atau menghasilkan
+kurang dari 30 font valid, snapshot lama dipertahankan. Jalankan quality gate dan commit snapshot
+generated setelah sinkronisasi.
 
 ## Batas upload
 

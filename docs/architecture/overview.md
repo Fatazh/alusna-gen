@@ -40,6 +40,8 @@ Current strengths:
 - Analytics is an opt-in, provider-neutral app boundary with no default network transmission.
 - Indonesian public URLs have indexable English `/en` counterparts with shared feature components,
   reciprocal `hreflang`, and locale-specific static HTML.
+- Google Fonts metadata is a validated build-time snapshot owned by Typography; the Developer API
+  key never crosses into browser code, while selected CSS font files remain lazy-loaded.
 - Dependency-cruiser enforces cross-feature public API access.
 
 Current pressure points:

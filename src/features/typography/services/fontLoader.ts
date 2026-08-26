@@ -1,18 +1,50 @@
 import { isSafeFontDataUrl, sanitizeFontFamily } from "../model/font";
 
-const loadedFamilies = new Set<string>();
+const loadedRequests = new Map<string, Promise<void>>();
 
-export function loadGoogleFont(family: string, variants: string[] = ["400"]): void {
-  if (loadedFamilies.has(family)) return;
-  const params = new URLSearchParams({
-    family: `${family}:wght@${variants.join(";")}`,
+export function buildGoogleFontCssUrl(
+  family: string,
+  weights: readonly (number | string)[] = [400],
+  style: "normal" | "italic" = "normal",
+): string {
+  const safeFamily = sanitizeFontFamily(family);
+  const safeWeights = [...new Set(weights.map(Number))]
+    .filter((weight) => Number.isInteger(weight) && weight >= 100 && weight <= 900)
+    .sort((a, b) => a - b);
+  if (safeWeights.length === 0) safeWeights.push(400);
+  const specification =
+    style === "italic"
+      ? `${safeFamily}:ital,wght@${safeWeights.map((weight) => `1,${weight}`).join(";")}`
+      : `${safeFamily}:wght@${safeWeights.join(";")}`;
+  const params = new URLSearchParams({ family: specification, display: "swap" });
+  return `https://fonts.googleapis.com/css2?${params.toString()}`;
+}
+
+export function loadGoogleFont(
+  family: string,
+  weights: readonly (number | string)[] = [400],
+  style: "normal" | "italic" = "normal",
+): Promise<void> {
+  const href = buildGoogleFontCssUrl(family, weights, style);
+  const existing = loadedRequests.get(href);
+  if (existing) return existing;
+
+  const request = new Promise<void>((resolve, reject) => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    link.dataset.googleFont = sanitizeFontFamily(family);
+    link.onload = () => resolve();
+    link.onerror = () => {
+      loadedRequests.delete(href);
+      link.remove();
+      reject(new Error(`Failed to load Google Font: ${sanitizeFontFamily(family)}`));
+    };
+    document.head.appendChild(link);
   });
-  const href = `https://fonts.googleapis.com/css2?${params.toString()}`;
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = href;
-  document.head.appendChild(link);
-  loadedFamilies.add(family);
+
+  loadedRequests.set(href, request);
+  return request;
 }
 
 export async function loadUploadedFont(file: File): Promise<{ family: string; dataUrl: string }> {

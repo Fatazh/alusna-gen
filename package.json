@@ -10,6 +10,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:production": "node scripts/validate-production-env.mjs && tsc -b && vite build --mode production && node scripts/verify-production-build.mjs",
+    "fonts:sync": "node scripts/sync-google-fonts.mjs",
     "preview": "vite preview",
     "test": "vitest run --exclude \"e2e/**\"",
     "test:e2e": "npm run build && playwright test",

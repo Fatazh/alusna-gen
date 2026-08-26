@@ -4,8 +4,9 @@ Last updated: 2026-08-26
 
 ## Current objective
 
-ALUSNA production launch hardening is implemented. The remaining launch work requires the real
-HTTPS origin, public contact email, and verification against the selected host.
+ALUSNA production launch hardening and the Google Fonts catalog integration are implemented. The
+remaining launch work requires the real HTTPS origin, public contact email, and verification against
+the selected host.
 
 ## Completed
 
@@ -163,6 +164,17 @@ HTTPS origin, public contact email, and verification against the selected host.
   opener, transport, and response-level CSP protections.
 - Browser coverage now has 29 required passing scenarios plus one optional sponsor scenario,
   including enforcement of the external bootstrap and strict production script policy.
+- Typography now uses a validated local Google Fonts metadata snapshot with search, category and
+  style filters, supported-weight selection, italic availability, and incremental catalog display.
+- Google Fonts CSS is loaded only for an active or intentionally previewed family, cached by its
+  complete family/weight/style URL, and falls back to the local font stack when the network fails.
+- The Developer API key stays outside the browser bundle; the explicit `fonts:sync` maintenance
+  command validates catalog data, caps output, writes atomically, and preserves the existing
+  snapshot on failure.
+- The Node.js 22 quality gate passes with 145 unit and contract tests across 19 files; browser
+  coverage now has 30 required passing scenarios plus one optional sponsor scenario.
+- The production entry is 67.91 kB gzip and the lazy Typography module is 5.48 kB gzip with the
+  current 30-family fallback snapshot.
 
 ## In progress
 
@@ -196,9 +208,17 @@ HTTPS origin, public contact email, and verification against the selected host.
   separate styling refactor and is not required to block executable script injection.
 - Security-header templates are platform-dependent and remain unverified until the real HTTPS host
   is available.
+- The committed Google Fonts snapshot remains the curated 30-family fallback until a maintainer
+  supplies a Developer API key and deliberately runs `npm run fonts:sync`.
+- Font rendering still depends on Google-hosted CSS and font files when a Google family is selected;
+  network failure falls back safely, but self-hosting is required for full offline and privacy
+  independence.
+- A 300-family synchronized snapshot will increase the lazy Typography chunk; measure its gzip size
+  after the first live catalog synchronization.
 
 ## Next task
 
-Copy `.env.production.example` to `.env.production`, configure the final origin and contact channel,
-run `npm run build:production`, then verify nested URLs, response headers, and indexing on the real
-host before selecting an advertising provider.
+Optionally synchronize and review the Google Fonts snapshot with a restricted Developer API key.
+Then copy `.env.production.example` to `.env.production`, configure the final origin and contact
+channel, run `npm run build:production`, and verify nested URLs, response headers, and indexing on
+the real host before selecting an advertising provider.

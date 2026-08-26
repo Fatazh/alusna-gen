@@ -53,9 +53,9 @@ export function PaletteTab({
 
   // Load the fonts selected by the current tone so the preview renders correctly.
   useEffect(() => {
-    loadGoogleFont(kit.headlineFont, ["400", "700"]);
-    loadGoogleFont(kit.bodyFont, ["400"]);
-    loadGoogleFont(kit.monoFont, ["400"]);
+    void loadGoogleFont(kit.headlineFont, [400, 700]).catch(() => {});
+    void loadGoogleFont(kit.bodyFont, [400]).catch(() => {});
+    void loadGoogleFont(kit.monoFont, [400]).catch(() => {});
   }, [kit.headlineFont, kit.bodyFont, kit.monoFont]);
 
   // Effective background & text colors

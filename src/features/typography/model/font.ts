@@ -1,94 +1,6 @@
-// Font utilities: Google Fonts catalog, loader, font file parsing.
+// Font utilities: family sanitization, local upload validation, and CSS stacks.
 
 export type FontCategory = "serif" | "sans-serif" | "display" | "handwriting" | "monospace";
-
-export type FontDef = {
-  family: string;
-  category: FontCategory;
-  variants: string[];
-};
-
-// A curated subset of popular Google Fonts (kept local to avoid network dependency at startup).
-export const GOOGLE_FONTS: FontDef[] = [
-  {
-    family: "Inter",
-    category: "sans-serif",
-    variants: ["400", "500", "600", "700"],
-  },
-  {
-    family: "Roboto",
-    category: "sans-serif",
-    variants: ["300", "400", "500", "700"],
-  },
-  {
-    family: "Open Sans",
-    category: "sans-serif",
-    variants: ["400", "600", "700"],
-  },
-  { family: "Lato", category: "sans-serif", variants: ["400", "700"] },
-  {
-    family: "Montserrat",
-    category: "sans-serif",
-    variants: ["400", "600", "700"],
-  },
-  {
-    family: "Poppins",
-    category: "sans-serif",
-    variants: ["400", "500", "600", "700"],
-  },
-  { family: "Nunito", category: "sans-serif", variants: ["400", "600", "700"] },
-  {
-    family: "Raleway",
-    category: "sans-serif",
-    variants: ["400", "600", "700"],
-  },
-  {
-    family: "Work Sans",
-    category: "sans-serif",
-    variants: ["400", "600", "700"],
-  },
-  {
-    family: "Source Sans 3",
-    category: "sans-serif",
-    variants: ["400", "600", "700"],
-  },
-  {
-    family: "Playfair Display",
-    category: "serif",
-    variants: ["400", "600", "700"],
-  },
-  { family: "Merriweather", category: "serif", variants: ["400", "700"] },
-  { family: "Lora", category: "serif", variants: ["400", "600", "700"] },
-  {
-    family: "Crimson Text",
-    category: "serif",
-    variants: ["400", "600", "700"],
-  },
-  { family: "EB Garamond", category: "serif", variants: ["400", "600", "700"] },
-  { family: "PT Serif", category: "serif", variants: ["400", "700"] },
-  { family: "Bebas Neue", category: "display", variants: ["400"] },
-  { family: "Oswald", category: "display", variants: ["400", "600", "700"] },
-  { family: "Anton", category: "display", variants: ["400"] },
-  { family: "Archivo Black", category: "display", variants: ["400"] },
-  { family: "Righteous", category: "display", variants: ["400"] },
-  { family: "Pacifico", category: "handwriting", variants: ["400"] },
-  {
-    family: "Dancing Script",
-    category: "handwriting",
-    variants: ["400", "700"],
-  },
-  { family: "Caveat", category: "handwriting", variants: ["400", "700"] },
-  { family: "Sacramento", category: "handwriting", variants: ["400"] },
-  { family: "JetBrains Mono", category: "monospace", variants: ["400", "700"] },
-  { family: "Fira Code", category: "monospace", variants: ["400", "700"] },
-  {
-    family: "Source Code Pro",
-    category: "monospace",
-    variants: ["400", "700"],
-  },
-  { family: "Space Mono", category: "monospace", variants: ["400", "700"] },
-  { family: "IBM Plex Mono", category: "monospace", variants: ["400", "700"] },
-];
 
 // Font family names are embedded into CSS `font-family` strings, so they must
 // be restricted to a safe character set. This guards against CSS injection via
@@ -126,4 +38,4 @@ export function fontStack(family: string, category?: FontCategory): string {
   return `'${family}', ${fallback}`;
 }
 
-export const FONT_WEIGHTS = [300, 400, 500, 600, 700, 800, 900] as const;
+export const FONT_WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;

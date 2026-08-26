@@ -72,6 +72,25 @@ test("homepage starts a tool workflow without a full reload", async ({ page }) =
   ).toBeVisible();
 });
 
+test("Google Fonts catalog supports search, weights, and italic preview", async ({ page }) => {
+  await page.goto("/font-pairing");
+
+  await expect(page.locator("[data-google-font-catalog]")).toContainText("Google Fonts");
+  await page.getByRole("searchbox", { name: "Cari Google Fonts" }).fill("Playfair Display");
+  const playfair = page.getByRole("button").filter({ hasText: "Playfair Display" }).first();
+  await expect(playfair).toBeVisible();
+  await playfair.click();
+
+  const weight = page.getByLabel(/Weight:/);
+  await expect(weight.locator("option")).toHaveText(["400", "600", "700"]);
+  await weight.selectOption("700");
+  await page.getByRole("button", { name: "Aktifkan gaya italic" }).click();
+
+  await expect(page.getByText("font-family: 'Playfair Display'", { exact: false })).toBeVisible();
+  await expect(page.getByText("font-weight: 700", { exact: false })).toBeVisible();
+  await expect(page.getByText("font-style: italic", { exact: false })).toBeVisible();
+});
+
 test("language switch preserves the tool and updates bilingual SEO metadata", async ({ page }) => {
   await page.goto("/color-mixer");
   await page.getByRole("button", { name: "Use English" }).click();

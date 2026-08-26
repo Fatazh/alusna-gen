@@ -45,6 +45,15 @@ components.
   external consumer requires a privacy, CSP, consent, and regional review before activation.
 - When guidance changes, keep its static HTML contract and no-JavaScript E2E coverage passing.
 
+## Google Fonts catalog
+
+- The browser must never call the Google Fonts Developer API or receive its API key.
+- `src/features/typography/data/googleFonts.generated.ts` is the committed fallback snapshot.
+- Refresh it with `npm run fonts:sync` and an unprefixed `GOOGLE_FONTS_API_KEY` shell/CI secret.
+- Keep the default catalog limit at 300 unless bundle and Typography-route performance are reviewed.
+- A failed sync must leave the previous snapshot intact; validate and commit generated changes as a
+  coherent catalog update.
+
 ## Validation
 
 Run targeted tests while editing. Before merging or releasing, run:

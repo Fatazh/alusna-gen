@@ -85,7 +85,7 @@ export function TypographyTab({
       { family: kit.monoFont, variants: ["400"] },
     ];
     selected.forEach(({ family, variants }) => {
-      if (!uploadedFamilies.has(family)) loadGoogleFont(family, variants);
+      if (!uploadedFamilies.has(family)) void loadGoogleFont(family, variants).catch(() => {});
     });
   }, [kit.headlineFont, kit.bodyFont, kit.monoFont, uploadedFamilies]);
 
@@ -264,7 +264,7 @@ function FontSection({
                 onClick={() => onSelect(option.family)}
                 onMouseEnter={() => {
                   if (!uploadedFamilies.has(option.family)) {
-                    loadGoogleFont(option.family, ["400", "600", "700"]);
+                    void loadGoogleFont(option.family, [400, 600, 700]).catch(() => {});
                   }
                 }}
                 className="rounded-lg border px-4 py-3 text-left transition hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"

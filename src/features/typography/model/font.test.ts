@@ -1,5 +1,64 @@
 import { describe, expect, it } from "vitest";
+import { buildGoogleFontCssUrl } from "../services/fontLoader";
 import { sanitizeFontFamily, fontStack, isSafeFontDataUrl } from "./font";
+import { GOOGLE_FONTS, filterGoogleFonts, nearestFontWeight } from "./googleFonts";
+
+describe("Google Fonts catalog", () => {
+  it("contains unique, sanitized families with supported metadata", () => {
+    expect(GOOGLE_FONTS.length).toBeGreaterThanOrEqual(30);
+    expect(new Set(GOOGLE_FONTS.map((font) => font.family)).size).toBe(GOOGLE_FONTS.length);
+    for (const font of GOOGLE_FONTS) {
+      expect(sanitizeFontFamily(font.family)).toBe(font.family);
+      expect(font.weights.length).toBeGreaterThan(0);
+      expect(font.weights).toEqual([...font.weights].sort((a, b) => a - b));
+      expect(font.styles.length).toBeGreaterThan(0);
+      for (const style of font.styles) expect(font.styleWeights[style].length).toBeGreaterThan(0);
+    }
+  });
+
+  it("filters by family, category, and available style", () => {
+    const result = filterGoogleFonts(GOOGLE_FONTS, {
+      category: "serif",
+      search: "playfair",
+      style: "italic",
+    });
+    expect(result.map((font) => font.family)).toEqual(["Playfair Display"]);
+    expect(
+      filterGoogleFonts(GOOGLE_FONTS, {
+        category: "handwriting",
+        search: "sacramento",
+        style: "italic",
+      }),
+    ).toEqual([]);
+  });
+
+  it("chooses the nearest supported weight", () => {
+    expect(nearestFontWeight([300, 400, 700], 650)).toBe(700);
+    expect(nearestFontWeight([300, 400, 700], 450)).toBe(400);
+    expect(nearestFontWeight([], 700)).toBe(400);
+  });
+
+  it("preserves the exact weight matrix for each style", () => {
+    const playfair = GOOGLE_FONTS.find((font) => font.family === "Playfair Display");
+    expect(playfair?.styleWeights.normal).toEqual([400, 600, 700]);
+    expect(playfair?.styleWeights.italic).toEqual([400, 600, 700]);
+  });
+});
+
+describe("buildGoogleFontCssUrl", () => {
+  it("builds a deduplicated CSS2 request without exposing any API key", () => {
+    const url = new URL(buildGoogleFontCssUrl("Roboto", [700, 400, 700]));
+    expect(url.origin).toBe("https://fonts.googleapis.com");
+    expect(url.searchParams.get("family")).toBe("Roboto:wght@400;700");
+    expect(url.searchParams.get("display")).toBe("swap");
+    expect(url.searchParams.has("key")).toBe(false);
+  });
+
+  it("uses the italic axis and sanitizes the family", () => {
+    const url = new URL(buildGoogleFontCssUrl('Roboto";color:red', [400], "italic"));
+    expect(url.searchParams.get("family")).toBe("Robotocolorred:ital,wght@1,400");
+  });
+});
 
 describe("sanitizeFontFamily", () => {
   it("keeps safe characters and spaces", () => {

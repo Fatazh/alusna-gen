@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GOOGLE_FONTS, fontStack, type FontCategory, type FontDef } from "../model/font";
+import { FONT_WEIGHTS, fontStack, type FontCategory } from "../model/font";
+import {
+  FILTER_FONT_PAGE_SIZE,
+  GOOGLE_FONTS,
+  GOOGLE_FONTS_META,
+  filterGoogleFonts,
+  findGoogleFont,
+  nearestFontWeight,
+  type FontDef,
+  type FontStyle,
+} from "../model/googleFonts";
 import { loadGoogleFont, loadUploadedFont, restoreUploadedFont } from "../services/fontLoader";
 import { useStudio } from "../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
@@ -23,13 +33,19 @@ const SAMPLE_TEXTS: SampleText[] = [
   { label: "Alfabet", text: "ABCDEFG abcdefg" },
 ];
 
-const CATEGORIES: { id: FontCategory | "all"; label: string }[] = [
-  { id: "all", label: "Semua" },
-  { id: "sans-serif", label: "Sans" },
-  { id: "serif", label: "Serif" },
-  { id: "display", label: "Display" },
-  { id: "handwriting", label: "Handwriting" },
-  { id: "monospace", label: "Mono" },
+const CATEGORIES: { id: FontCategory | "all"; labelId: string; labelEn: string }[] = [
+  { id: "all", labelId: "Semua", labelEn: "All" },
+  { id: "sans-serif", labelId: "Sans", labelEn: "Sans" },
+  { id: "serif", labelId: "Serif", labelEn: "Serif" },
+  { id: "display", labelId: "Display", labelEn: "Display" },
+  { id: "handwriting", labelId: "Tulisan tangan", labelEn: "Handwriting" },
+  { id: "monospace", labelId: "Mono", labelEn: "Mono" },
+];
+
+const STYLE_FILTERS: { id: FontStyle | "all"; labelId: string; labelEn: string }[] = [
+  { id: "all", labelId: "Semua gaya", labelEn: "All styles" },
+  { id: "normal", labelId: "Normal", labelEn: "Normal" },
+  { id: "italic", labelId: "Italic", labelEn: "Italic" },
 ];
 
 export function FontModule() {
@@ -44,8 +60,15 @@ export function FontModule() {
   const addUploadedFont = useStudio((s) => s.addUploadedFont);
 
   const [category, setCategory] = useState<FontCategory | "all">("all");
+  const [styleFilter, setStyleFilter] = useState<FontStyle | "all">("all");
   const [search, setSearch] = useState("");
   const [weight, setWeight] = useState(400);
+  const [italic, setItalic] = useState(false);
+  const [visibleFontCount, setVisibleFontCount] = useState(FILTER_FONT_PAGE_SIZE);
+  const [fontLoadResult, setFontLoadResult] = useState<{
+    key: string;
+    status: "loaded" | "error";
+  } | null>(null);
   const [size, setSize] = useState(32);
   const [bgMode, setBgMode] = useState<"surface" | "color">("surface");
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -98,8 +121,8 @@ export function FontModule() {
   useEffect(() => {
     if (!pairing) return;
     for (const fam of [pairing.heading, pairing.body]) {
-      const def = GOOGLE_FONTS.find((f) => f.family === fam);
-      if (def) loadGoogleFont(def.family, def.variants);
+      const def = findGoogleFont(fam);
+      if (def) void loadGoogleFont(def.family, def.styleWeights.normal).catch(() => {});
     }
   }, [pairing]);
 
@@ -113,23 +136,49 @@ export function FontModule() {
   // Load Google Font for active family on demand.
   const activeDef = useMemo<FontDef | undefined>(() => {
     if (uploadedFonts.some((f) => f.family === activeFontFamily)) return undefined;
-    return GOOGLE_FONTS.find((f) => f.family === activeFontFamily);
+    return findGoogleFont(activeFontFamily);
   }, [activeFontFamily, uploadedFonts]);
 
+  const effectiveItalic = Boolean(
+    activeDef &&
+    activeDef.styles.includes("italic") &&
+    (italic || !activeDef.styles.includes("normal")),
+  );
+  const availableWeights = activeDef
+    ? activeDef.styleWeights[effectiveItalic ? "italic" : "normal"]
+    : [...FONT_WEIGHTS];
+  const effectiveWeight = nearestFontWeight(availableWeights, weight);
+  const activeFontRequestKey = activeDef
+    ? `${activeDef.family}:${effectiveWeight}:${effectiveItalic ? "italic" : "normal"}`
+    : null;
+  const fontLoadState = !activeFontRequestKey
+    ? "idle"
+    : fontLoadResult?.key === activeFontRequestKey
+      ? fontLoadResult.status
+      : "loading";
+
   useEffect(() => {
-    if (activeDef) {
-      loadGoogleFont(activeDef.family, activeDef.variants);
-    }
-  }, [activeDef]);
+    if (!activeDef || !activeFontRequestKey) return;
+    let current = true;
+    const selectedStyle: FontStyle = effectiveItalic ? "italic" : "normal";
+    void loadGoogleFont(activeDef.family, [effectiveWeight], selectedStyle)
+      .then(() => {
+        if (current) setFontLoadResult({ key: activeFontRequestKey, status: "loaded" });
+      })
+      .catch(() => {
+        if (current) setFontLoadResult({ key: activeFontRequestKey, status: "error" });
+      });
+    return () => {
+      current = false;
+    };
+  }, [activeDef, activeFontRequestKey, effectiveItalic, effectiveWeight]);
 
   const filteredFonts = useMemo(() => {
-    return GOOGLE_FONTS.filter((f) => {
-      const matchCat = category === "all" || f.category === category;
-      const matchSearch =
-        search.trim() === "" || f.family.toLowerCase().includes(search.toLowerCase());
-      return matchCat && matchSearch;
-    });
-  }, [category, search]);
+    return filterGoogleFonts(GOOGLE_FONTS, { category, search, style: styleFilter });
+  }, [category, search, styleFilter]);
+
+  const visibleFonts = filteredFonts.slice(0, visibleFontCount);
+  const canUseItalic = activeDef?.styles.includes("italic") ?? false;
 
   const fontFamilyStack = activeDef
     ? fontStack(activeDef.family, activeDef.category)
@@ -188,7 +237,7 @@ export function FontModule() {
   const bgColor =
     bgMode === "color" ? formatRgba({ ...selectedColor, a: selectedAlpha }) : "var(--surface)";
 
-  const cssSnippet = `font-family: ${fontFamilyStack};\nfont-size: ${size}px;\nfont-weight: ${weight};\ncolor: ${rgbToHex(selectedColor)};`;
+  const cssSnippet = `font-family: ${fontFamilyStack};\nfont-size: ${size}px;\nfont-weight: ${effectiveWeight};\nfont-style: ${effectiveItalic ? "italic" : "normal"};\ncolor: ${rgbToHex(selectedColor)};`;
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
 
@@ -264,39 +313,109 @@ export function FontModule() {
               </div>
             )}
 
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2 text-[11px]"
+              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+              data-google-font-catalog
+            >
+              <span>
+                {GOOGLE_FONTS.length} Google Fonts ·{" "}
+                {GOOGLE_FONTS_META.source === "curated-fallback"
+                  ? text("snapshot lokal", "local snapshot")
+                  : text("katalog API tersinkron", "API-synced catalog")}
+              </span>
+              <span>
+                {fontLoadState === "loading"
+                  ? text("Memuat font…", "Loading font…")
+                  : fontLoadState === "error"
+                    ? text(
+                        "Font gagal dimuat; fallback digunakan",
+                        "Font failed to load; using fallback",
+                      )
+                    : fontLoadState === "loaded"
+                      ? text("Font aktif siap", "Active font ready")
+                      : text("Dimuat saat dipilih", "Loaded on selection")}
+              </span>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((c) => (
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => {
+                    setCategory(c.id);
+                    setVisibleFontCount(FILTER_FONT_PAGE_SIZE);
+                  }}
                   className={chipClass}
                   style={getChipStyle(category === c.id)}
                 >
-                  {c.label}
+                  {text(c.labelId, c.labelEn)}
                 </button>
               ))}
             </div>
 
-            <input
-              type="text"
-              placeholder="Cari font…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              style={{
-                borderColor: "var(--input-border)",
-                backgroundColor: "var(--input-bg)",
-                color: "var(--input-text)",
-              }}
-            />
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <input
+                type="search"
+                aria-label={text("Cari Google Fonts", "Search Google Fonts")}
+                placeholder={text("Cari Google Fonts…", "Search Google Fonts…")}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setVisibleFontCount(FILTER_FONT_PAGE_SIZE);
+                }}
+                className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                style={{
+                  borderColor: "var(--input-border)",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--input-text)",
+                }}
+              />
+              <div
+                className="flex flex-wrap gap-1.5"
+                aria-label={text("Filter gaya", "Style filter")}
+              >
+                {STYLE_FILTERS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      setStyleFilter(option.id);
+                      setVisibleFontCount(FILTER_FONT_PAGE_SIZE);
+                    }}
+                    aria-pressed={styleFilter === option.id}
+                    className="rounded-lg border px-2.5 py-2 text-[11px] font-medium"
+                    style={getChipStyle(styleFilter === option.id)}
+                  >
+                    {text(option.labelId, option.labelEn)}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="grid max-h-64 grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
-              {filteredFonts.map((f) => (
+            <div className="grid max-h-80 grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+              {visibleFonts.map((f) => (
                 <button
                   key={f.family}
                   type="button"
                   onClick={() => selectFont(f.family)}
+                  onPointerEnter={() => {
+                    const style: FontStyle = f.styleWeights.normal.length ? "normal" : "italic";
+                    void loadGoogleFont(
+                      f.family,
+                      [nearestFontWeight(f.styleWeights[style], 400)],
+                      style,
+                    ).catch(() => {});
+                  }}
+                  onFocus={() => {
+                    const style: FontStyle = f.styleWeights.normal.length ? "normal" : "italic";
+                    void loadGoogleFont(
+                      f.family,
+                      [nearestFontWeight(f.styleWeights[style], 400)],
+                      style,
+                    ).catch(() => {});
+                  }}
                   className="rounded-lg border px-3 py-2 text-left transition"
                   style={{
                     borderColor: activeFontFamily === f.family ? "var(--border)" : "var(--border)",
@@ -314,7 +433,14 @@ export function FontModule() {
                       color: "var(--text-primary)",
                     }}
                   >
-                    {f.family}
+                    {text("Bagusnya dimulai di sini", "Good design starts here")}
+                  </div>
+                  <div
+                    className="mt-1 text-[9px] uppercase tracking-wide"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {f.category} · {f.weights.length} {text("weight", "weights")}
+                    {f.styles.includes("italic") ? " · italic" : ""}
                   </div>
                 </button>
               ))}
@@ -323,10 +449,21 @@ export function FontModule() {
                   className="col-span-full py-4 text-center text-xs"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Tidak ada font yang cocok.
+                  {text("Tidak ada font yang cocok.", "No matching fonts.")}
                 </p>
               )}
             </div>
+            {visibleFontCount < filteredFonts.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleFontCount((count) => count + FILTER_FONT_PAGE_SIZE)}
+                className="w-full rounded-lg border px-3 py-2 text-xs font-medium"
+                style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+              >
+                {text("Tampilkan lebih banyak", "Show more")} ({visibleFontCount}/
+                {filteredFonts.length})
+              </button>
+            )}
           </CardBody>
         </Card>
 
@@ -460,22 +597,45 @@ export function FontModule() {
             <div className="flex flex-wrap gap-4">
               <div className="flex-1">
                 <label
-                  htmlFor="font-weight-range"
+                  htmlFor="font-weight-select"
                   className="mb-1 block text-[11px]"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Weight: {weight}
+                  Weight: {effectiveWeight}
                 </label>
-                <input
-                  id="font-weight-range"
-                  type="range"
-                  min={100}
-                  max={900}
-                  step={100}
-                  value={weight}
+                <select
+                  id="font-weight-select"
+                  value={effectiveWeight}
                   onChange={(e) => setWeight(Number(e.target.value))}
-                  className="w-full"
-                />
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  style={{
+                    borderColor: "var(--input-border)",
+                    backgroundColor: "var(--input-bg)",
+                    color: "var(--input-text)",
+                  }}
+                >
+                  {availableWeights.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex min-w-28 flex-col justify-end">
+                <span className="mb-1 block text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  {text("Gaya", "Style")}
+                </span>
+                <button
+                  type="button"
+                  disabled={!canUseItalic}
+                  onClick={() => setItalic((value) => !value)}
+                  aria-label={text("Aktifkan gaya italic", "Toggle italic style")}
+                  aria-pressed={effectiveItalic}
+                  className="rounded-lg border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40"
+                  style={getChipStyle(effectiveItalic)}
+                >
+                  {effectiveItalic ? "Italic" : "Normal"}
+                </button>
               </div>
               <div className="flex-1">
                 <label
@@ -534,7 +694,8 @@ export function FontModule() {
                       <div
                         style={{
                           fontFamily: sampleFont,
-                          fontWeight: weight,
+                          fontWeight: effectiveWeight,
+                          fontStyle: pairing ? "normal" : effectiveItalic ? "italic" : "normal",
                           fontSize:
                             s.label === "Headline"
                               ? size * 1.6
