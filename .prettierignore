@@ -6,5 +6,6 @@ dist
 audit-monetization
 playwright-report
 test-results
+src/features/typography/data/googleFonts.generated.ts
 package-lock.json
 *.tsbuildinfo

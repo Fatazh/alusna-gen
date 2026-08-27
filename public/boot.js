@@ -2,9 +2,19 @@
 (function () {
   "use strict";
 
+  var monitoringBoot = true;
+
+  function stopMonitoringBoot() {
+    if (!monitoringBoot) return;
+    monitoringBoot = false;
+    window.removeEventListener("error", handleBootError);
+    window.removeEventListener("unhandledrejection", handleBootRejection);
+  }
+
   function hideLoading() {
     var loading = document.getElementById("boot-loading");
     if (loading) loading.style.display = "none";
+    stopMonitoringBoot();
   }
 
   window.__showBootError = function (title, detail) {
@@ -22,20 +32,25 @@
     hideLoading();
   };
 
-  window.addEventListener("error", function (event) {
+  function handleBootError(event) {
+    if (!monitoringBoot) return;
     window.__showBootError(
       "Runtime error",
       (event.error && event.error.stack) || event.message || String(event),
     );
-  });
+  }
 
-  window.addEventListener("unhandledrejection", function (event) {
+  function handleBootRejection(event) {
+    if (!monitoringBoot) return;
     var reason = event.reason;
     window.__showBootError(
       "Unhandled promise rejection",
       (reason && reason.stack) || (reason && reason.message) || String(reason),
     );
-  });
+  }
+
+  window.addEventListener("error", handleBootError);
+  window.addEventListener("unhandledrejection", handleBootRejection);
 
   window.__hideBootLoading = hideLoading;
 })();

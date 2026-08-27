@@ -60,6 +60,17 @@ test("production HTML uses an external bootstrap and blocks inline scripts", asy
   expect(policy).not.toContain("script-src 'self' 'unsafe-inline'");
   await expect(page.locator('script[src="/boot.js"]')).toHaveCount(1);
   await expect(page.locator("#boot-error")).toBeHidden();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new ErrorEvent("error", {
+        error: new EvalError("Responsive simulator CSP probe"),
+        message: "Responsive simulator CSP probe",
+      }),
+    );
+  });
+  await expect(page.locator("#boot-error")).toBeHidden();
 });
 
 test("homepage starts a tool workflow without a full reload", async ({ page }) => {

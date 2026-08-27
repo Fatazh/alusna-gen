@@ -164,6 +164,9 @@ the selected host.
   opener, transport, and response-level CSP protections.
 - Browser coverage now has 29 required passing scenarios plus one optional sponsor scenario,
   including enforcement of the external bootstrap and strict production script policy.
+- Bootstrap error monitoring now stops after React starts successfully, so CSP violations from
+  responsive-preview tooling or browser extensions cannot replace a running app with the fatal
+  startup overlay; production CSP remains strict and does not allow `unsafe-eval`.
 - Typography now uses a validated local Google Fonts metadata snapshot with search, category and
   style filters, supported-weight selection, italic availability, and incremental catalog display.
 - Google Fonts CSS is loaded only for an active or intentionally previewed family, cached by its
@@ -173,8 +176,8 @@ the selected host.
   snapshot on failure.
 - The Node.js 22 quality gate passes with 145 unit and contract tests across 19 files; browser
   coverage now has 30 required passing scenarios plus one optional sponsor scenario.
-- The production entry is 67.91 kB gzip and the lazy Typography module is 5.48 kB gzip with the
-  current 30-family fallback snapshot.
+- The production entry is 67.88 kB gzip and the lazy Typography module is 10.10 kB gzip with the
+  current 300-family API-synchronized snapshot.
 
 ## In progress
 
@@ -208,13 +211,13 @@ the selected host.
   separate styling refactor and is not required to block executable script injection.
 - Security-header templates are platform-dependent and remain unverified until the real HTTPS host
   is available.
-- The committed Google Fonts snapshot remains the curated 30-family fallback until a maintainer
-  supplies a Developer API key and deliberately runs `npm run fonts:sync`.
+- The committed Google Fonts snapshot contains 300 API-synchronized families; future refreshes
+  still require a maintainer-controlled Developer API key and an explicit `npm run fonts:sync`.
 - Font rendering still depends on Google-hosted CSS and font files when a Google family is selected;
   network failure falls back safely, but self-hosting is required for full offline and privacy
   independence.
-- A 300-family synchronized snapshot will increase the lazy Typography chunk; measure its gzip size
-  after the first live catalog synchronization.
+- The 300-family snapshot increases the lazy Typography chunk to 10.10 kB gzip; review pagination
+  and catalog size before raising the synchronization limit further.
 
 ## Next task
 
