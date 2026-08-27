@@ -71,6 +71,12 @@ test("production HTML uses an external bootstrap and blocks inline scripts", asy
     );
   });
   await expect(page.locator("#boot-error")).toBeHidden();
+
+  await page.evaluate(() => {
+    window.__showBootError?.("Temporary deployment error", "External preview tooling");
+    window.__hideBootLoading?.();
+  });
+  await expect(page.locator("#boot-error")).toBeHidden();
 });
 
 test("homepage starts a tool workflow without a full reload", async ({ page }) => {

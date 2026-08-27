@@ -167,6 +167,9 @@ the selected host.
 - Bootstrap error monitoring now stops after React starts successfully, so CSP violations from
   responsive-preview tooling or browser extensions cannot replace a running app with the fatal
   startup overlay; production CSP remains strict and does not allow `unsafe-eval`.
+- Bootstrap recovery now clears transient pre-render errors after a successful mount, ignores
+  blocked external-resource failures such as Vercel Toolbar injection, and uses an intentional
+  theme-aware loading screen instead of a red/black error-like flash.
 - Mobile and tablet headers now use a two-row layout with four equally distributed module tabs,
   visible locale and theme controls, and no nested horizontal navigation scroll; desktop retains
   the compact single-row header at the `xl` breakpoint.

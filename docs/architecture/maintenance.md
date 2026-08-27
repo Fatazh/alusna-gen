@@ -75,6 +75,10 @@ emitted HTML page has canonical and reciprocal language metadata. Apply `public/
 that support the headers-file convention, or adapt `deploy/nginx-security.conf.example` for Nginx.
 Always verify the resulting response headers on the live HTTPS origin.
 
+On Vercel, keep the Toolbar disabled for Production. Set
+`VERCEL_PREVIEW_FEEDBACK_ENABLED=0` for preview branches that do not need Comments; do not expand
+the public CSP for `vercel.live` unless the Toolbar is an explicit reviewed product dependency.
+
 The optional configured-sponsor E2E should also run when sponsor environment variables change.
 
 ## Low-maintenance operating cadence

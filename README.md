@@ -110,6 +110,12 @@ belum dapat dihapus tanpa refactor presentasi yang lebih luas.
 gunakan `deploy/nginx-security.conf.example` di HTTPS server block. Pastikan header benar-benar
 muncul pada respons domain produksi; file konfigurasi di repository tidak otomatis mengubah server.
 
+Jika memakai Vercel, nonaktifkan **Vercel Toolbar** untuk environment publik melalui Project
+Settings → General → Vercel Toolbar → Production → Off. Untuk preview yang tidak memerlukan
+Comments, atur environment variable `VERCEL_PREVIEW_FEEDBACK_ENABLED=0`. Jangan menambahkan
+`vercel.live` ke CSP hanya untuk menghilangkan pesan console; Toolbar membutuhkan beberapa izin
+script, koneksi, frame, font, gambar, dan style pihak ketiga yang tidak dibutuhkan pengunjung ALUSNA.
+
 ## SEO dan sponsor
 
 Salin `.env.example` menjadi `.env`, lalu isi URL domain publik sebelum build:
