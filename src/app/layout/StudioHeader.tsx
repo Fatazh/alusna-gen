@@ -58,12 +58,9 @@ export function StudioHeader({
           className="flex min-h-16 shrink-0 items-center rounded-lg"
         >
           <img
-            src="/logo.svg"
+            src={theme === "dark" ? "/logo.svg" : "/logo.png"}
             alt={`${APP_BRAND.name} — ${locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}`}
             className="h-10 w-auto rounded-md object-contain sm:h-14"
-            style={
-              theme === "dark" ? { backgroundColor: "#ffffff", padding: "2px 4px" } : undefined
-            }
           />
         </a>
 

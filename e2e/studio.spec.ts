@@ -230,8 +230,13 @@ test("top-level navigation updates the URL and supports browser history", async 
 test("ALUSNA identity and structured data are present", async ({ page }) => {
   await page.goto("/color-palette-generator/");
 
-  await expect(page.getByRole("link", { name: "Beranda ALUSNA" })).toBeVisible();
-  await expect(page.getByText("Bagusnya dimulai di sini.", { exact: true })).toBeVisible();
+  const homeLink = page.getByRole("link", { name: "Beranda ALUSNA" });
+  const logo = homeLink.locator("img");
+  await expect(homeLink).toBeVisible();
+  await expect(logo).toHaveAttribute("src", "/logo.png");
+  await page.getByRole("button", { name: "Gunakan tema gelap" }).click();
+  await expect(logo).toHaveAttribute("src", "/logo.svg");
+  await expect(logo).not.toHaveAttribute("style", /background/);
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/favicon.svg");
 
   const structuredData = JSON.parse(
