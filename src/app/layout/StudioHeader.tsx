@@ -47,7 +47,7 @@ export function StudioHeader({
       className="sticky top-0 z-30 border-b backdrop-blur-xl"
       style={{ backgroundColor: "var(--chrome-bg)" }}
     >
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto] items-center gap-x-2 px-4 sm:px-6 lg:px-8 xl:grid-cols-[auto_1fr_auto] xl:gap-x-4">
         <a
           href={locale === "en" ? "/en" : "/"}
           aria-label={locale === "en" ? "ALUSNA home" : "Beranda ALUSNA"}
@@ -55,7 +55,7 @@ export function StudioHeader({
             event.preventDefault();
             onNavigateHome();
           }}
-          className="flex min-h-16 shrink-0 items-center rounded-lg"
+          className="col-start-1 row-start-1 flex min-h-14 shrink-0 items-center rounded-lg xl:min-h-16"
         >
           <img
             src={theme === "dark" ? "/logo.svg" : "/logo.png"}
@@ -64,44 +64,57 @@ export function StudioHeader({
           />
         </a>
 
-        <div className="flex min-w-0 items-center gap-1 sm:gap-3">
-          <nav
-            className="flex min-w-0 items-stretch overflow-x-auto"
-            role="tablist"
-            aria-label={locale === "en" ? "Studio modules" : "Modul studio"}
-          >
-            {TOP_TABS.map((tab) => {
-              const TabIcon = tab.icon;
-              const active = toolNavigationActive && topTab === tab.id;
-              return (
-                <a
-                  key={tab.id}
-                  href={findPageForModule(tab.id, colorTab, locale).path}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    onSwitchTab(tab.id);
-                  }}
-                  title={tab.desc}
-                  className="relative inline-flex min-h-16 shrink-0 items-center gap-2 px-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
-                  style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
-                >
-                  <TabIcon size={18} weight={active ? "fill" : "regular"} aria-hidden="true" />
-                  <span className={tab.id === "design" ? "hidden sm:inline" : "inline"}>
-                    {locale === "en" && tab.id === "color" ? "Color" : tab.label}
-                  </span>
-                  {active && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-2 bottom-0 h-0.5"
-                      style={{ backgroundColor: "var(--accent)" }}
-                    />
-                  )}
-                </a>
-              );
-            })}
-          </nav>
+        <nav
+          className="col-span-2 row-start-2 grid min-w-0 grid-cols-4 border-t xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:flex xl:justify-end xl:border-t-0"
+          style={{ borderColor: "var(--border)" }}
+          role="tablist"
+          aria-label={locale === "en" ? "Studio modules" : "Modul studio"}
+        >
+          {TOP_TABS.map((tab) => {
+            const TabIcon = tab.icon;
+            const active = toolNavigationActive && topTab === tab.id;
+            const mobileLabel =
+              tab.id === "color"
+                ? locale === "en"
+                  ? "Color"
+                  : "Warna"
+                : tab.id === "design"
+                  ? "Design"
+                  : tab.id === "brand"
+                    ? "Brand"
+                    : tab.label;
+            return (
+              <a
+                key={tab.id}
+                href={findPageForModule(tab.id, colorTab, locale).path}
+                role="tab"
+                aria-selected={active}
+                onClick={(event) => {
+                  event.preventDefault();
+                  onSwitchTab(tab.id);
+                }}
+                title={tab.desc}
+                className="relative inline-flex min-h-12 min-w-0 items-center justify-center gap-1 px-1 text-[11px] font-semibold transition xl:min-h-16 xl:shrink-0 xl:gap-2 xl:px-4 xl:text-sm"
+                style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+              >
+                <TabIcon size={18} weight={active ? "fill" : "regular"} aria-hidden="true" />
+                <span className="truncate xl:hidden">{mobileLabel}</span>
+                <span className="hidden xl:inline">
+                  {locale === "en" && tab.id === "color" ? "Color" : tab.label}
+                </span>
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-2 bottom-0 h-0.5"
+                    style={{ backgroundColor: "var(--accent)" }}
+                  />
+                )}
+              </a>
+            );
+          })}
+        </nav>
+
+        <div className="col-start-2 row-start-1 flex min-w-0 items-center gap-1 sm:gap-3 xl:col-start-3">
           <button
             type="button"
             onClick={onSwitchLocale}
@@ -115,7 +128,7 @@ export function StudioHeader({
           <button
             type="button"
             onClick={onToggleTheme}
-            className="hidden h-9 w-9 items-center justify-center rounded-md border transition md:inline-flex"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border transition"
             style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
             title={locale === "en" ? "Change theme" : "Ganti tema"}
             aria-label={

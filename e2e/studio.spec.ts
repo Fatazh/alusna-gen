@@ -292,6 +292,17 @@ test("representative tools do not overflow at mobile, tablet, or desktop widths"
     }));
     expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 
+    const studioNavigation = page.getByRole("tablist", { name: "Modul studio" });
+    const navigationDimensions = await studioNavigation.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }));
+    expect(navigationDimensions.scrollWidth).toBeLessThanOrEqual(navigationDimensions.clientWidth);
+    await expect(page.getByRole("button", { name: /Gunakan tema (gelap|terang)/ })).toBeVisible();
+    for (const tabName of ["Warna", "Font", "Design", "Brand"]) {
+      await expect(page.getByRole("tab", { name: new RegExp(tabName) })).toBeVisible();
+    }
+
     if (current.path === "/color-palette-generator/") {
       const savedColorTarget = page.getByRole("button", {
         name: "Pilih warna tersimpan Indigo",

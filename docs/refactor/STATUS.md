@@ -167,6 +167,9 @@ the selected host.
 - Bootstrap error monitoring now stops after React starts successfully, so CSP violations from
   responsive-preview tooling or browser extensions cannot replace a running app with the fatal
   startup overlay; production CSP remains strict and does not allow `unsafe-eval`.
+- Mobile and tablet headers now use a two-row layout with four equally distributed module tabs,
+  visible locale and theme controls, and no nested horizontal navigation scroll; desktop retains
+  the compact single-row header at the `xl` breakpoint.
 - Typography now uses a validated local Google Fonts metadata snapshot with search, category and
   style filters, supported-weight selection, italic availability, and incremental catalog display.
 - Google Fonts CSS is loaded only for an active or intentionally previewed family, cached by its
@@ -176,7 +179,7 @@ the selected host.
   snapshot on failure.
 - The Node.js 22 quality gate passes with 145 unit and contract tests across 19 files; browser
   coverage now has 30 required passing scenarios plus one optional sponsor scenario.
-- The production entry is 67.88 kB gzip and the lazy Typography module is 10.10 kB gzip with the
+- The production entry is 68.04 kB gzip and the lazy Typography module is 10.10 kB gzip with the
   current 300-family API-synchronized snapshot.
 
 ## In progress
