@@ -149,13 +149,13 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     path: "/design-token-generator",
     topTab: "design",
     title: copy(
-      "Design Token Generator | CSS, Tailwind dan JSON",
-      "Design Token Generator | CSS, Tailwind and JSON",
+      "Design Token dan Theme Generator | DTCG & Tailwind v4",
+      "Design Token and Theme Generator | DTCG & Tailwind v4",
     ),
-    heading: copy("Design Token Generator", "Design Token Generator"),
+    heading: copy("Design Token dan Theme Generator", "Design Token and Theme Generator"),
     description: copy(
-      "Buat color roles, typography, spacing, radius, dan shadow lalu ekspor ke CSS, Tailwind, JSON, atau React Native.",
-      "Create color roles, typography, spacing, radii, and shadows, then export to CSS, Tailwind, JSON, or React Native.",
+      "Buat token light, dark, dan high-contrast dengan preview WCAG lalu ekspor ke DTCG 2025.10, Tailwind v4, CSS, SCSS, atau React Native.",
+      "Create light, dark, and high-contrast tokens with WCAG previews, then export to DTCG 2025.10, Tailwind v4, CSS, SCSS, or React Native.",
     ),
   },
   {

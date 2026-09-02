@@ -1,9 +1,25 @@
-import { type RGB, rgbToHex, rgbToHsl, hslToRgb, rotateHue, withLightness } from "../../color";
-import { generateShades, type Shade } from "../../color";
+import {
+  bestTextOn,
+  contrastRatio,
+  generateShades,
+  hslToRgb,
+  rgbToHex,
+  rgbToHsl,
+  rotateHue,
+  type RGB,
+  type Shade,
+  withLightness,
+} from "../../color";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+export type ThemeMode = "light" | "dark" | "high-contrast";
+
+export type DesignSystemOptions = {
+  name?: string;
+  mode?: ThemeMode;
+  fontFamily?: string;
+  spacingBase?: number;
+  radiusBase?: number;
+};
 
 export type DesignToken = {
   name: string;
@@ -11,355 +27,373 @@ export type DesignToken = {
   category: "color" | "typography" | "spacing" | "radius" | "shadow";
 };
 
-// Token/prefix names are embedded into exported code (CSS variable names,
-// JSON keys, SCSS vars). Restrict to a safe identifier character set.
 export function sanitizeTokenName(name: string): string {
   return name.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32);
 }
 
+export function sanitizeFontFamily(name: string): string {
+  return name
+    .replace(/[{};<>]/g, "")
+    .replace(/[\r\n\t]+/g, " ")
+    .trim()
+    .slice(0, 80);
+}
+
 export type ColorRole = {
+  token: string;
   role: string;
   hex: string;
   rgb: RGB;
   usage: string;
 };
 
+export type ComponentColorToken = {
+  component: "button" | "card" | "input" | "alert";
+  property: string;
+  reference: string;
+  usage: string;
+};
+
 export type TypographyScale = {
   name: string;
   size: string;
-  lineHeight: string;
+  lineHeight: number;
   fontWeight: number;
+  fontFamily: string;
+  letterSpacing: string;
   usage: string;
 };
 
-export type SpacingScale = {
-  name: string;
-  value: string;
-  px: number;
-  usage: string;
-};
+export type SpacingScale = { name: string; value: string; px: number; usage: string };
+export type RadiusScale = { name: string; value: string; px: number; usage: string };
 
-export type RadiusScale = {
-  name: string;
-  value: string;
-  usage: string;
+export type ShadowLayer = {
+  color: RGB;
+  alpha: number;
+  offsetX: number;
+  offsetY: number;
+  blur: number;
+  spread: number;
+  inset?: boolean;
 };
 
 export type ShadowScale = {
   name: string;
   css: string;
+  layers: ShadowLayer[];
   usage: string;
+};
+
+export type ContrastCheck = {
+  label: string;
+  foregroundToken: string;
+  backgroundToken: string;
+  foreground: string;
+  background: string;
+  ratio: number;
+  aaNormal: boolean;
+  aaLarge: boolean;
+  aaa: boolean;
 };
 
 export type DesignSystem = {
   name: string;
+  mode: ThemeMode;
+  fontFamily: string;
+  spacingBase: number;
+  radiusBase: number;
   colors: ColorRole[];
   shades: Shade[];
+  componentColors: ComponentColorToken[];
   typography: TypographyScale[];
   spacing: SpacingScale[];
   radius: RadiusScale[];
   shadows: ShadowScale[];
+  contrastChecks: ContrastCheck[];
 };
 
-// ---------------------------------------------------------------------------
-// Generate full design system from a base color
-// ---------------------------------------------------------------------------
+const WHITE: RGB = { r: 255, g: 255, b: 255 };
+const BLACK: RGB = { r: 0, g: 0, b: 0 };
 
-export function generateDesignSystem(base: RGB, name: string = "brand"): DesignSystem {
+const colorRole = (token: string, role: string, rgb: RGB, usage: string): ColorRole => ({
+  token,
+  role,
+  hex: rgbToHex(rgb),
+  rgb,
+  usage,
+});
+
+const textOn = (color: RGB): RGB => (bestTextOn(color) === "#000000" ? BLACK : WHITE);
+const remValue = (px: number) => (px === 0 ? "0" : `${Number((px / 16).toFixed(4))}rem`);
+
+const shadowCss = (layers: ShadowLayer[]) =>
+  layers
+    .map((layer) => {
+      const prefix = layer.inset ? "inset " : "";
+      return `${prefix}${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px ${layer.spread}px rgba(${layer.color.r},${layer.color.g},${layer.color.b},${layer.alpha})`;
+    })
+    .join(", ");
+
+function semanticColors(base: RGB, mode: ThemeMode): ColorRole[] {
   const hsl = rgbToHsl(base);
-  const shades = generateShades(base);
+  const primary = mode === "dark" ? withLightness(base, Math.max(hsl.l, 65)) : base;
+  const primaryLightness = rgbToHsl(primary).l;
+  const primaryHover = withLightness(
+    primary,
+    mode === "dark" ? Math.min(primaryLightness + 8, 88) : Math.max(primaryLightness - 8, 12),
+  );
+  const primaryActive = withLightness(
+    primary,
+    mode === "dark" ? Math.min(primaryLightness + 15, 92) : Math.max(primaryLightness - 16, 8),
+  );
+  const secondary = rotateHue(primary, 150);
+  const accent = rotateHue(primary, 30);
+  const neutralHsl = rgbToHsl(withLightness(base, 50));
+  const neutral = (lightness: number) =>
+    hslToRgb({ h: neutralHsl.h, s: Math.min(neutralHsl.s, 12), l: lightness });
 
-  // Derive color roles from the base color
-  const primary = base;
-  const primaryLight = hslToRgb({
-    h: hsl.h,
-    s: Math.max(hsl.s - 15, 10),
-    l: Math.min(hsl.l + 25, 90),
+  const canvas =
+    mode === "high-contrast"
+      ? { background: BLACK, surface: BLACK, variant: { r: 24, g: 24, b: 27 } }
+      : mode === "dark"
+        ? { background: neutral(7), surface: neutral(11), variant: neutral(17) }
+        : { background: neutral(99), surface: neutral(97), variant: neutral(92) };
+  const text =
+    mode === "high-contrast"
+      ? { primary: WHITE, secondary: WHITE, tertiary: { r: 229, g: 229, b: 229 } }
+      : mode === "dark"
+        ? { primary: neutral(96), secondary: neutral(76), tertiary: neutral(64) }
+        : { primary: neutral(10), secondary: neutral(38), tertiary: neutral(50) };
+  const border = mode === "high-contrast" ? WHITE : mode === "dark" ? neutral(28) : neutral(82);
+  const success = mode === "dark" ? { r: 74, g: 222, b: 128 } : { r: 22, g: 163, b: 74 };
+  const warning = mode === "dark" ? { r: 250, g: 204, b: 21 } : { r: 161, g: 98, b: 7 };
+  const error = mode === "dark" ? { r: 248, g: 113, b: 113 } : { r: 220, g: 38, b: 38 };
+  const info = mode === "dark" ? { r: 96, g: 165, b: 250 } : { r: 37, g: 99, b: 235 };
+
+  return [
+    colorRole("primary", "Primary", primary, "Main brand color, CTAs, links, focus rings"),
+    colorRole("primary-hover", "Primary Hover", primaryHover, "Primary hover state"),
+    colorRole("primary-active", "Primary Active", primaryActive, "Primary pressed state"),
+    colorRole("on-primary", "On Primary", textOn(primary), "Text and icons on primary"),
+    colorRole("secondary", "Secondary", secondary, "Secondary actions, badges, tags"),
+    colorRole("on-secondary", "On Secondary", textOn(secondary), "Text and icons on secondary"),
+    colorRole("accent", "Accent", accent, "Highlights and illustrations"),
+    colorRole("on-accent", "On Accent", textOn(accent), "Text and icons on accent"),
+    colorRole("background", "Background", canvas.background, "Page background"),
+    colorRole("surface", "Surface", canvas.surface, "Card and panel background"),
+    colorRole("surface-variant", "Surface Variant", canvas.variant, "Subtle grouped background"),
+    colorRole("text-primary", "Text Primary", text.primary, "Headings and primary body text"),
+    colorRole(
+      "text-secondary",
+      "Text Secondary",
+      text.secondary,
+      "Descriptions and supporting text",
+    ),
+    colorRole("text-tertiary", "Text Tertiary", text.tertiary, "Placeholders and disabled text"),
+    colorRole("border", "Border", border, "Borders and dividers"),
+    colorRole("success", "Success", success, "Success states and positive feedback"),
+    colorRole("on-success", "On Success", textOn(success), "Text and icons on success"),
+    colorRole("warning", "Warning", warning, "Warnings and caution indicators"),
+    colorRole("on-warning", "On Warning", textOn(warning), "Text and icons on warning"),
+    colorRole("error", "Error", error, "Errors and destructive actions"),
+    colorRole("on-error", "On Error", textOn(error), "Text and icons on error"),
+    colorRole("info", "Info", info, "Informational states"),
+    colorRole("on-info", "On Info", textOn(info), "Text and icons on info"),
+  ];
+}
+
+function makeTypography(fontFamily: string): TypographyScale[] {
+  const item = (
+    name: string,
+    size: string,
+    lineHeight: number,
+    fontWeight: number,
+    letterSpacing: string,
+    usage: string,
+  ): TypographyScale => ({ name, size, lineHeight, fontWeight, fontFamily, letterSpacing, usage });
+
+  return [
+    item("Display XL", "3.5rem", 1.1, 800, "-0.03em", "Hero headings and splash screens"),
+    item("Display", "2.5rem", 1.15, 700, "-0.025em", "Section headings and feature titles"),
+    item("H1", "2rem", 1.2, 700, "-0.02em", "Page titles"),
+    item("H2", "1.5rem", 1.25, 600, "-0.015em", "Section titles"),
+    item("H3", "1.25rem", 1.3, 600, "-0.01em", "Card titles and subsection headers"),
+    item("H4", "1.125rem", 1.35, 600, "0", "Small headings and labels"),
+    item("Body Large", "1.125rem", 1.6, 400, "0", "Lead paragraphs and intros"),
+    item("Body", "1rem", 1.6, 400, "0", "Default body text"),
+    item("Body Small", "0.875rem", 1.5, 400, "0", "Secondary text and descriptions"),
+    item("Caption", "0.75rem", 1.4, 500, "0.01em", "Captions and metadata"),
+    item("Overline", "0.6875rem", 1.3, 600, "0.08em", "Labels and categories"),
+    item("Code", "0.875rem", 1.6, 400, "0", "Inline code and code blocks"),
+  ];
+}
+
+function makeSpacing(base: number): SpacingScale[] {
+  const values: Array<[string, number, string]> = [
+    ["0", 0, "No spacing"],
+    ["0.5", 0.5, "Micro gap"],
+    ["1", 1, "Tight spacing"],
+    ["1.5", 1.5, "Compact spacing"],
+    ["2", 2, "Small spacing"],
+    ["3", 3, "Default control padding"],
+    ["4", 4, "Default card padding"],
+    ["5", 5, "Large spacing"],
+    ["6", 6, "Extra large spacing"],
+    ["8", 8, "Section padding"],
+    ["10", 10, "Large section gap"],
+    ["12", 12, "Page margins"],
+    ["16", 16, "Large layout spacing"],
+    ["20", 20, "Hero spacing"],
+    ["24", 24, "Extra large section spacing"],
+  ];
+  return values.map(([name, multiplier, usage]) => {
+    const px = Number((base * multiplier).toFixed(2));
+    return { name, px, value: remValue(px), usage };
   });
-  const primaryDark = hslToRgb({
-    h: hsl.h,
-    s: Math.min(hsl.s + 10, 100),
-    l: Math.max(hsl.l - 25, 10),
+}
+
+function makeRadius(base: number): RadiusScale[] {
+  const values: Array<[string, number, string]> = [
+    ["none", 0, "Sharp corners"],
+    ["sm", 0.5, "Inputs and badges"],
+    ["md", 0.75, "Buttons"],
+    ["lg", 1, "Cards and panels"],
+    ["xl", 1.5, "Modals and dropdowns"],
+    ["2xl", 2, "Large cards"],
+    ["3xl", 3, "Feature cards"],
+  ];
+  const radius = values.map(([name, multiplier, usage]) => {
+    const px = Number((base * multiplier).toFixed(2));
+    return { name, px, value: remValue(px), usage };
+  });
+  radius.push({ name: "full", px: 9999, value: "9999px", usage: "Pills and circles" });
+  return radius;
+}
+
+function makeShadows(base: RGB, mode: ThemeMode): ShadowScale[] {
+  const shadowColor = mode === "light" ? BLACK : WHITE;
+  const alphaMultiplier = mode === "light" ? 1 : 0.65;
+  const layer = (offsetY: number, blur: number, spread: number, alpha: number): ShadowLayer => ({
+    color: shadowColor,
+    alpha: Number((alpha * alphaMultiplier).toFixed(3)),
+    offsetX: 0,
+    offsetY,
+    blur,
+    spread,
+  });
+  const define = (name: string, layers: ShadowLayer[], usage: string): ShadowScale => ({
+    name,
+    layers,
+    css: shadowCss(layers),
+    usage,
   });
 
-  // Secondary: complementary-ish (rotate 150°)
-  const secondary = rotateHue(base, 150);
-  const secondaryHsl = rgbToHsl(secondary);
-  const secondaryLight = hslToRgb({
-    h: secondaryHsl.h,
-    s: Math.max(secondaryHsl.s - 15, 10),
-    l: Math.min(secondaryHsl.l + 25, 90),
+  return [
+    define("xs", [layer(1, 2, 0, 0.05)], "Subtle lift for small elements"),
+    define("sm", [layer(1, 3, 0, 0.1), layer(1, 2, -1, 0.1)], "Cards and buttons"),
+    define("md", [layer(4, 6, -1, 0.1), layer(2, 4, -2, 0.1)], "Dropdowns and popovers"),
+    define("lg", [layer(10, 15, -3, 0.1), layer(4, 6, -4, 0.1)], "Modals and hover cards"),
+    define("xl", [layer(20, 25, -5, 0.1), layer(8, 10, -6, 0.1)], "Large modals"),
+    define("2xl", [layer(25, 50, -12, 0.25)], "Prominent floating panels"),
+    define("inner", [{ ...layer(2, 4, 0, 0.05), inset: true }], "Inset and pressed states"),
+    define(
+      "glow",
+      [{ color: base, alpha: 0.2, offsetX: 0, offsetY: 0, blur: 20, spread: 4 }],
+      "Brand focus and glow effect",
+    ),
+  ];
+}
+
+const COMPONENT_COLORS: ComponentColorToken[] = [
+  { component: "button", property: "background", reference: "primary", usage: "Primary button" },
+  {
+    component: "button",
+    property: "foreground",
+    reference: "on-primary",
+    usage: "Primary button label",
+  },
+  {
+    component: "button",
+    property: "hover",
+    reference: "primary-hover",
+    usage: "Primary button hover",
+  },
+  { component: "card", property: "background", reference: "surface", usage: "Card surface" },
+  { component: "card", property: "foreground", reference: "text-primary", usage: "Card content" },
+  { component: "card", property: "border", reference: "border", usage: "Card boundary" },
+  { component: "input", property: "background", reference: "surface", usage: "Input background" },
+  { component: "input", property: "foreground", reference: "text-primary", usage: "Input value" },
+  { component: "input", property: "border", reference: "border", usage: "Input border" },
+  { component: "alert", property: "background", reference: "info", usage: "Information alert" },
+  {
+    component: "alert",
+    property: "foreground",
+    reference: "on-info",
+    usage: "Information alert text",
+  },
+];
+
+function makeContrastChecks(colors: ColorRole[]): ContrastCheck[] {
+  const byToken = new Map(colors.map((color) => [color.token, color]));
+  const pairs: Array<[string, string, string]> = [
+    ["Primary action", "on-primary", "primary"],
+    ["Page content", "text-primary", "background"],
+    ["Card content", "text-primary", "surface"],
+    ["Secondary text", "text-secondary", "surface"],
+    ["Error message", "on-error", "error"],
+    ["Information alert", "on-info", "info"],
+  ];
+
+  return pairs.map(([label, foregroundToken, backgroundToken]) => {
+    const foreground = byToken.get(foregroundToken);
+    const background = byToken.get(backgroundToken);
+    if (!foreground || !background) throw new Error(`Missing contrast token for ${label}`);
+    const ratio = contrastRatio(foreground.rgb, background.rgb);
+    return {
+      label,
+      foregroundToken,
+      backgroundToken,
+      foreground: foreground.hex,
+      background: background.hex,
+      ratio,
+      aaNormal: ratio >= 4.5,
+      aaLarge: ratio >= 3,
+      aaa: ratio >= 7,
+    };
   });
+}
 
-  // Accent: analogous warm (rotate 30°)
-  const accent = rotateHue(base, 30);
-  const accentHsl = rgbToHsl(accent);
-  const accentLight = hslToRgb({
-    h: accentHsl.h,
-    s: Math.max(accentHsl.s - 10, 10),
-    l: Math.min(accentHsl.l + 20, 88),
-  });
+export function getDesignSystemColor(system: DesignSystem, token: string): ColorRole {
+  const color = system.colors.find((candidate) => candidate.token === token);
+  if (!color) throw new Error(`Unknown design-system color token: ${token}`);
+  return color;
+}
 
-  // Neutrals: desaturated version of the base
-  const neutralBase = withLightness(base, 50);
-  const neutralHsl = rgbToHsl(neutralBase);
-  const neutral = (l: number) => hslToRgb({ h: neutralHsl.h, s: Math.min(neutralHsl.s, 15), l });
-
-  // Semantic colors
-  const success = { r: 34, g: 197, b: 94 }; // green-500
-  const warning = { r: 234, g: 179, b: 8 }; // yellow-500
-  const error = { r: 239, g: 68, b: 68 }; // red-500
-  const info = { r: 59, g: 130, b: 246 }; // blue-500
-
-  const colors: ColorRole[] = [
-    {
-      role: "Primary",
-      hex: rgbToHex(primary),
-      rgb: primary,
-      usage: "Main brand color, CTAs, links, focus rings",
-    },
-    {
-      role: "Primary Light",
-      hex: rgbToHex(primaryLight),
-      rgb: primaryLight,
-      usage: "Hover states, secondary buttons, highlights",
-    },
-    {
-      role: "Primary Dark",
-      hex: rgbToHex(primaryDark),
-      rgb: primaryDark,
-      usage: "Active states, emphasis, dark mode accents",
-    },
-    {
-      role: "Secondary",
-      hex: rgbToHex(secondary),
-      rgb: secondary,
-      usage: "Secondary actions, badges, tags",
-    },
-    {
-      role: "Secondary Light",
-      hex: rgbToHex(secondaryLight),
-      rgb: secondaryLight,
-      usage: "Secondary hover, subtle backgrounds",
-    },
-    {
-      role: "Accent",
-      hex: rgbToHex(accent),
-      rgb: accent,
-      usage: "Accents, highlights, illustrations",
-    },
-    {
-      role: "Accent Light",
-      hex: rgbToHex(accentLight),
-      rgb: accentLight,
-      usage: "Accent backgrounds, subtle highlights",
-    },
-    { role: "Background", hex: rgbToHex(neutral(99)), rgb: neutral(99), usage: "Page background" },
-    {
-      role: "Surface",
-      hex: rgbToHex(neutral(98)),
-      rgb: neutral(98),
-      usage: "Card/panel background",
-    },
-    {
-      role: "Surface Variant",
-      hex: rgbToHex(neutral(94)),
-      rgb: neutral(94),
-      usage: "Borders, dividers, subtle backgrounds",
-    },
-    {
-      role: "Text Primary",
-      hex: rgbToHex(neutral(10)),
-      rgb: neutral(10),
-      usage: "Headings, primary body text",
-    },
-    {
-      role: "Text Secondary",
-      hex: rgbToHex(neutral(50)),
-      rgb: neutral(50),
-      usage: "Subtitles, descriptions, captions",
-    },
-    {
-      role: "Text Tertiary",
-      hex: rgbToHex(neutral(60)),
-      rgb: neutral(60),
-      usage: "Placeholders, disabled text",
-    },
-    {
-      role: "Border",
-      hex: rgbToHex(neutral(85)),
-      rgb: neutral(85),
-      usage: "Default borders, dividers",
-    },
-    {
-      role: "Success",
-      hex: rgbToHex(success),
-      rgb: success,
-      usage: "Success states, positive feedback",
-    },
-    {
-      role: "Warning",
-      hex: rgbToHex(warning),
-      rgb: warning,
-      usage: "Warning states, caution indicators",
-    },
-    { role: "Error", hex: rgbToHex(error), rgb: error, usage: "Error states, destructive actions" },
-    {
-      role: "Info",
-      hex: rgbToHex(info),
-      rgb: info,
-      usage: "Informational states, neutral highlights",
-    },
-  ];
-
-  // Typography scale
-  const typography: TypographyScale[] = [
-    {
-      name: "Display XL",
-      size: "3.5rem",
-      lineHeight: "1.1",
-      fontWeight: 800,
-      usage: "Hero headings, splash screens",
-    },
-    {
-      name: "Display",
-      size: "2.5rem",
-      lineHeight: "1.15",
-      fontWeight: 700,
-      usage: "Section headings, feature titles",
-    },
-    { name: "H1", size: "2rem", lineHeight: "1.2", fontWeight: 700, usage: "Page titles" },
-    { name: "H2", size: "1.5rem", lineHeight: "1.25", fontWeight: 600, usage: "Section titles" },
-    {
-      name: "H3",
-      size: "1.25rem",
-      lineHeight: "1.3",
-      fontWeight: 600,
-      usage: "Card titles, subsection headers",
-    },
-    {
-      name: "H4",
-      size: "1.125rem",
-      lineHeight: "1.35",
-      fontWeight: 600,
-      usage: "Small headings, labels",
-    },
-    {
-      name: "Body Large",
-      size: "1.125rem",
-      lineHeight: "1.6",
-      fontWeight: 400,
-      usage: "Lead paragraphs, intros",
-    },
-    { name: "Body", size: "1rem", lineHeight: "1.6", fontWeight: 400, usage: "Default body text" },
-    {
-      name: "Body Small",
-      size: "0.875rem",
-      lineHeight: "1.5",
-      fontWeight: 400,
-      usage: "Secondary text, descriptions",
-    },
-    {
-      name: "Caption",
-      size: "0.75rem",
-      lineHeight: "1.4",
-      fontWeight: 500,
-      usage: "Captions, timestamps, metadata",
-    },
-    {
-      name: "Overline",
-      size: "0.6875rem",
-      lineHeight: "1.3",
-      fontWeight: 600,
-      usage: "Labels, categories, uppercase tags",
-    },
-    {
-      name: "Code",
-      size: "0.875rem",
-      lineHeight: "1.6",
-      fontWeight: 400,
-      usage: "Inline code, code blocks (monospace)",
-    },
-  ];
-
-  // Spacing scale (4px base)
-  const spacing: SpacingScale[] = [
-    { name: "0", value: "0", px: 0, usage: "No spacing" },
-    { name: "0.5", value: "0.125rem", px: 2, usage: "Micro gap" },
-    { name: "1", value: "0.25rem", px: 4, usage: "Tight spacing (icon gaps)" },
-    { name: "1.5", value: "0.375rem", px: 6, usage: "Compact spacing" },
-    { name: "2", value: "0.5rem", px: 8, usage: "Small spacing (inline elements)" },
-    { name: "3", value: "0.75rem", px: 12, usage: "Default spacing (button padding)" },
-    { name: "4", value: "1rem", px: 16, usage: "Medium spacing (card padding)" },
-    { name: "5", value: "1.25rem", px: 20, usage: "Large spacing (section gaps)" },
-    { name: "6", value: "1.5rem", px: 24, usage: "Extra large spacing" },
-    { name: "8", value: "2rem", px: 32, usage: "2x spacing (section padding)" },
-    { name: "10", value: "2.5rem", px: 40, usage: "3x spacing" },
-    { name: "12", value: "3rem", px: 48, usage: "4x spacing (page margins)" },
-    { name: "16", value: "4rem", px: 64, usage: "Large section spacing" },
-    { name: "20", value: "5rem", px: 80, usage: "Hero spacing" },
-    { name: "24", value: "6rem", px: 96, usage: "Extra large section spacing" },
-  ];
-
-  // Border radius scale
-  const radius: RadiusScale[] = [
-    { name: "none", value: "0", usage: "Sharp corners" },
-    { name: "sm", value: "0.25rem", usage: "Subtle rounding (inputs, badges)" },
-    { name: "md", value: "0.375rem", usage: "Default rounding (buttons)" },
-    { name: "lg", value: "0.5rem", usage: "Cards, panels" },
-    { name: "xl", value: "0.75rem", usage: "Modals, dropdowns" },
-    { name: "2xl", value: "1rem", usage: "Large cards, hero sections" },
-    { name: "3xl", value: "1.5rem", usage: "Feature cards" },
-    { name: "full", value: "9999px", usage: "Pills, circular elements" },
-  ];
-
-  // Shadow scale
-  const shadows: ShadowScale[] = [
-    { name: "xs", css: "0 1px 2px 0 rgba(0,0,0,0.05)", usage: "Subtle lift for small elements" },
-    {
-      name: "sm",
-      css: "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)",
-      usage: "Cards, buttons",
-    },
-    {
-      name: "md",
-      css: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
-      usage: "Dropdowns, popovers",
-    },
-    {
-      name: "lg",
-      css: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
-      usage: "Modals, cards on hover",
-    },
-    {
-      name: "xl",
-      css: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)",
-      usage: "Large modals, floating panels",
-    },
-    {
-      name: "2xl",
-      css: "0 25px 50px -12px rgba(0,0,0,0.25)",
-      usage: "Tooltips, prominent popovers",
-    },
-    {
-      name: "inner",
-      css: "inset 0 2px 4px 0 rgba(0,0,0,0.05)",
-      usage: "Input focus, inset effects",
-    },
-    {
-      name: "glow",
-      css: `0 0 20px 4px ${rgbToHex(base)}33`,
-      usage: "Brand glow, focus ring effect",
-    },
-  ];
+export function generateDesignSystem(
+  base: RGB,
+  nameOrOptions: string | DesignSystemOptions = "brand",
+): DesignSystem {
+  const options = typeof nameOrOptions === "string" ? { name: nameOrOptions } : nameOrOptions;
+  const name = sanitizeTokenName(options.name ?? "brand") || "brand";
+  const mode = options.mode ?? "light";
+  const fontFamily = sanitizeFontFamily(options.fontFamily ?? "") || "Inter";
+  const spacingBase = Math.min(8, Math.max(2, options.spacingBase ?? 4));
+  const radiusBase = Math.min(24, Math.max(0, options.radiusBase ?? 8));
+  const colors = semanticColors(base, mode);
 
   return {
     name,
+    mode,
+    fontFamily,
+    spacingBase,
+    radiusBase,
     colors,
-    shades,
-    typography,
-    spacing,
-    radius,
-    shadows,
+    shades: generateShades(base),
+    componentColors: COMPONENT_COLORS,
+    typography: makeTypography(fontFamily),
+    spacing: makeSpacing(spacingBase),
+    radius: makeRadius(radiusBase),
+    shadows: makeShadows(base, mode),
+    contrastChecks: makeContrastChecks(colors),
   };
 }

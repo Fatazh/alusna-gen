@@ -187,7 +187,9 @@ the selected host.
 
 ## In progress
 
-- None.
+- Design System P0 upgrade: introduce light, dark, and high-contrast theme modes; layered design
+  tokens; DTCG 2025.10 and Tailwind v4 exports; component previews; and contrast validation without
+  changing persisted browser data or public URLs.
 
 ## Known risks
 

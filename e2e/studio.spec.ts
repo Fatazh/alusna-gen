@@ -283,7 +283,9 @@ test("representative tools do not overflow at mobile, tablet, or desktop widths"
   const cases = [
     { width: 390, height: 844, path: "/" },
     { width: 390, height: 844, path: "/color-palette-generator/" },
+    { width: 390, height: 844, path: "/design-token-generator/" },
     { width: 1024, height: 768, path: "/brand-kit-generator/" },
+    { width: 1024, height: 768, path: "/design-token-generator/" },
     { width: 1440, height: 900, path: "/design-token-generator/" },
   ];
 
@@ -330,6 +332,38 @@ test("Brand Kit exposes usable export previews", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Tailwind Config/ })).toBeEnabled();
   await expect(page.getByRole("heading", { name: "Preview" })).toBeVisible();
   await expect(page.getByText('"brandName": "My Brand"', { exact: false })).toBeVisible();
+});
+
+test("Design System builds modes, validates contrast, and exports current token formats", async ({
+  page,
+}) => {
+  await page.goto("/design-token-generator/");
+
+  await expect(page.getByRole("heading", { name: "Generator Token & Tema" })).toBeVisible();
+  await expect(page.locator("[data-design-system-preview]")).toBeVisible();
+  await expect(page.getByText("Semua pasangan utama lulus WCAG AA")).toBeVisible();
+
+  const lightBackground = await page
+    .locator("[data-design-system-preview]")
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  const darkMode = page.getByRole("button", { name: "Gelap", exact: true });
+  await darkMode.click();
+  await expect(darkMode).toHaveAttribute("aria-pressed", "true");
+  const darkBackground = await page
+    .locator("[data-design-system-preview]")
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(darkBackground).not.toBe(lightBackground);
+
+  await page.getByRole("button", { name: "Tailwind v4 @theme" }).click();
+  await expect(page.locator("pre")).toContainText("@theme {");
+
+  await page.getByRole("button", { name: "DTCG 2025.10 JSON" }).click();
+  await expect(page.locator("pre")).toContainText("schemas/2025.10/format.json");
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Unduh", exact: true }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("brand-dark.tokens.json");
 });
 
 test("Experiment applies RGB intensities and derives a CMYK target", async ({ page }) => {

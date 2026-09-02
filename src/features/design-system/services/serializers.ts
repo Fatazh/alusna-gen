@@ -1,218 +1,258 @@
-import { rgbToHex } from "../../color";
-import { type DesignSystem } from "../model/designSystem";
+import { rgbToHex, type RGB } from "../../color";
+import { type DesignSystem, type ShadowLayer } from "../model/designSystem";
 
-// ---------------------------------------------------------------------------
-// Export formats
-// ---------------------------------------------------------------------------
+const tokenKey = (value: string) => value.toLowerCase().replace(/\s+/g, "-").replace(/\./g, "_");
+const cssName = (system: DesignSystem, category: string, name: string) =>
+  `--${system.name}-${category}-${tokenKey(name)}`;
 
-export function toCssVariables(ds: DesignSystem): string {
-  const lines: string[] = [":root {", "  /* ── Colors ── */"];
-  ds.colors.forEach((c) => {
-    const varName = `--${ds.name}-${c.role.toLowerCase().replace(/\s+/g, "-")}`;
-    lines.push(`  ${varName}: ${c.hex};`);
+const numberFromCss = (value: string) => Number.parseFloat(value) || 0;
+const dimension = (value: number, unit: "px" | "rem" = "px") => ({ value, unit });
+const colorValue = (rgb: RGB, alpha = 1) => ({
+  colorSpace: "srgb",
+  components: [rgb.r / 255, rgb.g / 255, rgb.b / 255].map((value) => Number(value.toFixed(6))),
+  alpha,
+});
+
+const shadowValue = (layer: ShadowLayer) => ({
+  color: colorValue(layer.color, layer.alpha),
+  offsetX: dimension(layer.offsetX),
+  offsetY: dimension(layer.offsetY),
+  blur: dimension(layer.blur),
+  spread: dimension(layer.spread),
+  ...(layer.inset ? { inset: true } : {}),
+});
+
+export function toCssVariables(system: DesignSystem): string {
+  const lines: string[] = [
+    `/* ${system.name} · ${system.mode} */`,
+    ":root {",
+    "  /* Semantic colors */",
+  ];
+  system.colors.forEach((color) => {
+    lines.push(`  ${cssName(system, "color", color.token)}: ${color.hex};`);
   });
-  lines.push("");
-  lines.push("  /* ── Shade scale ── */");
-  ds.shades.forEach((s) => {
-    lines.push(`  --${ds.name}-${s.step}: ${rgbToHex(s.rgb)};`);
+  lines.push("", "  /* Primitive shade scale */");
+  system.shades.forEach((shade) => {
+    lines.push(`  ${cssName(system, "shade", String(shade.step))}: ${rgbToHex(shade.rgb)};`);
   });
-  lines.push("");
-  lines.push("  /* ── Typography ── */");
-  ds.typography.forEach((t) => {
-    const prefix = `--${ds.name}-text-${t.name.toLowerCase().replace(/\s+/g, "-")}`;
-    lines.push(`  ${prefix}-size: ${t.size};`);
-    lines.push(`  ${prefix}-line-height: ${t.lineHeight};`);
-    lines.push(`  ${prefix}-weight: ${t.fontWeight};`);
+  lines.push(
+    "",
+    "  /* Typography */",
+    `  ${cssName(system, "font", "family")}: ${JSON.stringify(system.fontFamily)}, sans-serif;`,
+  );
+  system.typography.forEach((type) => {
+    const prefix = cssName(system, "text", type.name);
+    lines.push(`  ${prefix}-size: ${type.size};`);
+    lines.push(`  ${prefix}-line-height: ${type.lineHeight};`);
+    lines.push(`  ${prefix}-weight: ${type.fontWeight};`);
+    lines.push(`  ${prefix}-tracking: ${type.letterSpacing};`);
   });
-  lines.push("");
-  lines.push("  /* ── Spacing ── */");
-  ds.spacing.forEach((s) => {
-    lines.push(`  --${ds.name}-space-${s.name}: ${s.value};`);
+  lines.push("", "  /* Spacing */");
+  system.spacing.forEach((space) => {
+    lines.push(`  ${cssName(system, "space", space.name)}: ${space.value};`);
   });
-  lines.push("");
-  lines.push("  /* ── Border Radius ── */");
-  ds.radius.forEach((r) => {
-    lines.push(`  --${ds.name}-radius-${r.name}: ${r.value};`);
+  lines.push("", "  /* Border radius */");
+  system.radius.forEach((radius) => {
+    lines.push(`  ${cssName(system, "radius", radius.name)}: ${radius.value};`);
   });
-  lines.push("");
-  lines.push("  /* ── Shadows ── */");
-  ds.shadows.forEach((s) => {
-    lines.push(`  --${ds.name}-shadow-${s.name}: ${s.css};`);
+  lines.push("", "  /* Shadows */");
+  system.shadows.forEach((shadow) => {
+    lines.push(`  ${cssName(system, "shadow", shadow.name)}: ${shadow.css};`);
+  });
+  lines.push("", "  /* Component aliases */");
+  system.componentColors.forEach((token) => {
+    lines.push(
+      `  --${system.name}-${token.component}-${token.property}: var(${cssName(system, "color", token.reference)});`,
+    );
   });
   lines.push("}");
   return lines.join("\n");
 }
 
-export function toTailwindConfig(ds: DesignSystem): string {
-  const colorObj: Record<string, string> = {};
-  ds.colors.forEach((c) => {
-    const key = c.role.toLowerCase().replace(/\s+/g, "-");
-    colorObj[key] = c.hex;
+export function toTailwindConfig(system: DesignSystem): string {
+  const lines = [
+    `/* Tailwind CSS v4 theme · ${system.name} · ${system.mode} */`,
+    '@import "tailwindcss";',
+    "",
+    "@theme {",
+    `  --font-${system.name}: ${JSON.stringify(system.fontFamily)}, sans-serif;`,
+  ];
+  system.colors.forEach((color) => {
+    lines.push(`  --color-${system.name}-${color.token}: ${color.hex};`);
   });
-
-  const shadeObj: Record<string, string> = {};
-  ds.shades.forEach((s) => {
-    shadeObj[s.step] = rgbToHex(s.rgb);
+  system.shades.forEach((shade) => {
+    lines.push(`  --color-${system.name}-${shade.step}: ${rgbToHex(shade.rgb)};`);
   });
-
-  const spacingObj: Record<string, string> = {};
-  ds.spacing.forEach((s) => {
-    spacingObj[s.name] = s.value;
+  system.spacing.forEach((space) => {
+    lines.push(`  --spacing-${system.name}-${tokenKey(space.name)}: ${space.value};`);
   });
-
-  const radiusObj: Record<string, string> = {};
-  ds.radius.forEach((r) => {
-    radiusObj[r.name] = r.value;
+  system.radius.forEach((radius) => {
+    lines.push(`  --radius-${system.name}-${radius.name}: ${radius.value};`);
   });
-
-  const config = {
-    theme: {
-      extend: {
-        colors: {
-          [ds.name]: colorObj,
-          [`${ds.name}-shade`]: shadeObj,
-        },
-        spacing: spacingObj,
-        borderRadius: radiusObj,
-        boxShadow: Object.fromEntries(ds.shadows.map((s) => [s.name, s.css])),
-      },
-    },
-  };
-
-  return `// tailwind.config.js\nexport default ${JSON.stringify(config, null, 2)};`;
+  system.shadows.forEach((shadow) => {
+    lines.push(`  --shadow-${system.name}-${shadow.name}: ${shadow.css};`);
+  });
+  lines.push("}");
+  return lines.join("\n");
 }
 
-export function toJsonTokens(ds: DesignSystem): string {
-  const tokens: Record<string, unknown> = {
-    [ds.name]: {
-      color: Object.fromEntries(
-        ds.colors.map((c) => [
-          c.role.toLowerCase().replace(/\s+/g, "-"),
-          { $type: "color", $value: c.hex, $description: c.usage },
-        ]),
-      ),
-      shade: Object.fromEntries(
-        ds.shades.map((s) => [String(s.step), { $type: "color", $value: rgbToHex(s.rgb) }]),
-      ),
-      typography: Object.fromEntries(
-        ds.typography.map((t) => [
-          t.name.toLowerCase().replace(/\s+/g, "-"),
-          {
-            $type: "typography",
-            $value: {
-              fontSize: t.size,
-              lineHeight: t.lineHeight,
-              fontWeight: t.fontWeight,
-            },
-            $description: t.usage,
+export function toJsonTokens(system: DesignSystem): string {
+  const typography = Object.fromEntries(
+    system.typography.map((type) => {
+      const fontSizeRem = numberFromCss(type.size);
+      const trackingRem = Number((fontSizeRem * numberFromCss(type.letterSpacing)).toFixed(4));
+      return [
+        tokenKey(type.name),
+        {
+          $type: "typography",
+          $value: {
+            fontFamily: type.fontFamily,
+            fontSize: dimension(fontSizeRem, "rem"),
+            fontWeight: type.fontWeight,
+            letterSpacing: dimension(trackingRem, "rem"),
+            lineHeight: type.lineHeight,
           },
-        ]),
-      ),
-      spacing: Object.fromEntries(
-        ds.spacing.map((s) => [
-          s.name,
-          { $type: "dimension", $value: s.value, $description: s.usage },
-        ]),
-      ),
-      radius: Object.fromEntries(
-        ds.radius.map((r) => [
-          r.name,
-          { $type: "dimension", $value: r.value, $description: r.usage },
-        ]),
-      ),
-      shadow: Object.fromEntries(
-        ds.shadows.map((s) => [s.name, { $type: "shadow", $value: s.css, $description: s.usage }]),
-      ),
+          $description: type.usage,
+        },
+      ];
+    }),
+  );
+
+  const tokens = {
+    $schema: "https://www.designtokens.org/schemas/2025.10/format.json",
+    [system.name]: {
+      $description: `${system.name} ${system.mode} design tokens generated by ALUSNA`,
+      primitive: {
+        color: {
+          $type: "color",
+          ...Object.fromEntries(
+            system.shades.map((shade) => [
+              String(shade.step),
+              { $value: colorValue(shade.rgb), $description: `Brand shade ${shade.step}` },
+            ]),
+          ),
+        },
+      },
+      semantic: {
+        color: {
+          $type: "color",
+          ...Object.fromEntries(
+            system.colors.map((color) => [
+              color.token,
+              { $value: colorValue(color.rgb), $description: color.usage },
+            ]),
+          ),
+        },
+      },
+      component: {
+        color: Object.fromEntries(
+          [...new Set(system.componentColors.map((token) => token.component))].map((component) => [
+            component,
+            Object.fromEntries(
+              system.componentColors
+                .filter((token) => token.component === component)
+                .map((token) => [
+                  token.property,
+                  {
+                    $type: "color",
+                    $value: `{${system.name}.semantic.color.${token.reference}}`,
+                    $description: token.usage,
+                  },
+                ]),
+            ),
+          ]),
+        ),
+      },
+      typography,
+      spacing: {
+        $type: "dimension",
+        ...Object.fromEntries(
+          system.spacing.map((space) => [
+            tokenKey(space.name),
+            { $value: dimension(space.px), $description: space.usage },
+          ]),
+        ),
+      },
+      radius: {
+        $type: "dimension",
+        ...Object.fromEntries(
+          system.radius.map((radius) => [
+            radius.name,
+            { $value: dimension(radius.px), $description: radius.usage },
+          ]),
+        ),
+      },
+      shadow: {
+        $type: "shadow",
+        ...Object.fromEntries(
+          system.shadows.map((shadow) => [
+            shadow.name,
+            {
+              $value:
+                shadow.layers.length === 1
+                  ? shadowValue(shadow.layers[0])
+                  : shadow.layers.map(shadowValue),
+              $description: shadow.usage,
+            },
+          ]),
+        ),
+      },
     },
   };
   return JSON.stringify(tokens, null, 2);
 }
 
-export function toReactNativeTheme(ds: DesignSystem): string {
-  const colors: Record<string, string> = {};
-  ds.colors.forEach((c) => {
-    colors[c.role.toLowerCase().replace(/\s+/g, "_")] = c.hex;
-  });
-
+export function toReactNativeTheme(system: DesignSystem): string {
   const theme = {
-    colors,
+    mode: system.mode,
+    colors: Object.fromEntries(system.colors.map((color) => [color.token, color.hex])),
     typography: Object.fromEntries(
-      ds.typography.map((t) => [
-        t.name.toLowerCase().replace(/\s+/g, "_"),
+      system.typography.map((type) => [
+        tokenKey(type.name),
         {
-          fontSize: parseFloat(t.size) * 16,
-          lineHeight: parseFloat(t.lineHeight) * parseFloat(t.size) * 16,
-          fontWeight: String(t.fontWeight),
+          fontFamily: type.fontFamily,
+          fontSize: numberFromCss(type.size) * 16,
+          lineHeight: numberFromCss(type.size) * 16 * type.lineHeight,
+          fontWeight: String(type.fontWeight),
+          letterSpacing: numberFromCss(type.letterSpacing),
         },
       ]),
     ),
-    spacing: Object.fromEntries(ds.spacing.map((s) => [s.name, s.px])),
-    borderRadius: Object.fromEntries(
-      ds.radius.map((r) => [r.name, r.value === "9999px" ? 9999 : parseFloat(r.value) * 16]),
-    ),
+    spacing: Object.fromEntries(system.spacing.map((space) => [tokenKey(space.name), space.px])),
+    borderRadius: Object.fromEntries(system.radius.map((radius) => [radius.name, radius.px])),
   };
-
-  return `// theme.ts\nimport { DefaultTheme } from 'styled-components';\n\nexport const theme = ${JSON.stringify(theme, null, 2)} as const;\n\nexport type AppTheme = typeof theme;`;
+  return `// theme.ts\nexport const theme = ${JSON.stringify(theme, null, 2)} as const;\n\nexport type AppTheme = typeof theme;`;
 }
 
-export function toScssVariables(ds: DesignSystem): string {
-  const lines: string[] = ["// ── Design System SCSS Variables ──", ""];
-
-  lines.push("// Colors");
-  ds.colors.forEach((c) => {
-    const varName = `$${ds.name}-${c.role.toLowerCase().replace(/\s+/g, "-")}`;
-    lines.push(`${varName}: ${c.hex};`);
-  });
-
-  lines.push("");
-  lines.push("// Shade scale");
-  ds.shades.forEach((s) => {
-    lines.push(`$${ds.name}-${s.step}: ${rgbToHex(s.rgb)};`);
-  });
-
-  lines.push("");
-  lines.push("// Typography");
-  ds.typography.forEach((t) => {
-    const prefix = `$${ds.name}-text-${t.name.toLowerCase().replace(/\s+/g, "-")}`;
-    lines.push(`${prefix}-size: ${t.size};`);
-    lines.push(`${prefix}-line-height: ${t.lineHeight};`);
-    lines.push(`${prefix}-weight: ${t.fontWeight};`);
-  });
-
-  lines.push("");
-  lines.push("// Spacing");
-  ds.spacing.forEach((s) => {
-    lines.push(`$${ds.name}-space-${s.name}: ${s.value};`);
-  });
-
-  lines.push("");
-  lines.push("// Border Radius");
-  ds.radius.forEach((r) => {
-    lines.push(`$${ds.name}-radius-${r.name}: ${r.value};`);
-  });
-
-  lines.push("");
-  lines.push("// Shadows");
-  ds.shadows.forEach((s) => {
-    lines.push(`$${ds.name}-shadow-${s.name}: ${s.css};`);
-  });
-
-  return lines.join("\n");
+export function toScssVariables(system: DesignSystem): string {
+  return toCssVariables(system)
+    .replace(/^\/\*[\s\S]*?\*\/\n:root \{/, `// ${system.name} · ${system.mode}`)
+    .replace(new RegExp(`var\\(--${system.name}-([a-z0-9_-]+)\\)`, "g"), `$${system.name}-$1`)
+    .replace(/^  --/gm, "$")
+    .replace(/;\n?}$/, ";");
 }
 
 export type ExportFormat = "css" | "tailwind" | "json" | "react-native" | "scss";
 
-export function exportDesignSystem(ds: DesignSystem, format: ExportFormat): string {
+export const EXPORT_FILE_META: Record<ExportFormat, { extension: string; mime: string }> = {
+  css: { extension: "css", mime: "text/css" },
+  tailwind: { extension: "css", mime: "text/css" },
+  json: { extension: "tokens.json", mime: "application/json" },
+  "react-native": { extension: "theme.ts", mime: "text/typescript" },
+  scss: { extension: "scss", mime: "text/x-scss" },
+};
+
+export function exportDesignSystem(system: DesignSystem, format: ExportFormat): string {
   switch (format) {
     case "css":
-      return toCssVariables(ds);
+      return toCssVariables(system);
     case "tailwind":
-      return toTailwindConfig(ds);
+      return toTailwindConfig(system);
     case "json":
-      return toJsonTokens(ds);
+      return toJsonTokens(system);
     case "react-native":
-      return toReactNativeTheme(ds);
+      return toReactNativeTheme(system);
     case "scss":
-      return toScssVariables(ds);
+      return toScssVariables(system);
   }
 }

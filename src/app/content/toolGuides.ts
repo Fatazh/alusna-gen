@@ -146,16 +146,16 @@ const ENGLISH_TOOL_GUIDES: Record<string, ToolGuide> = {
   },
   "/design-token-generator": {
     overview:
-      "Design tokens translate visual decisions into reusable names and values across design and code. Good tokens communicate purpose, not just raw values.",
+      "Design tokens translate visual decisions into reusable names and values across design and code. ALUSNA separates primitive shades, semantic roles, and component aliases so the exported theme communicates purpose rather than raw values alone.",
     steps: [
-      "Set a base color and clear prefix.",
-      "Review color, typography, spacing, radius, and shadow roles.",
-      "Choose an export format and review names before production use.",
+      "Set a clear token prefix, theme mode, spacing unit, and radius foundation.",
+      "Review the component preview and WCAG contrast checks before inspecting individual tokens.",
+      "Download DTCG 2025.10, Tailwind v4, CSS, SCSS, or React Native output and review it before production use.",
     ],
-    useCases: ["Design systems", "Developer handoff", "Multi-platform themes"],
+    useCases: ["Light and dark themes", "Figma and developer handoff", "Multi-platform tokens"],
     tips: [
-      "Prefer semantic names such as text-primary or surface.",
-      "Version and review tokens shared by multiple products.",
+      "Keep primitive values, semantic decisions, and component aliases in separate layers.",
+      "Version and review downloaded tokens when they are shared by multiple products.",
     ],
     relatedPaths: ["/shade-generator", "/font-pairing", "/brand-kit-generator"],
   },
@@ -314,16 +314,16 @@ export const TOOL_GUIDES: Record<ToolPage["path"], ToolGuide> = {
   },
   "/design-token-generator": {
     overview:
-      "Design token menerjemahkan keputusan visual menjadi nama dan nilai yang dapat dipakai lintas desain serta kode. Token yang baik menjelaskan fungsi, bukan hanya menyimpan nilai mentah.",
+      "Design token menerjemahkan keputusan visual menjadi nama dan nilai yang dapat dipakai lintas desain serta kode. ALUSNA memisahkan shade primitive, peran semantik, dan alias komponen agar tema menjelaskan fungsi, bukan hanya nilai mentah.",
     steps: [
-      "Tentukan warna dasar dan prefix yang jelas untuk proyek atau brand.",
-      "Tinjau peran warna, tipografi, spacing, radius, dan shadow yang dihasilkan.",
-      "Pilih format ekspor yang sesuai lalu review penamaan sebelum dimasukkan ke repository produksi.",
+      "Tentukan prefix token, mode tema, unit spacing, dan radius dasar.",
+      "Periksa preview komponen dan hasil kontras WCAG sebelum meninjau setiap kelompok token.",
+      "Unduh DTCG 2025.10, Tailwind v4, CSS, SCSS, atau React Native lalu review sebelum dipakai di produksi.",
     ],
-    useCases: ["Design system", "Handoff developer", "Tema multi-platform"],
+    useCases: ["Tema light dan dark", "Handoff Figma dan developer", "Token multi-platform"],
     tips: [
-      "Gunakan nama semantik seperti text-primary atau surface, bukan nama yang terikat pada warna tertentu.",
-      "Token perlu versioning dan review ketika dipakai oleh lebih dari satu produk atau platform.",
+      "Pisahkan nilai primitive, keputusan semantik, dan alias komponen ke lapisan berbeda.",
+      "Beri versioning dan review pada file token yang dipakai oleh lebih dari satu produk.",
     ],
     relatedPaths: ["/shade-generator", "/font-pairing", "/brand-kit-generator"],
   },
