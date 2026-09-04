@@ -95,11 +95,33 @@ describe("sanitizePersistedStudioState", () => {
 describe("studio storage limits", () => {
   beforeEach(() => {
     useStudio.setState({
+      colorHistory: [],
       savedColors: [],
       paletteLibrary: [],
       savedBrandKits: [],
       uploadedFonts: [],
     });
+  });
+
+  it("keeps color history unique and moves a reused color to the front", () => {
+    const red = { r: 255, g: 0, b: 0 };
+    const green = { r: 0, g: 255, b: 0 };
+    const blue = { r: 0, g: 0, b: 255 };
+    useStudio.setState({ colorHistory: [red, green, blue] });
+
+    useStudio.getState().pushColorHistory(blue);
+
+    expect(useStudio.getState().colorHistory).toEqual([blue, red, green]);
+  });
+
+  it("does not duplicate the current history color", () => {
+    const red = { r: 255, g: 0, b: 0 };
+    const blue = { r: 0, g: 0, b: 255 };
+    useStudio.setState({ colorHistory: [red, blue] });
+
+    useStudio.getState().pushColorHistory(red);
+
+    expect(useStudio.getState().colorHistory).toEqual([red, blue]);
   });
 
   it("caps new saved colors, palettes, brand kits, and uploaded fonts", () => {

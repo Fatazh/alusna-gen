@@ -41,11 +41,16 @@ export const useStudio = create<StudioState>()(
 
       colorHistory: [],
       pushColorHistory: (rgb) =>
-        set((s) =>
-          s.colorHistory[0] && sameRgb(s.colorHistory[0], rgb)
-            ? s
-            : { colorHistory: [rgb, ...s.colorHistory].slice(0, HISTORY_CAP) },
-        ),
+        set((s) => {
+          if (s.colorHistory[0] && sameRgb(s.colorHistory[0], rgb)) return s;
+
+          return {
+            colorHistory: [
+              rgb,
+              ...s.colorHistory.filter((historyColor) => !sameRgb(historyColor, rgb)),
+            ].slice(0, HISTORY_CAP),
+          };
+        }),
 
       theme: "light" as Theme,
       setTheme: (t) => set({ theme: t }),

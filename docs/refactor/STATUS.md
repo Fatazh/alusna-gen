@@ -1,6 +1,6 @@
 # Refactor Status
 
-Last updated: 2026-08-26
+Last updated: 2026-09-04
 
 ## Current objective
 
@@ -184,12 +184,21 @@ the selected host.
   coverage now has 30 required passing scenarios plus one optional sponsor scenario.
 - The production entry is 68.04 kB gzip and the lazy Typography module is 10.10 kB gzip with the
   current 300-family API-synchronized snapshot.
+- Design System now generates light, dark, and high-contrast themes from layered primitive,
+  semantic, and component tokens with adjustable spacing, radius, typography, and shadows.
+- Its preview and contrast checks cover representative buttons, cards, inputs, alerts, and text
+  pairings before export.
+- Design System exports CSS variables, Tailwind v4 theme variables, DTCG 2025.10 JSON, SCSS, and
+  React Native tokens; every format can be copied or downloaded as a browser-local file.
+- Color history is now a unique most-recently-used list: choosing an older swatch moves it to the
+  front instead of creating another copy.
+- The Node.js 22 quality gate passes with 150 unit and contract tests across 20 files; browser
+  coverage now has 31 required passing scenarios plus one optional sponsor scenario.
+- The production entry is 68.09 kB gzip and the lazy Design System module is 9.37 kB gzip.
 
 ## In progress
 
-- Design System P0 upgrade: introduce light, dark, and high-contrast theme modes; layered design
-  tokens; DTCG 2025.10 and Tailwind v4 exports; component previews; and contrast validation without
-  changing persisted browser data or public URLs.
+- None.
 
 ## Known risks
 
@@ -226,6 +235,12 @@ the selected host.
   independence.
 - The 300-family snapshot increases the lazy Typography chunk to 10.10 kB gzip; review pagination
   and catalog size before raising the synchronization limit further.
+- The richer Design System increases its lazy chunk from 5.09 kB to 9.37 kB gzip. It remains
+  route-split, but future additions should avoid pulling editor-only dependencies into the entry.
+- DTCG output follows the 2025.10 schema structure, but compatibility has not yet been verified
+  against every third-party design-token importer.
+- The 2026-09-04 online production dependency audit could not reach the npm endpoint before its
+  configured timeout; the cached offline audit reports 0 vulnerabilities.
 
 ## Next task
 
