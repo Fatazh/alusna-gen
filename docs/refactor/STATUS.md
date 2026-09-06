@@ -1,6 +1,6 @@
 # Refactor Status
 
-Last updated: 2026-09-06
+Last updated: 2026-09-07
 
 ## Current objective
 
@@ -193,7 +193,7 @@ the selected host.
   React Native tokens; every format can be copied or downloaded as a browser-local file.
 - Color history is now a unique most-recently-used list: choosing an older swatch moves it to the
   front instead of creating another copy.
-- The Node.js 22 quality gate passes with 158 unit and contract tests across 21 files; browser
+- The Node.js 22 quality gate passes with 160 unit and contract tests across 22 files; browser
   coverage now has 32 required passing scenarios plus one optional sponsor scenario.
 - The production entry is 68.09 kB gzip and the lazy Design System module is 9.37 kB gzip.
 - The design-reference audit fixed duplicate colors in the Accessibility Simulator, localized the
@@ -233,6 +233,10 @@ the selected host.
 - A permanent Vercel redirect now maps the common typo `/robot.txt` to the standard `/robots.txt`.
 - Component Kit MVP is now a separate Design System UI module with token-driven actions, forms,
   feedback states, and copyable CSS handoff snippets.
+- Component Kit now includes an Overlays category with accessible Tabs, Dialog, and Toast examples;
+  the interaction workflow is covered by browser tests.
+- Component Kit handoff now supports CSS, Tailwind, and React snippets with deterministic token
+  values and one-click copy behavior.
 
 ## In progress
 
@@ -275,7 +279,7 @@ the selected host.
   independence.
 - The 300-family snapshot increases the lazy Typography chunk to 10.10 kB gzip; review pagination
   and catalog size before raising the synchronization limit further.
-- The richer Design System increases its lazy chunk from 5.09 kB to 9.37 kB gzip. It remains
+- The richer Design System increases its lazy chunk from 5.09 kB to 13.44 kB gzip. It remains
   route-split, but future additions should avoid pulling editor-only dependencies into the entry.
 - DTCG output follows the 2025.10 schema structure, but compatibility has not yet been verified
   against every third-party design-token importer.

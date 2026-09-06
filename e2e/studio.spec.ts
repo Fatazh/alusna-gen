@@ -368,7 +368,26 @@ test("Design System builds modes, validates contrast, and exports current token 
   await expect(page.getByLabel("Nama proyek")).toBeVisible();
   await page.getByRole("button", { name: "Feedback", exact: true }).click();
   await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByRole("button", { name: "Overlay", exact: true }).click();
+  await expect(page.getByRole("tab", { name: "Ringkasan" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.getByRole("tab", { name: "Token" }).click();
+  await expect(page.getByRole("tab", { name: "Token" })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("button", { name: "Buka dialog" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Batal" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("button", { name: "Tampilkan toast" }).click();
+  await expect(page.getByText("Toast berhasil ditampilkan")).toBeVisible();
   await page.getByRole("button", { name: "Aksi", exact: true }).click();
+  const handoff = page.locator("[data-component-kit-handoff]");
+  await expect(handoff).toContainText(".brand-button");
+  await page.getByRole("button", { name: "Tailwind", exact: true }).click();
+  await expect(handoff).toContainText("className");
+  await page.getByRole("button", { name: "React", exact: true }).click();
+  await expect(handoff).toContainText("export function");
 
   const baseColor = page.getByLabel("Kode HEX");
   await baseColor.fill("#0C7BC0");

@@ -2,36 +2,48 @@ import { useState, type CSSProperties } from "react";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
 import { CopyButton } from "../../../shared/ui/CopyButton";
 import { useLocale } from "../../../shared/i18n";
+import { useToast } from "../../../shared/ui/toastContext";
 import { getDesignSystemColor, type DesignSystem } from "../model/designSystem";
+import {
+  buildComponentKitSnippet,
+  COMPONENT_KIT_SIZE_VALUES,
+  type ComponentKitButtonVariant,
+  type ComponentKitControlSize,
+  type ComponentKitHandoffFormat,
+  type ComponentKitTab,
+} from "../services/componentKitSnippets";
 
-type KitTab = "actions" | "forms" | "feedback";
-type ButtonVariant = "primary" | "secondary" | "ghost";
-type ControlSize = "sm" | "md" | "lg";
+type OverlayTab = "overview" | "tokens";
 
-const KIT_TABS: Array<{ id: KitTab; idLabel: string; enLabel: string }> = [
+const KIT_TABS: Array<{ id: ComponentKitTab; idLabel: string; enLabel: string }> = [
   { id: "actions", idLabel: "Aksi", enLabel: "Actions" },
   { id: "forms", idLabel: "Form", enLabel: "Forms" },
   { id: "feedback", idLabel: "Feedback", enLabel: "Feedback" },
+  { id: "overlays", idLabel: "Overlay", enLabel: "Overlays" },
 ];
 
-const SIZE_VALUES: Record<ControlSize, { label: string; height: string; padding: string }> = {
-  sm: { label: "Small", height: "2rem", padding: "0 0.75rem" },
-  md: { label: "Medium", height: "2.5rem", padding: "0 1rem" },
-  lg: { label: "Large", height: "3rem", padding: "0 1.25rem" },
-};
+const HANDOFF_FORMATS: Array<{ id: ComponentKitHandoffFormat; label: string }> = [
+  { id: "css", label: "CSS" },
+  { id: "tailwind", label: "Tailwind" },
+  { id: "react", label: "React" },
+];
 
 export function ComponentKit({ system }: { system: DesignSystem }) {
   const { text } = useLocale();
-  const [tab, setTab] = useState<KitTab>("actions");
-  const [variant, setVariant] = useState<ButtonVariant>("primary");
-  const [size, setSize] = useState<ControlSize>("md");
+  const { show } = useToast();
+  const [tab, setTab] = useState<ComponentKitTab>("actions");
+  const [handoffFormat, setHandoffFormat] = useState<ComponentKitHandoffFormat>("css");
+  const [overlayTab, setOverlayTab] = useState<OverlayTab>("overview");
+  const [variant, setVariant] = useState<ComponentKitButtonVariant>("primary");
+  const [size, setSize] = useState<ComponentKitControlSize>("md");
   const [inputValue, setInputValue] = useState("ALUSNA Studio");
   const [checked, setChecked] = useState(true);
   const [enabled, setEnabled] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const color = (token: string) => getDesignSystemColor(system, token).hex;
   const radius = system.radius.find((item) => item.name === "md")?.value ?? "0.5rem";
-  const buttonStyle = (buttonVariant: ButtonVariant): CSSProperties => {
+  const buttonStyle = (buttonVariant: ComponentKitButtonVariant): CSSProperties => {
     if (buttonVariant === "secondary") {
       return {
         backgroundColor: color("secondary"),
@@ -52,8 +64,8 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
       color: color("on-primary"),
     };
   };
-  const sizeStyle = SIZE_VALUES[size];
-  const snippet = buildSnippet(system, tab, variant, size, color);
+  const sizeStyle = COMPONENT_KIT_SIZE_VALUES[size];
+  const snippet = buildComponentKitSnippet(system, tab, variant, size, color, handoffFormat);
 
   return (
     <Card>
@@ -139,23 +151,25 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             {tab === "actions" && (
               <div className="space-y-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  {(["primary", "secondary", "ghost"] as ButtonVariant[]).map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      aria-pressed={variant === item}
-                      onClick={() => setVariant(item)}
-                      className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium capitalize"
-                      style={
-                        variant === item
-                          ? { borderColor: color("primary"), color: color("primary") }
-                          : { borderColor: color("border"), color: color("text-secondary") }
-                      }
-                    >
-                      {item}
-                    </button>
-                  ))}
-                  {(["sm", "md", "lg"] as ControlSize[]).map((item) => (
+                  {(["primary", "secondary", "ghost"] as ComponentKitButtonVariant[]).map(
+                    (item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        aria-pressed={variant === item}
+                        onClick={() => setVariant(item)}
+                        className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium capitalize"
+                        style={
+                          variant === item
+                            ? { borderColor: color("primary"), color: color("primary") }
+                            : { borderColor: color("border"), color: color("text-secondary") }
+                        }
+                      >
+                        {item}
+                      </button>
+                    ),
+                  )}
+                  {(["sm", "md", "lg"] as ComponentKitControlSize[]).map((item) => (
                     <button
                       key={item}
                       type="button"
@@ -334,6 +348,106 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 </p>
               </div>
             )}
+
+            {tab === "overlays" && (
+              <div className="space-y-5">
+                <div
+                  className="flex gap-1 border-b"
+                  role="tablist"
+                  aria-label={text("Contoh tabs", "Tabs example")}
+                  style={{ borderColor: color("border") }}
+                >
+                  {(
+                    [
+                      ["overview", text("Ringkasan", "Overview")],
+                      ["tokens", text("Token", "Tokens")],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="tab"
+                      id={`component-kit-tab-${id}`}
+                      aria-selected={overlayTab === id}
+                      aria-controls={`component-kit-panel-${id}`}
+                      tabIndex={overlayTab === id ? 0 : -1}
+                      onClick={() => setOverlayTab(id)}
+                      onKeyDown={(event) => {
+                        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+                        event.preventDefault();
+                        const nextTab = event.key === "ArrowRight" ? "tokens" : "overview";
+                        setOverlayTab(nextTab);
+                        document.getElementById(`component-kit-tab-${nextTab}`)?.focus();
+                      }}
+                      className="border-b-2 px-3 py-2 text-xs font-medium"
+                      style={
+                        overlayTab === id
+                          ? { borderColor: color("primary"), color: color("primary") }
+                          : { borderColor: "transparent", color: "var(--text-muted)" }
+                      }
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <div
+                  id={`component-kit-panel-${overlayTab}`}
+                  role="tabpanel"
+                  aria-labelledby={`component-kit-tab-${overlayTab}`}
+                  tabIndex={0}
+                  className="rounded-lg border p-4"
+                  style={{ borderColor: color("border"), backgroundColor: color("surface") }}
+                >
+                  {overlayTab === "overview" ? (
+                    <>
+                      <p className="text-sm font-semibold" style={{ color: color("text-primary") }}>
+                        {text("Alur kerja terpusat", "Focused workflow")}
+                      </p>
+                      <p className="mt-1 text-xs" style={{ color: color("text-secondary") }}>
+                        {text(
+                          "Tabs menjaga konteks, dialog meminta keputusan, dan toast memberi konfirmasi singkat.",
+                          "Tabs preserve context, dialogs request decisions, and toasts confirm short actions.",
+                        )}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="space-y-2 text-xs" style={{ color: color("text-secondary") }}>
+                      <p className="font-mono">tab.active → primary</p>
+                      <p className="font-mono">dialog.surface → surface</p>
+                      <p className="font-mono">toast.success → success</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDialogOpen(true)}
+                    className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                    style={{
+                      backgroundColor: color("primary"),
+                      borderColor: color("primary"),
+                      color: color("on-primary"),
+                    }}
+                  >
+                    {text("Buka dialog", "Open dialog")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      show(text("Toast berhasil ditampilkan", "Toast shown successfully"))
+                    }
+                    className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                    style={{
+                      backgroundColor: color("surface"),
+                      borderColor: color("border"),
+                      color: color("text-primary"),
+                    }}
+                  >
+                    {text("Tampilkan toast", "Show toast")}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <aside
@@ -375,7 +489,30 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 </div>
               ))}
             </div>
+            <div
+              className="mt-3 flex flex-wrap gap-1"
+              role="toolbar"
+              aria-label={text("Format handoff", "Handoff format")}
+            >
+              {HANDOFF_FORMATS.map((format) => (
+                <button
+                  key={format.id}
+                  type="button"
+                  aria-pressed={handoffFormat === format.id}
+                  onClick={() => setHandoffFormat(format.id)}
+                  className="rounded-md border px-2 py-1 text-[10px] font-medium"
+                  style={
+                    handoffFormat === format.id
+                      ? { borderColor: color("primary"), color: color("primary") }
+                      : { borderColor: color("border"), color: color("text-secondary") }
+                  }
+                >
+                  {format.label}
+                </button>
+              ))}
+            </div>
             <pre
+              data-component-kit-handoff
               className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border p-3 text-[10px] leading-relaxed"
               style={{
                 backgroundColor: color("surface"),
@@ -388,37 +525,70 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
           </aside>
         </div>
       </CardBody>
+      {dialogOpen && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
+          role="presentation"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setDialogOpen(false);
+          }}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setDialogOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="component-kit-dialog-title"
+            aria-describedby="component-kit-dialog-description"
+            className="w-full max-w-md rounded-xl border p-5 shadow-2xl"
+            style={{ backgroundColor: color("surface"), borderColor: color("border") }}
+          >
+            <h4
+              id="component-kit-dialog-title"
+              className="text-base font-semibold"
+              style={{ color: color("text-primary") }}
+            >
+              {text("Konfirmasi perubahan", "Confirm changes")}
+            </h4>
+            <p
+              id="component-kit-dialog-description"
+              className="mt-2 text-sm"
+              style={{ color: color("text-secondary") }}
+            >
+              {text(
+                "Dialog menjaga fokus pengguna pada keputusan penting.",
+                "A dialog keeps the user focused on an important decision.",
+              )}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDialogOpen(false)}
+                className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                style={{ borderColor: color("border"), color: color("text-primary") }}
+              >
+                {text("Batal", "Cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDialogOpen(false);
+                  show(text("Perubahan diterapkan", "Changes applied"));
+                }}
+                className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                style={{
+                  backgroundColor: color("primary"),
+                  borderColor: color("primary"),
+                  color: color("on-primary"),
+                }}
+              >
+                {text("Terapkan", "Apply")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
-}
-
-function buildSnippet(
-  system: DesignSystem,
-  tab: KitTab,
-  variant: ButtonVariant,
-  size: ControlSize,
-  color: (token: string) => string,
-): string {
-  const name = system.name || "brand";
-  if (tab === "forms") {
-    return `.${name}-input {
-  background: ${color("surface")};
-  border: 1px solid ${color("border")};
-  color: ${color("text-primary")};
-  border-radius: ${system.radius.find((item) => item.name === "md")?.value ?? "0.5rem"};
-}`;
-  }
-  if (tab === "feedback") {
-    return `.${name}-alert {
-  background: ${color("info")};
-  color: ${color("on-info")};
-  border-radius: ${system.radius.find((item) => item.name === "md")?.value ?? "0.5rem"};
-}`;
-  }
-  return `.${name}-button {
-  background: ${color(variant === "secondary" ? "secondary" : variant === "ghost" ? "surface" : "primary")};
-  color: ${color(variant === "secondary" ? "on-secondary" : variant === "ghost" ? "text-primary" : "on-primary")};
-  min-height: ${SIZE_VALUES[size].height};
-  padding: ${SIZE_VALUES[size].padding};
-}`;
 }

@@ -92,6 +92,38 @@ Status: **verified**
 - [x] Show the active token map and a copyable CSS handoff snippet beside the live preview.
 - [x] Extend component color aliases and add unit/E2E coverage for the kit workflow.
 
-Next expansion: add Tabs, Dialog, Toast, and a downloadable component package only after the
-foundation is validated with real designer workflows. Keep cloud projects, authentication, and a
-public package out of scope until there is evidence of demand.
+Next expansion after this foundation: validate the kit with real designer workflows before adding
+framework-specific exports. Keep cloud projects, authentication, and a public package out of scope
+until there is evidence of demand.
+
+## Phase 12: Component Kit interaction patterns
+
+Status: **verified**
+
+- [x] Add an Overlays category with accessible Tabs, Dialog, and Toast examples.
+- [x] Keep interaction state local to the playground and reuse the shared toast provider.
+- [x] Expose token mapping and copyable CSS snippets for overlay patterns.
+- [x] Cover opening, closing, tab selection, and toast feedback in browser tests.
+
+Next expansion: validate the kit with real designer workflows before adding a downloadable
+component package or framework-specific code export.
+
+## Phase 13: Framework handoff snippets
+
+Status: **verified**
+
+- [x] Add CSS, Tailwind, and React handoff formats to the Component Kit inspector.
+- [x] Keep generated snippets deterministic, token-driven, and safe for sanitized system names.
+- [x] Preserve one-click copy behavior across all handoff formats.
+- [x] Cover format switching and generated output in the Design System E2E workflow.
+
+Next expansion: observe real handoff usage before introducing downloadable packages or additional
+framework adapters.
+
+## Phase 14: Workflow validation gate
+
+Status: **planned**
+
+- [ ] Collect feedback from at least three real designer–developer handoff workflows.
+- [ ] Measure which snippet formats are copied and where output needs context or escaping.
+- [ ] Decide whether a downloadable package is justified by repeated usage.
