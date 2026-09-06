@@ -228,6 +228,9 @@ the selected host.
   updates the pairing preview and never replaces the active catalog or uploaded font.
 - Design System now accepts a custom base color through the shared picker and HEX input, can sync
   from the active Color workspace value, and persists the sanitized choice for the current session.
+- Vercel deployment is now pinned to the production SEO build, which fails closed when the public
+  origin or contact email is still a placeholder instead of publishing incomplete metadata.
+- A permanent Vercel redirect now maps the common typo `/robot.txt` to the standard `/robots.txt`.
 
 ## In progress
 
@@ -238,6 +241,8 @@ the selected host.
 - E2E covers route rendering, primary navigation, representative responsive layouts, canonical URLs,
   and the Brand Kit export preview, but not every editor combination, download, or clipboard failure.
 - The ALUSNA domain and final production origin are not configured yet.
+- Search Console ownership verification and sitemap submission remain external launch steps; code
+  cannot make a site appear in search results before a real domain is deployed and submitted.
 - The legacy `cikp-studio` key is intentionally retained; removal requires a later explicit compatibility decision.
 - `studio.ts` remains a shared persisted Zustand store; introduce slices only when a product change
   needs independently owned state lifecycles.

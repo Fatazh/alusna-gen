@@ -102,6 +102,18 @@ npm run build:production
 Perintah ini gagal tertutup apabila origin/email belum valid atau artefak tidak memiliki sitemap,
 canonical URL, dan `hreflang`. Output dibuat di `dist`.
 
+Pada Vercel, `vercel.json` menjalankan `npm run build:production` secara otomatis. Sebelum deploy,
+isi environment variables untuk environment **Production** di Project Settings:
+
+```text
+VITE_SITE_URL=https://domain-publik-anda.com
+VITE_CONTACT_EMAIL=alamat-email-aktif@domain-publik-anda.com
+```
+
+`VITE_SITE_URL` harus sama persis dengan domain publik (HTTPS, tanpa path). Jika masih memakai
+domain placeholder atau variabel belum diatur, build produksi akan dihentikan agar situs tidak
+terpublikasi tanpa canonical dan sitemap yang valid.
+
 Bootstrap error produksi dimuat dari file eksternal sehingga `script-src` tidak memerlukan
 `'unsafe-inline'`. UI masih menggunakan inline style React, sehingga `style-src 'unsafe-inline'`
 belum dapat dihapus tanpa refactor presentasi yang lebih luas.
