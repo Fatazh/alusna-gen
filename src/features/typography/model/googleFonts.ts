@@ -14,6 +14,11 @@ export type FontDef = {
   variableWeight?: { min: number; max: number };
 };
 
+export type FontPairing = {
+  heading: string;
+  body: string;
+};
+
 export const GOOGLE_FONTS: FontDef[] = GOOGLE_FONTS_CATALOG.map((font) => {
   const generated = font as typeof font & {
     lastModified?: string;
@@ -70,8 +75,69 @@ export const GOOGLE_FONTS_META: {
 } = GOOGLE_FONTS_CATALOG_META;
 export const FILTER_FONT_PAGE_SIZE = 40;
 
+const PAIRING_HEADINGS = [
+  "Playfair Display",
+  "Oswald",
+  "Lora",
+  "Bebas Neue",
+  "Merriweather",
+  "Montserrat",
+];
+
+const PAIRING_BODIES = [
+  "Inter",
+  "Open Sans",
+  "Source Sans 3",
+  "Roboto",
+  "Lato",
+  "Merriweather Sans",
+];
+
 export function findGoogleFont(family: string): FontDef | undefined {
   return GOOGLE_FONTS.find((font) => font.family === family);
+}
+
+/**
+ * Suggests pairings around the currently selected family.
+ *
+ * Display/serif/handwriting families are treated as headings and receive a
+ * readable sans-serif body. Other families (including uploaded fonts without
+ * catalog metadata) are treated as body text and receive a curated heading.
+ */
+export function suggestFontPairings(
+  activeFamily: string,
+  fonts: FontDef[] = GOOGLE_FONTS,
+): FontPairing[] {
+  const family = activeFamily.trim();
+  if (!family) return [];
+
+  const available = new Set(fonts.map((font) => font.family));
+  const activeDefinition = fonts.find((font) => font.family === family);
+  const activeIsHeading = Boolean(
+    activeDefinition && ["serif", "display", "handwriting"].includes(activeDefinition.category),
+  );
+  const preferred = activeIsHeading ? PAIRING_BODIES : PAIRING_HEADINGS;
+  const fallbackCategories = activeIsHeading
+    ? new Set<FontCategory>(["sans-serif", "monospace"])
+    : new Set<FontCategory>(["serif", "display"]);
+
+  const candidates = [
+    ...preferred.filter((candidate) => available.has(candidate)),
+    ...fonts
+      .filter(
+        (font) =>
+          font.family !== family &&
+          fallbackCategories.has(font.category) &&
+          !preferred.includes(font.family),
+      )
+      .map((font) => font.family),
+  ].filter((candidate, index, list) => candidate !== family && list.indexOf(candidate) === index);
+
+  return candidates
+    .slice(0, 3)
+    .map((candidate) =>
+      activeIsHeading ? { heading: family, body: candidate } : { heading: candidate, body: family },
+    );
 }
 
 export function filterGoogleFonts(

@@ -44,6 +44,29 @@ describe("Design System draft storage", () => {
     expect(readDesignSystemDraft(storage)).toEqual(draft);
   });
 
+  it("round-trips and clamps a custom base color", () => {
+    const storage = new MemoryStorage();
+    writeDesignSystemDraft(
+      {
+        name: "brand",
+        mode: "light",
+        spacingBase: 4,
+        radiusBase: 8,
+        exportFormat: "css",
+        baseColor: { r: 12, g: 128, b: 240 },
+      },
+      storage,
+    );
+
+    expect(readDesignSystemDraft(storage)?.baseColor).toEqual({ r: 12, g: 128, b: 240 });
+
+    storage.setItem(
+      DESIGN_SYSTEM_DRAFT_KEY,
+      JSON.stringify({ name: "brand", baseColor: { r: -20, g: 300, b: 12.6 } }),
+    );
+    expect(readDesignSystemDraft(storage)?.baseColor).toEqual({ r: 0, g: 255, b: 13 });
+  });
+
   it("clamps invalid values and fails closed on corrupt data", () => {
     const storage = new MemoryStorage();
     storage.setItem(

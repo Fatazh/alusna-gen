@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Check } from "@phosphor-icons/react/Check";
 import { ArrowsClockwise } from "@phosphor-icons/react/ArrowsClockwise";
 import { LockSimple } from "@phosphor-icons/react/LockSimple";
 import { Palette } from "@phosphor-icons/react/Palette";
 import { PencilSimple } from "@phosphor-icons/react/PencilSimple";
-import { useStudio } from "../../../store/studio";
 import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
 import { useToast } from "../../../shared/ui/toastContext";
@@ -46,7 +44,6 @@ export function PaletteTab({
   const { text } = useLocale();
   const { show } = useToast();
   const toneStyle = TONE_PROFILES[kit.tone].style;
-  const savedColors = useStudio((s) => s.savedColors);
 
   // Auto-adjust toggle
   const [autoAdjust, setAutoAdjust] = useState(true);
@@ -317,62 +314,6 @@ export function PaletteTab({
           </div>
         </CardBody>
       </Card>
-
-      {/* Saved Colors Palette Footer (for Primary) */}
-      {savedColors.length > 0 && (
-        <Card>
-          <CardHeader
-            title={text("Pilih dari Palet Tersimpan", "Choose from Saved Colors")}
-            subtitle={text(
-              "Klik untuk mengganti warna Primary",
-              "Choose a saved color to replace Primary",
-            )}
-          />
-          <CardBody>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
-              {savedColors.map((sc) => {
-                const scHex = rgbToHex(sc.rgb);
-                const isActive = rgbToHex(kit.primaryColor) === scHex;
-                return (
-                  <button
-                    key={sc.id}
-                    type="button"
-                    onClick={() => {
-                      handlePrimaryChange(sc.rgb);
-                      show(`✓ Primary: ${sc.name || scHex}`);
-                    }}
-                    className={`group relative h-12 w-full rounded-lg border-2 transition hover:scale-105 ${
-                      isActive
-                        ? "border-[var(--accent)]"
-                        : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
-                    }`}
-                    style={{ backgroundColor: scHex }}
-                    title={`${sc.name} — ${scHex}`}
-                  >
-                    <span className="absolute inset-x-0 bottom-0 text-center text-[8px] font-medium text-white/80 bg-black/40 rounded-b-md py-0.5 truncate px-1">
-                      {sc.name || scHex}
-                    </span>
-                    {isActive && (
-                      <div className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--accent)] text-[8px] text-white">
-                        <Check size={10} weight="bold" aria-hidden="true" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                {savedColors.length}{" "}
-                {text(
-                  "warna tersimpan — pilih untuk Primary",
-                  "saved colors — choose one for Primary",
-                )}
-              </span>
-            </div>
-          </CardBody>
-        </Card>
-      )}
 
       {/* Color Harmony Suggestions */}
       <Card>

@@ -4,7 +4,7 @@ import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
 import { DownloadSimple } from "@phosphor-icons/react/DownloadSimple";
 import { WarningCircle } from "@phosphor-icons/react/WarningCircle";
 import { useStudio } from "../../../store/studio";
-import { rgbToHex } from "../../color";
+import { ColorPicker, rgbToHex, type RGB } from "../../color";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
 import { CopyButton } from "../../../shared/ui/CopyButton";
 import { useLocale } from "../../../shared/i18n";
@@ -40,6 +40,7 @@ export function DesignSystemModule() {
   const selectedColor = useStudio((state) => state.selectedColor);
   const activeFontFamily = useStudio((state) => state.activeFontFamily);
   const [draft] = useState(readDesignSystemDraft);
+  const [baseColor, setBaseColor] = useState<RGB>(() => draft?.baseColor ?? selectedColor);
   const [dsName, setDsName] = useState(draft?.name ?? "brand");
   const [mode, setMode] = useState<ThemeMode>(draft?.mode ?? "light");
   const [spacingBase, setSpacingBase] = useState(draft?.spacingBase ?? 4);
@@ -49,14 +50,14 @@ export function DesignSystemModule() {
 
   const system = useMemo(
     () =>
-      generateDesignSystem(selectedColor, {
+      generateDesignSystem(baseColor, {
         name: dsName,
         mode,
         fontFamily: activeFontFamily,
         spacingBase,
         radiusBase,
       }),
-    [activeFontFamily, dsName, mode, radiusBase, selectedColor, spacingBase],
+    [activeFontFamily, baseColor, dsName, mode, radiusBase, spacingBase],
   );
   const exportedCode = useMemo(
     () => exportDesignSystem(system, exportFormat),
@@ -65,8 +66,15 @@ export function DesignSystemModule() {
   const failedContrastChecks = system.contrastChecks.filter((check) => !check.aaNormal).length;
 
   useEffect(() => {
-    writeDesignSystemDraft({ name: dsName, mode, spacingBase, radiusBase, exportFormat });
-  }, [dsName, exportFormat, mode, radiusBase, spacingBase]);
+    writeDesignSystemDraft({
+      name: dsName,
+      mode,
+      spacingBase,
+      radiusBase,
+      exportFormat,
+      baseColor,
+    });
+  }, [baseColor, dsName, exportFormat, mode, radiusBase, spacingBase]);
 
   const toggleSection = (section: string) =>
     setExpandedSection((current) => (current === section ? null : section));
@@ -175,12 +183,41 @@ export function DesignSystemModule() {
           </div>
 
           <div
+            className="rounded-xl border p-4"
+            style={{ borderColor: "var(--border)", backgroundColor: "var(--surface-soft)" }}
+          >
+            <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {text("Warna dasar sistem", "System base color")}
+                </p>
+                <p className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
+                  {text(
+                    "Pilih warna brand yang menjadi sumber token primary dan turunannya.",
+                    "Choose the brand color that drives primary tokens and their derived scales.",
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setBaseColor(selectedColor)}
+                className="rounded-lg border px-3 py-2 text-xs font-medium transition"
+                style={{ borderColor: "var(--input-border)", color: "var(--text-secondary)" }}
+              >
+                {text("Gunakan warna aktif", "Use active color")}
+                <span className="ml-1 font-mono">{rgbToHex(selectedColor)}</span>
+              </button>
+            </div>
+            <ColorPicker rgb={baseColor} onRgbChange={setBaseColor} />
+          </div>
+
+          <div
             className="flex flex-wrap items-center gap-3 border-t pt-4"
             style={{ borderColor: "var(--border)" }}
           >
             <div
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold"
-              style={{ backgroundColor: rgbToHex(selectedColor), color: color("on-primary") }}
+              style={{ backgroundColor: rgbToHex(baseColor), color: color("on-primary") }}
             >
               {system.name.charAt(0).toUpperCase()}
             </div>

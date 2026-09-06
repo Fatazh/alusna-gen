@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildGoogleFontCssUrl } from "../services/fontLoader";
 import { sanitizeFontFamily, fontStack, isSafeFontDataUrl } from "./font";
-import { GOOGLE_FONTS, filterGoogleFonts, nearestFontWeight } from "./googleFonts";
+import {
+  GOOGLE_FONTS,
+  filterGoogleFonts,
+  nearestFontWeight,
+  suggestFontPairings,
+} from "./googleFonts";
 
 describe("Google Fonts catalog", () => {
   it("contains unique, sanitized families with supported metadata", () => {
@@ -53,6 +58,29 @@ describe("Google Fonts catalog", () => {
     expect(inter?.variableWeight).toEqual({ min: 100, max: 900 });
     expect(inter?.styleWeights.normal).toEqual([100, 200, 300, 400, 500, 600, 700, 800, 900]);
     expect(inter?.weights).toEqual([100, 200, 300, 400, 500, 600, 700, 800, 900]);
+  });
+
+  it("builds body pairings around a selected heading font", () => {
+    const pairings = suggestFontPairings("Playfair Display");
+
+    expect(pairings).toHaveLength(3);
+    expect(pairings.every((pairing) => pairing.heading === "Playfair Display")).toBe(true);
+    expect(pairings.every((pairing) => pairing.body !== "Playfair Display")).toBe(true);
+  });
+
+  it("builds heading pairings around a selected body font", () => {
+    const pairings = suggestFontPairings("Inter");
+
+    expect(pairings).toHaveLength(3);
+    expect(pairings.every((pairing) => pairing.body === "Inter")).toBe(true);
+    expect(pairings.every((pairing) => pairing.heading !== "Inter")).toBe(true);
+  });
+
+  it("keeps uploaded or unknown families in the suggested pairing", () => {
+    const pairings = suggestFontPairings("My Uploaded Font");
+
+    expect(pairings).toHaveLength(3);
+    expect(pairings.every((pairing) => pairing.body === "My Uploaded Font")).toBe(true);
   });
 });
 

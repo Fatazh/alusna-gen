@@ -221,6 +221,13 @@ the selected host.
 - Visual redesign Fase 9–10 are implemented: Design System drafts now persist safely for the current
   browser session, Brand Kit actions are bilingual, and the Node.js 22 production release gate has
   been rerun with launch configuration still fail-closed.
+- Brand Kit's redundant saved-palette panel was removed while the shared saved-color state and Color
+  workspace behavior remain unchanged.
+- Typography pairing suggestions now derive from the selected family: heading-style fonts are paired
+  with readable body fonts and body-style fonts with curated headings. Selecting a suggestion only
+  updates the pairing preview and never replaces the active catalog or uploaded font.
+- Design System now accepts a custom base color through the shared picker and HEX input, can sync
+  from the active Color workspace value, and persists the sanitized choice for the current session.
 
 ## In progress
 

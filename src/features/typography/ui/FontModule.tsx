@@ -7,7 +7,9 @@ import {
   filterGoogleFonts,
   findGoogleFont,
   nearestFontWeight,
+  suggestFontPairings,
   type FontDef,
+  type FontPairing,
   type FontStyle,
 } from "../model/googleFonts";
 import { loadGoogleFont, loadUploadedFont, restoreUploadedFont } from "../services/fontLoader";
@@ -98,19 +100,14 @@ export function FontModule() {
       ),
     })),
   );
-  const [pairing, setPairing] = useState<{ heading: string; body: string } | null>(null);
+  const [pairing, setPairing] = useState<FontPairing | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Curated heading/body pairings (all present in GOOGLE_FONTS).
-  const SUGGESTED_PAIRINGS: { heading: string; body: string }[] = [
-    { heading: "Playfair Display", body: "Inter" },
-    { heading: "Oswald", body: "Open Sans" },
-    { heading: "Lora", body: "Source Sans 3" },
-    { heading: "Bebas Neue", body: "Roboto" },
-    { heading: "Merriweather", body: "Lato" },
-    { heading: "Montserrat", body: "Lora" },
-  ];
+  const suggestedPairings = useMemo(
+    () => suggestFontPairings(activeFontFamily),
+    [activeFontFamily],
+  );
 
   const selectFont = (family: string) => {
     setActiveFontFamily(family);
@@ -545,7 +542,7 @@ export function FontModule() {
               </p>
             )}
             <div className="grid gap-2 sm:grid-cols-3">
-              {SUGGESTED_PAIRINGS.slice(0, 3).map((p) => {
+              {suggestedPairings.map((p) => {
                 const active = pairing?.heading === p.heading && pairing?.body === p.body;
                 return (
                   <button

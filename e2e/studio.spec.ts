@@ -110,6 +110,26 @@ test("Google Fonts catalog supports search, weights, and italic preview", async 
   await expect(page.getByText("font-style: italic", { exact: false })).toBeVisible();
 });
 
+test("font pairing suggestions follow the selected family", async ({ page }) => {
+  await page.goto("/font-pairing");
+  await page.getByRole("searchbox", { name: "Cari Google Fonts" }).fill("Playfair Display");
+
+  const playfair = page.getByRole("button").filter({ hasText: "Playfair Display" }).first();
+  await playfair.click();
+
+  const pairingSection = page
+    .getByRole("heading", { name: "Saran Pasangan Font" })
+    .locator("xpath=../../..");
+  const suggestions = pairingSection.getByRole("button");
+  await expect(suggestions).toHaveCount(3);
+  for (const suggestion of await suggestions.all()) {
+    await expect(suggestion).toContainText("Playfair Display");
+  }
+
+  await suggestions.nth(1).click();
+  await expect(page.getByText("font-family: 'Playfair Display'", { exact: false })).toBeVisible();
+});
+
 test("language switch preserves the tool and updates bilingual SEO metadata", async ({ page }) => {
   await page.goto("/color-mixer");
   await page.getByRole("button", { name: "Use English" }).click();
@@ -342,6 +362,12 @@ test("Design System builds modes, validates contrast, and exports current token 
   await expect(page.getByRole("heading", { name: "Generator Token & Tema" })).toBeVisible();
   await expect(page.locator("[data-design-system-preview]")).toBeVisible();
   await expect(page.getByText("Semua pasangan utama lulus WCAG AA")).toBeVisible();
+
+  const baseColor = page.getByLabel("Kode HEX");
+  await baseColor.fill("#0C7BC0");
+  await baseColor.blur();
+  await expect(baseColor).toHaveValue("#0C7BC0");
+  await expect(page.locator("pre")).toContainText("#0C7BC0");
 
   const lightBackground = await page
     .locator("[data-design-system-preview]")

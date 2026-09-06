@@ -1,5 +1,6 @@
 import { sanitizeTokenName, type ThemeMode } from "../model/designSystem";
 import type { ExportFormat } from "./serializers";
+import type { RGB } from "../../color";
 
 export const DESIGN_SYSTEM_DRAFT_KEY = "alusna-design-system-draft-v1";
 
@@ -9,6 +10,7 @@ export type DesignSystemDraft = {
   spacingBase: number;
   radiusBase: number;
   exportFormat: ExportFormat;
+  baseColor?: RGB;
 };
 
 const MODES = new Set<ThemeMode>(["light", "dark", "high-contrast"]);
@@ -29,6 +31,19 @@ function boundedNumber(value: unknown, min: number, max: number, fallback: numbe
   return Math.min(max, Math.max(min, Math.round(value)));
 }
 
+function sanitizedRgb(value: unknown): RGB | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const channels = value as Record<string, unknown>;
+  const channel = (input: unknown) =>
+    typeof input === "number" && Number.isFinite(input)
+      ? Math.min(255, Math.max(0, Math.round(input)))
+      : null;
+  const r = channel(channels.r);
+  const g = channel(channels.g);
+  const b = channel(channels.b);
+  return r === null || g === null || b === null ? undefined : { r, g, b };
+}
+
 export function readDesignSystemDraft(storage?: Storage): DesignSystemDraft | null {
   const target = getSessionStorage(storage);
   if (!target) return null;
@@ -42,12 +57,14 @@ export function readDesignSystemDraft(storage?: Storage): DesignSystemDraft | nu
     const exportFormat = EXPORT_FORMATS.has(draft.exportFormat as ExportFormat)
       ? (draft.exportFormat as ExportFormat)
       : "css";
+    const baseColor = sanitizedRgb(draft.baseColor);
     return {
       name: sanitizeTokenName(typeof draft.name === "string" ? draft.name : "brand") || "brand",
       mode,
       spacingBase: boundedNumber(draft.spacingBase, 2, 8, 4),
       radiusBase: boundedNumber(draft.radiusBase, 0, 24, 8),
       exportFormat,
+      ...(baseColor ? { baseColor } : {}),
     };
   } catch {
     return null;
@@ -58,6 +75,7 @@ export function writeDesignSystemDraft(draft: DesignSystemDraft, storage?: Stora
   const target = getSessionStorage(storage);
   if (!target) return;
   try {
+    const baseColor = sanitizedRgb(draft.baseColor);
     target.setItem(
       DESIGN_SYSTEM_DRAFT_KEY,
       JSON.stringify({
@@ -66,6 +84,7 @@ export function writeDesignSystemDraft(draft: DesignSystemDraft, storage?: Stora
         spacingBase: boundedNumber(draft.spacingBase, 2, 8, 4),
         radiusBase: boundedNumber(draft.radiusBase, 0, 24, 8),
         exportFormat: EXPORT_FORMATS.has(draft.exportFormat) ? draft.exportFormat : "css",
+        ...(baseColor ? { baseColor } : {}),
       }),
     );
   } catch {
