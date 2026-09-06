@@ -360,14 +360,22 @@ test("Design System builds modes, validates contrast, and exports current token 
   await page.goto("/design-token-generator/");
 
   await expect(page.getByRole("heading", { name: "Generator Token & Tema" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Component Kit" })).toBeVisible();
   await expect(page.locator("[data-design-system-preview]")).toBeVisible();
   await expect(page.getByText("Semua pasangan utama lulus WCAG AA")).toBeVisible();
+
+  await page.getByRole("button", { name: "Form", exact: true }).click();
+  await expect(page.getByLabel("Nama proyek")).toBeVisible();
+  await page.getByRole("button", { name: "Feedback", exact: true }).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByRole("button", { name: "Aksi", exact: true }).click();
 
   const baseColor = page.getByLabel("Kode HEX");
   await baseColor.fill("#0C7BC0");
   await baseColor.blur();
   await expect(baseColor).toHaveValue("#0C7BC0");
-  await expect(page.locator("pre")).toContainText("#0C7BC0");
+  const exportPreview = page.locator("[data-design-system-export-preview]");
+  await expect(exportPreview).toContainText("#0C7BC0");
 
   const lightBackground = await page
     .locator("[data-design-system-preview]")
@@ -381,10 +389,10 @@ test("Design System builds modes, validates contrast, and exports current token 
   expect(darkBackground).not.toBe(lightBackground);
 
   await page.getByRole("button", { name: "Tailwind v4 @theme" }).click();
-  await expect(page.locator("pre")).toContainText("@theme {");
+  await expect(exportPreview).toContainText("@theme {");
 
   await page.getByRole("button", { name: "DTCG 2025.10 JSON" }).click();
-  await expect(page.locator("pre")).toContainText("schemas/2025.10/format.json");
+  await expect(exportPreview).toContainText("schemas/2025.10/format.json");
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Unduh", exact: true }).click();

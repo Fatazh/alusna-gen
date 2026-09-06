@@ -48,7 +48,7 @@ export type ColorRole = {
 };
 
 export type ComponentColorToken = {
-  component: "button" | "card" | "input" | "alert";
+  component: "button" | "card" | "input" | "alert" | "badge" | "checkbox" | "switch";
   property: string;
   reference: string;
   usage: string;
@@ -354,6 +354,16 @@ const COMPONENT_COLORS: ComponentColorToken[] = [
     property: "foreground",
     reference: "on-info",
     usage: "Information alert text",
+  },
+  { component: "badge", property: "background", reference: "secondary", usage: "Badge background" },
+  { component: "badge", property: "foreground", reference: "on-secondary", usage: "Badge label" },
+  { component: "checkbox", property: "accent", reference: "primary", usage: "Checkbox accent" },
+  { component: "switch", property: "track", reference: "primary", usage: "Enabled switch track" },
+  {
+    component: "switch",
+    property: "thumb",
+    reference: "on-primary",
+    usage: "Enabled switch thumb",
   },
 ];
 

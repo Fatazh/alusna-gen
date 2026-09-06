@@ -13,12 +13,12 @@ import {
   generateDesignSystem,
   getDesignSystemColor,
   sanitizeTokenName,
-  type DesignSystem,
   type ThemeMode,
 } from "../model/designSystem";
 import { downloadDesignSystemExport } from "../services/download";
 import { exportDesignSystem, type ExportFormat } from "../services/serializers";
 import { readDesignSystemDraft, writeDesignSystemDraft } from "../services/draftStorage";
+import { ComponentKit } from "./ComponentKit";
 
 const EXPORT_FORMATS: Array<{ id: ExportFormat; label: string }> = [
   { id: "css", label: "CSS Variables" },
@@ -239,7 +239,7 @@ export function DesignSystemModule() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="space-y-4 xl:col-span-2">
-          <ComponentPreview system={system} />
+          <ComponentKit system={system} />
 
           <Card>
             <CardHeader
@@ -561,6 +561,7 @@ export function DesignSystemModule() {
                   </div>
                 </div>
                 <pre
+                  data-design-system-export-preview
                   className="max-h-[32rem] overflow-auto rounded-xl border p-4 text-[11px] leading-relaxed"
                   style={{
                     borderColor: "var(--border)",
@@ -616,113 +617,6 @@ function RangeControl({
         className="w-full"
       />
     </label>
-  );
-}
-
-function ComponentPreview({ system }: { system: DesignSystem }) {
-  const { text } = useLocale();
-  const color = (token: string) => getDesignSystemColor(system, token).hex;
-  const radius = system.radius.find((item) => item.name === "lg")?.value ?? "0.5rem";
-  const controlRadius = system.radius.find((item) => item.name === "md")?.value ?? "0.375rem";
-
-  return (
-    <Card>
-      <CardHeader
-        title={text("Preview Komponen", "Component Preview")}
-        subtitle={text(
-          "Uji token pada antarmuka nyata sebelum export",
-          "Test tokens in a real interface before export",
-        )}
-      />
-      <CardBody>
-        <div
-          data-design-system-preview
-          className="rounded-xl border p-4 sm:p-6"
-          style={{
-            backgroundColor: color("background"),
-            borderColor: color("border"),
-            color: color("text-primary"),
-            fontFamily: `${system.fontFamily}, sans-serif`,
-          }}
-        >
-          <div
-            className="mx-auto max-w-xl space-y-4 rounded-xl border p-5"
-            style={{
-              backgroundColor: color("surface"),
-              borderColor: color("border"),
-              borderRadius: radius,
-              boxShadow: system.shadows[2]?.css,
-            }}
-          >
-            <div>
-              <span
-                className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: color("primary") }}
-              >
-                {system.name} · {system.mode}
-              </span>
-              <h3 className="mt-2 text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
-                {text("Bangun lebih cepat dengan token", "Build faster with reliable tokens")}
-              </h3>
-              <p className="mt-2 text-sm" style={{ color: color("text-secondary") }}>
-                {text(
-                  "Warna, tipografi, spacing, dan state menggunakan sumber yang sama.",
-                  "Color, typography, spacing, and states share one source of truth.",
-                )}
-              </p>
-            </div>
-            <label className="block text-xs font-medium">
-              {text("Nama proyek", "Project name")}
-              <input
-                readOnly
-                value="ALUSNA Studio"
-                className="mt-1.5 w-full border px-3 py-2 text-sm outline-none"
-                style={{
-                  backgroundColor: color("surface"),
-                  borderColor: color("border"),
-                  borderRadius: controlRadius,
-                  color: color("text-primary"),
-                }}
-              />
-            </label>
-            <div
-              className="rounded-lg px-3 py-2 text-sm"
-              style={{ backgroundColor: color("info"), color: color("on-info") }}
-            >
-              {text(
-                "Semua perubahan tetap lokal di browser.",
-                "All changes remain local in your browser.",
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="min-h-10 px-4 text-sm font-semibold"
-                style={{
-                  backgroundColor: color("primary"),
-                  borderRadius: controlRadius,
-                  color: color("on-primary"),
-                }}
-              >
-                {text("Simpan tema", "Save theme")}
-              </button>
-              <button
-                type="button"
-                className="min-h-10 border px-4 text-sm font-semibold"
-                style={{
-                  backgroundColor: color("surface"),
-                  borderColor: color("border"),
-                  borderRadius: controlRadius,
-                  color: color("text-primary"),
-                }}
-              >
-                {text("Lihat dokumentasi", "View documentation")}
-              </button>
-            </div>
-          </div>
-        </div>
-      </CardBody>
-    </Card>
   );
 }
 

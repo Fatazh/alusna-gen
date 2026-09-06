@@ -44,6 +44,8 @@ describe("design system exports", () => {
       "$product-button-background: $product-color-primary;",
     );
     expect(toReactNativeTheme(system)).toContain('"letterSpacing": -0.64');
+    expect(system.componentColors.some((token) => token.component === "badge")).toBe(true);
+    expect(system.componentColors.some((token) => token.component === "switch")).toBe(true);
   });
 
   it("supports theme modes and adjustable foundation scales", () => {

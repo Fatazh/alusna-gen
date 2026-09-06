@@ -81,3 +81,17 @@ Status: **verified**
 - [x] Add a privacy-first analytics boundary with no default network transmission.
 - [x] Expand route, SEO, content, responsive, and browser coverage.
 - [x] Document remaining external launch work for domain, hosting, Search Console, and ads.
+
+## Phase 11: Component Kit foundation
+
+Status: **verified**
+
+- [x] Extract the component playground from the monolithic Design System screen.
+- [x] Add token-driven Button, Badge, Input, Select, Checkbox, Switch, and Alert examples.
+- [x] Cover variant, size, disabled, focus, feedback, and interaction states in the preview.
+- [x] Show the active token map and a copyable CSS handoff snippet beside the live preview.
+- [x] Extend component color aliases and add unit/E2E coverage for the kit workflow.
+
+Next expansion: add Tabs, Dialog, Toast, and a downloadable component package only after the
+foundation is validated with real designer workflows. Keep cloud projects, authentication, and a
+public package out of scope until there is evidence of demand.

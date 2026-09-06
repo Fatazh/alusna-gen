@@ -193,8 +193,8 @@ the selected host.
   React Native tokens; every format can be copied or downloaded as a browser-local file.
 - Color history is now a unique most-recently-used list: choosing an older swatch moves it to the
   front instead of creating another copy.
-- The Node.js 22 quality gate passes with 151 unit and contract tests across 20 files; browser
-  coverage now has 31 required passing scenarios plus one optional sponsor scenario.
+- The Node.js 22 quality gate passes with 158 unit and contract tests across 21 files; browser
+  coverage now has 32 required passing scenarios plus one optional sponsor scenario.
 - The production entry is 68.09 kB gzip and the lazy Design System module is 9.37 kB gzip.
 - The design-reference audit fixed duplicate colors in the Accessibility Simulator, localized the
   remaining Contrast Checker labels on English routes, and added explicit hover/active foreground
@@ -231,6 +231,8 @@ the selected host.
 - Vercel deployment is now pinned to the production SEO build, which fails closed when the public
   origin or contact email is still a placeholder instead of publishing incomplete metadata.
 - A permanent Vercel redirect now maps the common typo `/robot.txt` to the standard `/robots.txt`.
+- Component Kit MVP is now a separate Design System UI module with token-driven actions, forms,
+  feedback states, and copyable CSS handoff snippets.
 
 ## In progress
 
