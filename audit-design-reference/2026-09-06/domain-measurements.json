@@ -1,0 +1,52 @@
+{
+  "contrast": {
+    "shownChecksAllPass": true,
+    "normal": 4.7012529808810015,
+    "hover": 6.511128177528538,
+    "active": 8.689491279383342,
+    "primaryTextOnSurface": 4.138542468592831,
+    "inputBorderOnSurface": 1.475543229880031
+  },
+  "tracking": {
+    "style": "Display XL",
+    "css": "-0.03em",
+    "expectedAt16pxRoot": -1.68,
+    "exportedNative": -1.68
+  },
+  "tailwindIncludesTypographyScale": true,
+  "inter": {
+    "family": "Inter",
+    "category": "sans-serif",
+    "weights": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+    "styles": ["italic", "normal"],
+    "styleWeights": {
+      "normal": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+      "italic": [100, 200, 300, 400, 500, 600, 700, 800, 900]
+    },
+    "subsets": [
+      "cyrillic",
+      "cyrillic-ext",
+      "greek",
+      "greek-ext",
+      "latin",
+      "latin-ext",
+      "vietnamese"
+    ],
+    "lastModified": "2025-09-10",
+    "variableWeight": {
+      "min": 100,
+      "max": 900
+    }
+  },
+  "brandColorToken": {
+    "$type": "color",
+    "$value": "#6366F1"
+  },
+  "shadeBaseRetained": false,
+  "tailwindShadeName": [
+    "      colors: {",
+    "        my-brand: {",
+    "        50: '#f1f1fe',",
+    "        100: '#e3e3fd',"
+  ]
+}
