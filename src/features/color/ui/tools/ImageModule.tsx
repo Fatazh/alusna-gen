@@ -174,7 +174,8 @@ export function ImageModule() {
             type="button"
             onClick={() => colors.forEach((rgb) => saveColor(rgb, getColorName(rgb).label))}
             disabled={colors.length === 0}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400 disabled:opacity-40"
+            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110 disabled:opacity-40"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
             {text("Simpan semua ke palet", "Save all to palette")}
           </button>

@@ -4,6 +4,7 @@ import { CopyButton } from "../../../shared/ui/CopyButton";
 import { cn } from "../../../shared/lib/cn";
 import { useToast } from "../../../shared/ui/toastContext";
 import { useLocale } from "../../../shared/i18n";
+import { Plus } from "@phosphor-icons/react/Plus";
 
 // ---------------------------------------------------------------------------
 // ColorDetail — shows color name + all code formats
@@ -130,14 +131,11 @@ export function Swatch({
       <button
         type="button"
         onClick={onClick}
-        className={cn(
-          "relative w-full overflow-hidden rounded-xl border transition",
-          dims,
-          selected ? "ring-2 ring-indigo-500/30" : "",
-        )}
+        className={cn("relative w-full overflow-hidden rounded-xl border transition", dims)}
         style={{
           backgroundColor: hex,
-          borderColor: selected ? "rgba(99,102,241,0.5)" : "var(--border)",
+          borderColor: selected ? "var(--accent)" : "var(--border)",
+          boxShadow: selected ? "0 0 0 3px var(--focus-ring)" : undefined,
         }}
       >
         {/* Color name / label at bottom */}
@@ -182,7 +180,7 @@ export function Swatch({
           style={{ backgroundColor: "var(--surface)", color: "var(--text-primary)" }}
           title={text("Tambah ke palet tersimpan", "Add to saved palette")}
         >
-          +
+          <Plus size={13} weight="bold" aria-hidden="true" />
         </button>
       )}
     </div>

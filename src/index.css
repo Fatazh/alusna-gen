@@ -7,67 +7,71 @@
 /* ── Default = Light mode ── */
 :root {
   color-scheme: light;
-  --app-bg: #f4f5f7;
-  --chrome-bg: rgba(247, 248, 250, 0.96);
-  --chrome-text: #111111;
-  --chrome-sub: #5d626c;
-  --border: #dfe2e7;
+  --app-bg: #eef0f3;
+  --chrome-bg: rgba(246, 247, 249, 0.97);
+  --chrome-text: #171a1f;
+  --chrome-sub: #5c6572;
+  --border: #d7dce4;
   --card-bg: #ffffff;
-  --card-border: #dfe2e7;
-  --text-primary: #111111;
-  --text-secondary: #4f5560;
-  --text-muted: #737985;
+  --card-border: #d7dce4;
+  --text-primary: #171a1f;
+  --text-secondary: #4d5663;
+  --text-muted: #727c8b;
   --surface: #ffffff;
-  --surface-soft: #f7f8fa;
-  --surface-hover: #f0f2f5;
+  --surface-soft: #f5f6f8;
+  --surface-hover: #eaedf2;
   --input-bg: #ffffff;
-  --input-border: #cfd3da;
-  --input-text: #111111;
-  --chip-bg: #f1f3f6;
-  --chip-active-bg: #e7edff;
-  --scrollbar-thumb: #c8ccd4;
-  --scrollbar-hover: #9ca3af;
-  --tab-indicator: #1546d8;
-  --accent: #1546d8;
-  --accent-hover: #1039b8;
-  --accent-soft: #eaf0ff;
+  --input-border: #bec6d2;
+  --input-text: #171a1f;
+  --chip-bg: #edf0f4;
+  --chip-active-bg: #e3ebf8;
+  --scrollbar-thumb: #c1c8d2;
+  --scrollbar-hover: #9aa5b4;
+  --tab-indicator: #2f5fae;
+  --accent: #2f5fae;
+  --accent-hover: #244c8d;
+  --accent-soft: #e8eef8;
   --accent-contrast: #ffffff;
-  --magenta: #d81b60;
-  --amber: #f2b705;
-  --focus-ring: rgba(21, 70, 216, 0.32);
+  --magenta: #c33a70;
+  --amber: #bd8b12;
+  --focus-ring: rgba(47, 95, 174, 0.38);
+  --shadow-soft: 0 18px 40px -32px rgba(17, 24, 39, 0.6);
+  --shadow-focus: 0 0 0 3px var(--focus-ring);
 }
 
 /* ── Dark mode ── */
 .dark {
   color-scheme: dark;
-  --app-bg: #0d0f13;
-  --chrome-bg: rgba(13, 15, 19, 0.96);
-  --chrome-text: #f7f8fa;
-  --chrome-sub: #9ca3af;
-  --border: #292d35;
-  --card-bg: #15181e;
-  --card-border: #292d35;
-  --text-primary: #f7f8fa;
-  --text-secondary: #b5bbc5;
-  --text-muted: #858c98;
-  --surface: #15181e;
-  --surface-soft: #111319;
-  --surface-hover: #1d2129;
-  --input-bg: #111319;
-  --input-border: #343944;
-  --input-text: #f7f8fa;
-  --chip-bg: #1b1f27;
-  --chip-active-bg: #202b4d;
-  --scrollbar-thumb: #303641;
-  --scrollbar-hover: #454c59;
-  --tab-indicator: #6f8fff;
-  --accent: #6f8fff;
-  --accent-hover: #8ba4ff;
-  --accent-soft: #1d294d;
-  --accent-contrast: #081027;
-  --magenta: #ff5c96;
-  --amber: #f5c84c;
-  --focus-ring: rgba(111, 143, 255, 0.38);
+  --app-bg: #0d1014;
+  --chrome-bg: rgba(13, 16, 20, 0.97);
+  --chrome-text: #f3f5f8;
+  --chrome-sub: #a2acba;
+  --border: #2a313b;
+  --card-bg: #151a21;
+  --card-border: #2a313b;
+  --text-primary: #f3f5f8;
+  --text-secondary: #b2bbc8;
+  --text-muted: #85909f;
+  --surface: #151a21;
+  --surface-soft: #11161c;
+  --surface-hover: #1c232c;
+  --input-bg: #11161c;
+  --input-border: #3a4553;
+  --input-text: #f3f5f8;
+  --chip-bg: #1b222b;
+  --chip-active-bg: #233451;
+  --scrollbar-thumb: #303b49;
+  --scrollbar-hover: #4a586a;
+  --tab-indicator: #91ace6;
+  --accent: #91ace6;
+  --accent-hover: #aec2ee;
+  --accent-soft: #1c2a43;
+  --accent-contrast: #101722;
+  --magenta: #ec6d9d;
+  --amber: #dfb844;
+  --focus-ring: rgba(145, 172, 230, 0.46);
+  --shadow-soft: 0 18px 40px -32px rgba(0, 0, 0, 0.9);
+  --shadow-focus: 0 0 0 3px var(--focus-ring);
 }
 
 html,
@@ -85,9 +89,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--surface);
+  background-color: var(--app-bg);
   color: var(--text-primary);
   font-size: 15px;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 button,
@@ -296,18 +302,18 @@ input[type="color"]::-moz-color-swatch {
 }
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Glow effect for interactive elements */
+/* Accent interaction without neon glow */
 .glow-hover {
-  transition: box-shadow 0.3s ease;
-}
-.dark .glow-hover:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
 }
 .glow-hover:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 /* Smooth color transition */
@@ -365,6 +371,7 @@ input[type="color"]::-moz-color-swatch {
 *:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+  box-shadow: var(--shadow-focus);
 }
 
 /* Button press effect */
@@ -388,4 +395,20 @@ input[type="color"]::-moz-color-swatch {
 .card-hover:hover {
   border-color: rgba(0, 0, 0, 0.12);
   background-color: rgba(0, 0, 0, 0.02);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

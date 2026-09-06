@@ -39,8 +39,10 @@ describe("static page content", () => {
     const english = createStaticPageContent(findSeoPage("/en/about"));
 
     expect(indonesian).toContain("Catatan perubahan");
-    expect(indonesian).toContain("v1.0.0");
+    expect(indonesian).toContain("v1.2.0");
+    expect(indonesian).toContain("Fase 0–8");
     expect(english).toContain("Changelog");
-    expect(english).toContain("v1.0.0");
+    expect(english).toContain("v1.2.0");
+    expect(english).toContain("Phases 0–8");
   });
 });

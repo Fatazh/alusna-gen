@@ -1,6 +1,6 @@
 # Refactor Status
 
-Last updated: 2026-09-04
+Last updated: 2026-09-06
 
 ## Current objective
 
@@ -152,7 +152,8 @@ the selected host.
   `hreflang` (`id`, `en`, and `x-default`), and bilingual sitemap alternatives.
 - Unit and contract coverage expanded to 136 passing tests; browser coverage includes 28 required
   passing scenarios plus one intentionally skipped configured-sponsor scenario.
-- ALUSNA is marked as the `v1.0.0` public release in package metadata and the bilingual About page.
+- ALUSNA was introduced as the `v1.0.0` public release; the bilingual About page and package
+  metadata now identify the current `v1.2.0` release.
 - The About changelog records the initial toolset, browser-local behavior, bilingual URLs, SEO
   foundation, and pre-advertising trust pages; it is also emitted in static no-JavaScript HTML.
 - Node.js 22.x is now the explicit local and CI runtime contract.
@@ -192,9 +193,34 @@ the selected host.
   React Native tokens; every format can be copied or downloaded as a browser-local file.
 - Color history is now a unique most-recently-used list: choosing an older swatch moves it to the
   front instead of creating another copy.
-- The Node.js 22 quality gate passes with 150 unit and contract tests across 20 files; browser
+- The Node.js 22 quality gate passes with 151 unit and contract tests across 20 files; browser
   coverage now has 31 required passing scenarios plus one optional sponsor scenario.
 - The production entry is 68.09 kB gzip and the lazy Design System module is 9.37 kB gzip.
+- The design-reference audit fixed duplicate colors in the Accessibility Simulator, localized the
+  remaining Contrast Checker labels on English routes, and added explicit hover/active foreground
+  tokens and WCAG checks for Design System actions.
+- Google Fonts variable families now expose selectable standard weights within their advertised
+  axis range; Tailwind v4 exports typography variables and React Native exports pixel-correct
+  letter spacing.
+- Audit evidence and current measurements are recorded in `audit-design-reference/2026-09-06`.
+- Visual redesign Fase 0 baseline, Fase 1 shared foundation, and Fase 2 app shell are implemented;
+  details and constraints are recorded in `docs/redesign/README.md`.
+- Shared visual tokens now use a neutral paper/ink canvas, restrained cobalt action accent, editorial
+  surfaces, reduced-motion protection, and skeleton loading states.
+- Desktop and mobile/tablet navigation now use clear active states; color tools collapse into a
+  responsive grid instead of requiring horizontal scrolling.
+- Visual redesign Fase 3–5 are implemented: the homepage is now a design-reference hub with
+  context-based entry points, the Color workspace uses shared semantic action states and a clear
+  active-palette inspector, and Typography exposes active family, weight availability, and preview
+  mode before the catalog.
+- Feature-specific color actions no longer use indigo-only presentation tokens; selected controls and
+  action buttons follow the shared cobalt theme in light and dark mode.
+- Visual redesign Fase 6–8 are implemented: Design System now presents the primitive-to-component
+  workflow with responsive contrast/export panels, Brand Kit tabs collapse into a touch-safe grid,
+  and the final polish removes remaining feature-level indigo presentation tokens.
+- Visual redesign Fase 9–10 are implemented: Design System drafts now persist safely for the current
+  browser session, Brand Kit actions are bilingual, and the Node.js 22 production release gate has
+  been rerun with launch configuration still fail-closed.
 
 ## In progress
 
@@ -241,10 +267,17 @@ the selected host.
   against every third-party design-token importer.
 - The 2026-09-04 online production dependency audit could not reach the npm endpoint before its
   configured timeout; the cached offline audit reports 0 vulnerabilities.
+- Design System drafts are currently persisted for the browser session only; long-term persistence
+  would require a separate product decision and storage migration review.
+- Some legacy tool copy still needs a final English editorial pass; shared UI and the audited
+  Contrast Checker are localized.
+- Shade level 500 is a generated lightness step rather than an exact copy of the input color; keep
+  this behavior documented or add an explicit base-anchor option.
+- The visual redesign is complete through Fase 10; remaining product risk is final editorial review,
+  real hosting configuration, and optional long-term draft persistence beyond a browser session.
 
 ## Next task
 
-Optionally synchronize and review the Google Fonts snapshot with a restricted Developer API key.
-Then copy `.env.production.example` to `.env.production`, configure the final origin and contact
-channel, run `npm run build:production`, and verify nested URLs, response headers, and indexing on
-the real host before selecting an advertising provider.
+Configure the real production origin and contact channel, copy `.env.production.example` to
+`.env.production`, run `npm run build:production`, and verify nested URLs, response headers, and
+indexing on the real host before selecting an advertising provider.

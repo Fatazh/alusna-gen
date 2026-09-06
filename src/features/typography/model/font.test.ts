@@ -47,6 +47,13 @@ describe("Google Fonts catalog", () => {
       }
     }
   });
+
+  it("exposes selectable standard weights for variable Google Fonts", () => {
+    const inter = GOOGLE_FONTS.find((font) => font.family === "Inter");
+    expect(inter?.variableWeight).toEqual({ min: 100, max: 900 });
+    expect(inter?.styleWeights.normal).toEqual([100, 200, 300, 400, 500, 600, 700, 800, 900]);
+    expect(inter?.weights).toEqual([100, 200, 300, 400, 500, 600, 700, 800, 900]);
+  });
 });
 
 describe("buildGoogleFontCssUrl", () => {

@@ -255,8 +255,8 @@ export function FontModule() {
         };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="space-y-6">
+    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+      <div className="space-y-8">
         {/* Upload + search */}
         <Card>
           <CardHeader
@@ -280,7 +280,8 @@ export function FontModule() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="rounded-lg bg-indigo-500 px-4 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+                className="rounded-lg px-4 py-2 text-xs font-semibold transition hover:brightness-110"
+                style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
               >
                 {text("Upload Font", "Upload Font")} (.ttf/.otf/.woff/.woff2)
               </button>
@@ -336,6 +337,48 @@ export function FontModule() {
                       ? text("Font aktif siap", "Active font ready")
                       : text("Dimuat saat dipilih", "Loaded on selection")}
               </span>
+            </div>
+
+            <div
+              className="grid gap-3 border-y py-4 sm:grid-cols-3"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <div>
+                <span
+                  className="block font-mono text-[9px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {text("Font aktif", "Active family")}
+                </span>
+                <strong
+                  className="mt-1 block truncate text-sm"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {activeFontFamily}
+                </strong>
+              </div>
+              <div>
+                <span
+                  className="block font-mono text-[9px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {text("Bobot tersedia", "Available weights")}
+                </span>
+                <strong className="mt-1 block text-sm" style={{ color: "var(--text-primary)" }}>
+                  {availableWeights.length}
+                </strong>
+              </div>
+              <div>
+                <span
+                  className="block font-mono text-[9px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {text("Mode tampilan", "Preview mode")}
+                </span>
+                <strong className="mt-1 block text-sm" style={{ color: "var(--text-primary)" }}>
+                  {viewport}
+                </strong>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2">

@@ -143,7 +143,7 @@ export function ColorPicker({
           className={
             "shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition " +
             (searchOpen
-              ? "border-indigo-500/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
+              ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
               : "")
           }
           style={

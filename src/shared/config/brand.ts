@@ -2,7 +2,7 @@ export const APP_BRAND = {
   name: "ALUSNA",
   legalName: "ALUSNA",
   legacyName: "CIKP Studio",
-  version: "1.0.0",
+  version: "1.2.0",
   slogan: "Bagusnya dimulai di sini.",
   sloganEn: "Better design starts here.",
   descriptor: "Color, Typography & Brand Toolkit",

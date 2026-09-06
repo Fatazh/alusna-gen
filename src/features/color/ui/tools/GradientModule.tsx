@@ -53,9 +53,9 @@ export function GradientModule() {
   const getChipStyle = (active: boolean): React.CSSProperties =>
     active
       ? {
-          borderColor: "rgba(99,102,241,0.5)",
-          backgroundColor: "rgba(99,102,241,0.15)",
-          color: "#6366f1",
+          borderColor: "var(--accent)",
+          backgroundColor: "var(--accent-soft)",
+          color: "var(--accent)",
         }
       : { borderColor: "var(--border)", color: "var(--text-secondary)" };
 
@@ -250,7 +250,8 @@ export function GradientModule() {
                 if (rgb) saveColor(rgb, getColorName(rgb).label);
               }
             }}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
             {text("Simpan semua ke palet", "Save all to palette")}
           </button>

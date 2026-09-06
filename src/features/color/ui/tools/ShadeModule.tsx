@@ -154,7 +154,7 @@ export function ShadeModule() {
               className={
                 "flex-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition " +
                 (format === "vars"
-                  ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300"
+                  ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
                   : "text-zinc-500 dark:text-zinc-400")
               }
             >
@@ -166,7 +166,7 @@ export function ShadeModule() {
               className={
                 "flex-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition " +
                 (format === "tailwind"
-                  ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300"
+                  ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
                   : "text-zinc-500 dark:text-zinc-400")
               }
             >
@@ -190,7 +190,8 @@ export function ShadeModule() {
           <button
             type="button"
             onClick={() => shades.forEach((sh) => saveColor(sh.rgb, `${name} ${sh.step}`))}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
             {text("Simpan skala ke palet", "Save scale to palette")}
           </button>

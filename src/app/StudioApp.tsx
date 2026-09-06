@@ -112,7 +112,7 @@ export default function App() {
               <>
                 {topTab === "color" && (
                   <nav
-                    className="-mx-4 flex items-stretch gap-1 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+                    className="-mx-4 grid grid-cols-2 gap-px border-b px-4 sm:-mx-6 sm:grid-cols-4 sm:px-6 lg:-mx-8 lg:flex lg:gap-1 lg:px-8"
                     style={{ borderColor: "var(--border)" }}
                     role="tablist"
                     aria-label={currentPage.locale === "en" ? "Color tools" : "Alat warna"}
@@ -129,8 +129,11 @@ export default function App() {
                             event.preventDefault();
                             switchColorTab(t.id);
                           }}
-                          className="relative shrink-0 px-3 py-4 text-left text-xs font-semibold transition sm:px-4"
-                          style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+                          className="relative flex min-h-11 min-w-0 items-center justify-start gap-2 px-2 py-3 text-left text-xs font-semibold transition hover:bg-[var(--surface-hover)] active:scale-[0.99] sm:px-4 lg:min-h-14 lg:justify-center"
+                          style={{
+                            color: active ? "var(--accent)" : "var(--text-secondary)",
+                            backgroundColor: active ? "var(--accent-soft)" : undefined,
+                          }}
                           title={
                             currentPage.locale === "en"
                               ? (
@@ -154,7 +157,7 @@ export default function App() {
                           {active && (
                             <span
                               aria-hidden="true"
-                              className="absolute inset-x-3 bottom-0 h-0.5 sm:inset-x-4"
+                              className="absolute inset-x-2 bottom-0 h-0.5 rounded-full sm:inset-x-4"
                               style={{ backgroundColor: "var(--accent)" }}
                             />
                           )}

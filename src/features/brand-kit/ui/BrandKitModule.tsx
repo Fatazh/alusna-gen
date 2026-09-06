@@ -203,8 +203,8 @@ export function BrandKitModule() {
       tone,
       logoDataUrl,
     });
-    show("✓ Brand kit saved!");
-  }, [brandName, tagline, effectivePrimary, kit, tone, logoDataUrl, saveBrandKit, show]);
+    show(text("✓ Brand kit tersimpan!", "✓ Brand kit saved!"));
+  }, [brandName, tagline, effectivePrimary, kit, tone, logoDataUrl, saveBrandKit, show, text]);
 
   const handleExportHtml = useCallback(() => {
     const html = brandKitToHtml(kit);
@@ -215,8 +215,8 @@ export function BrandKitModule() {
     a.download = `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-guidelines.html`;
     a.click();
     URL.revokeObjectURL(url);
-    show("✓ Brand guidelines downloaded!");
-  }, [kit, brandName, show]);
+    show(text("✓ Panduan brand diunduh!", "✓ Brand guidelines downloaded!"));
+  }, [kit, brandName, show, text]);
 
   const handleExportJson = useCallback(() => {
     const data = {
@@ -244,8 +244,8 @@ export function BrandKitModule() {
     a.download = `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-kit.json`;
     a.click();
     URL.revokeObjectURL(url);
-    show("✓ Brand kit JSON downloaded!");
-  }, [kit, brandName, show]);
+    show(text("✓ JSON Brand Kit diunduh!", "✓ Brand kit JSON downloaded!"));
+  }, [kit, brandName, show, text]);
 
   const downloadText = useCallback((content: string, filename: string, type: string) => {
     const url = URL.createObjectURL(new Blob([content], { type }));
@@ -261,7 +261,10 @@ export function BrandKitModule() {
       const file = event.target.files?.[0];
       if (!file) return;
       try {
-        if (file.size > 1024 * 1024) throw new Error("File Brand Kit maksimal 1 MB.");
+        if (file.size > 1024 * 1024)
+          throw new Error(
+            text("File Brand Kit maksimal 1 MB.", "Brand Kit file must be 1 MB or smaller."),
+          );
         const imported = parseBrandKitImport(await file.text());
         setBrandName(imported.brandName);
         setTagline(imported.tagline);
@@ -276,18 +279,22 @@ export function BrandKitModule() {
         setBodyFontOverride(imported.bodyFont);
         setMonoFontOverride(imported.monoFont);
         setActiveTab("palette");
-        show("Brand kit berhasil diimpor.");
+        show(text("Brand kit berhasil diimpor.", "Brand kit imported."));
       } catch (error) {
-        show(error instanceof Error ? error.message : "Gagal mengimpor Brand Kit.");
+        show(
+          error instanceof Error
+            ? error.message
+            : text("Gagal mengimpor Brand Kit.", "Failed to import Brand Kit."),
+        );
       } finally {
         event.target.value = "";
       }
     },
-    [show],
+    [show, text],
   );
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
       {/* Brand Header */}
       <Card>
         <CardBody>
@@ -310,10 +317,12 @@ export function BrandKitModule() {
             <button
               type="button"
               className={`flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 bg-black/[0.02] transition dark:bg-white/5 ${
-                isDragging
-                  ? "border-indigo-500 bg-indigo-500/10 scale-105"
-                  : "border-black/10 hover:border-indigo-500/50 dark:border-white/10"
+                isDragging ? "scale-105" : "border-black/10 dark:border-white/10"
               }`}
+              style={{
+                borderColor: isDragging ? "var(--accent)" : undefined,
+                backgroundColor: isDragging ? "var(--accent-soft)" : undefined,
+              }}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -349,7 +358,7 @@ export function BrandKitModule() {
                   type="text"
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value || "My Brand")}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:border-indigo-500/50"
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:border-[var(--accent)]"
                   style={{
                     borderColor: "var(--input-border)",
                     backgroundColor: "var(--input-bg)",
@@ -369,7 +378,7 @@ export function BrandKitModule() {
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
                   placeholder="Your brand tagline..."
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-xs outline-none focus:border-indigo-500/50"
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-xs outline-none focus:border-[var(--accent)]"
                   style={{
                     borderColor: "var(--input-border)",
                     backgroundColor: "var(--input-bg)",
@@ -398,7 +407,7 @@ export function BrandKitModule() {
                         setHeadlineFontOverride(null);
                         setBodyFontOverride(null);
                         setMonoFontOverride(null);
-                        show(`✓ Tone: ${t.label}`);
+                        show(text(`✓ Tone: ${t.label}`, `✓ Tone: ${t.label}`));
                       }
                     }}
                     title={t.desc}
@@ -406,7 +415,7 @@ export function BrandKitModule() {
                     className={
                       "flex w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left transition " +
                       (tone === t.id
-                        ? "border-indigo-500/30 bg-indigo-500/15"
+                        ? "border-[var(--accent)] bg-[var(--accent-soft)]"
                         : "border-transparent hover:bg-black/5 dark:hover:bg-white/5")
                     }
                   >
@@ -419,7 +428,7 @@ export function BrandKitModule() {
                         className={
                           "block text-[11px] font-medium " +
                           (tone === t.id
-                            ? "text-indigo-700 dark:text-indigo-300"
+                            ? "text-[var(--accent)]"
                             : "text-zinc-700 dark:text-zinc-300")
                         }
                       >
@@ -457,10 +466,15 @@ export function BrandKitModule() {
                 <button
                   type="button"
                   onClick={handleSaveBrandKit}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-3 py-2 text-xs font-medium text-indigo-700 transition hover:bg-indigo-500/25 dark:text-indigo-300"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition hover:brightness-110"
+                  style={{
+                    borderColor: "var(--accent)",
+                    backgroundColor: "var(--accent-soft)",
+                    color: "var(--accent)",
+                  }}
                 >
                   <FloppyDisk size={16} className="mr-1 inline" aria-hidden="true" />
-                  Save Brand Kit
+                  {text("Simpan Brand Kit", "Save Brand Kit")}
                 </button>
               </div>
             </div>
@@ -470,7 +484,7 @@ export function BrandKitModule() {
 
       {/* Tab Navigation */}
       <div
-        className="flex gap-1 overflow-x-auto rounded-xl border p-1"
+        className="grid grid-cols-2 gap-1 rounded-xl border p-1 sm:grid-cols-5"
         style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
       >
         {(
@@ -487,7 +501,7 @@ export function BrandKitModule() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className="flex min-w-20 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition"
+              className="flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium transition"
               style={
                 activeTab === tab.id
                   ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
@@ -502,7 +516,7 @@ export function BrandKitModule() {
         <button
           type="button"
           onClick={() => setActiveTab("accessibility")}
-          className="flex min-w-24 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition"
+          className="flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium transition"
           style={
             activeTab === "accessibility"
               ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
@@ -553,7 +567,7 @@ export function BrandKitModule() {
               `${brandName.toLowerCase().replace(/\s+/g, "-")}-tokens.json`,
               "application/json",
             );
-            show("W3C design tokens downloaded!");
+            show(text("✓ Token W3C diunduh!", "✓ W3C design tokens downloaded!"));
           }}
           onExportTailwind={() => {
             downloadText(
@@ -561,7 +575,7 @@ export function BrandKitModule() {
               `${brandName.toLowerCase().replace(/\s+/g, "-")}-tailwind.config.js`,
               "text/javascript",
             );
-            show("Tailwind config downloaded!");
+            show(text("✓ Konfigurasi Tailwind diunduh!", "✓ Tailwind config downloaded!"));
           }}
         />
       )}
@@ -569,13 +583,16 @@ export function BrandKitModule() {
       {/* Saved Brand Kits */}
       {savedBrandKits.length > 0 && (
         <Card>
-          <CardHeader title="Saved Brand Kits" subtitle="Load your saved brand kits" />
+          <CardHeader
+            title={text("Brand Kit tersimpan", "Saved Brand Kits")}
+            subtitle={text("Muat Brand Kit yang pernah disimpan", "Load your saved brand kits")}
+          />
           <CardBody>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {savedBrandKits.map((savedKit) => (
                 <div
                   key={savedKit.id}
-                  className="group rounded-xl border p-4 transition hover:border-indigo-500/50"
+                  className="group rounded-xl border p-4 transition hover:border-[var(--accent)]"
                   style={{ borderColor: "var(--border)" }}
                 >
                   <div className="flex items-center gap-3">
@@ -611,7 +628,7 @@ export function BrandKitModule() {
                         setHeadlineFontOverride(savedKit.headlineFont);
                         setBodyFontOverride(savedKit.bodyFont);
                         setMonoFontOverride(savedKit.monoFont);
-                        show("✓ Brand kit loaded!");
+                        show(text("✓ Brand kit dimuat!", "✓ Brand kit loaded!"));
                       }}
                       className="flex-1 rounded-lg border px-2 py-1.5 text-[11px] transition"
                       style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
@@ -622,7 +639,7 @@ export function BrandKitModule() {
                       type="button"
                       onClick={() => {
                         deleteBrandKit(savedKit.id);
-                        show("✓ Brand kit deleted!");
+                        show(text("✓ Brand kit dihapus!", "✓ Brand kit deleted!"));
                       }}
                       className="rounded-lg border px-2 py-1.5 text-[11px] transition hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
                       style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}

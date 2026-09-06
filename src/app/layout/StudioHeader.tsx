@@ -47,7 +47,7 @@ export function StudioHeader({
       className="sticky top-0 z-30 border-b backdrop-blur-xl"
       style={{ backgroundColor: "var(--chrome-bg)" }}
     >
-      <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto] items-center gap-x-2 px-4 sm:px-6 lg:px-8 xl:grid-cols-[auto_1fr_auto] xl:gap-x-4">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[auto_1fr] items-center gap-x-3 px-4 py-2 sm:px-6 lg:px-8 xl:grid-cols-[auto_1fr_auto] xl:gap-x-6 xl:py-0">
         <a
           href={locale === "en" ? "/en" : "/"}
           aria-label={locale === "en" ? "ALUSNA home" : "Beranda ALUSNA"}
@@ -55,17 +55,17 @@ export function StudioHeader({
             event.preventDefault();
             onNavigateHome();
           }}
-          className="col-start-1 row-start-1 flex min-h-14 shrink-0 items-center rounded-lg xl:min-h-16"
+          className="col-start-1 row-start-1 flex min-h-12 shrink-0 items-center rounded-lg xl:min-h-16"
         >
           <img
             src={theme === "dark" ? "/logo.svg" : "/logo.png"}
             alt={`${APP_BRAND.name} — ${locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}`}
-            className="h-10 w-auto rounded-md object-contain sm:h-14"
+            className="h-9 w-auto rounded-md object-contain sm:h-11"
           />
         </a>
 
         <nav
-          className="col-span-2 row-start-2 grid min-w-0 grid-cols-4 border-t xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:flex xl:justify-end xl:border-t-0"
+          className="col-span-2 row-start-2 grid min-w-0 grid-cols-4 border-t pt-1 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:flex xl:justify-end xl:border-t-0 xl:pt-0"
           style={{ borderColor: "var(--border)" }}
           role="tablist"
           aria-label={locale === "en" ? "Studio modules" : "Modul studio"}
@@ -94,8 +94,11 @@ export function StudioHeader({
                   onSwitchTab(tab.id);
                 }}
                 title={tab.desc}
-                className="relative inline-flex min-h-12 min-w-0 items-center justify-center gap-1 px-1 text-[11px] font-semibold transition xl:min-h-16 xl:shrink-0 xl:gap-2 xl:px-4 xl:text-sm"
-                style={{ color: active ? "var(--accent)" : "var(--text-secondary)" }}
+                className="relative inline-flex min-h-11 min-w-0 items-center justify-center gap-1 rounded-md px-1 text-[11px] font-semibold transition hover:bg-[var(--surface-hover)] active:scale-[0.98] xl:min-h-16 xl:shrink-0 xl:gap-2 xl:px-4 xl:text-sm"
+                style={{
+                  color: active ? "var(--accent)" : "var(--text-secondary)",
+                  backgroundColor: active ? "var(--accent-soft)" : undefined,
+                }}
               >
                 <TabIcon size={18} weight={active ? "fill" : "regular"} aria-hidden="true" />
                 <span className="truncate xl:hidden">{mobileLabel}</span>
@@ -105,7 +108,7 @@ export function StudioHeader({
                 {active && (
                   <span
                     aria-hidden="true"
-                    className="absolute inset-x-2 bottom-0 h-0.5"
+                    className="absolute inset-x-2 bottom-0 h-0.5 rounded-full"
                     style={{ backgroundColor: "var(--accent)" }}
                   />
                 )}
@@ -114,7 +117,7 @@ export function StudioHeader({
           })}
         </nav>
 
-        <div className="col-start-2 row-start-1 flex min-w-0 items-center gap-1 sm:gap-3 xl:col-start-3">
+        <div className="col-start-2 row-start-1 flex min-w-0 items-center justify-end gap-1 sm:gap-2 xl:col-start-3 xl:gap-3">
           <button
             type="button"
             onClick={onSwitchLocale}

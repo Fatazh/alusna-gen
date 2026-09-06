@@ -7,19 +7,19 @@ import { ENGLISH_SEO_PAGES, SEO_PAGES } from "../router/routes";
 const WORKFLOW = [
   {
     step: "01",
-    title: "Temukan arah warna",
+    title: "Temukan arah visual",
     text: "Mulai dari palet, harmoni, gradien, atau warna dari gambar.",
     path: "/color-palette-generator",
   },
   {
     step: "02",
-    title: "Tetapkan tipografi",
+    title: "Tetapkan suara tipografi",
     text: "Bandingkan font dan susun hierarki teks yang konsisten.",
     path: "/font-pairing",
   },
   {
     step: "03",
-    title: "Bangun sistem",
+    title: "Bangun sistem yang bisa dipakai ulang",
     text: "Ubah keputusan visual menjadi token siap dipakai developer.",
     path: "/design-token-generator",
   },
@@ -45,7 +45,42 @@ const TOOL_LABELS: Record<string, { eyebrow: string; label: string }> = {
   "/brand-kit-generator": { eyebrow: "Identitas", label: "Susun brand kit" },
 };
 
-const FEATURE_COLORS = ["#1E40AF", "#D81B60", "#F2B705", "#F2F4F7", "#111111"];
+const FEATURE_COLORS = ["#2F5FAE", "#C33A70", "#BD8B12", "#F5F6F8", "#171A1F"];
+
+const DESIGN_CONTEXTS = [
+  {
+    id: "ui",
+    labelId: "UI / UX",
+    labelEn: "UI / UX",
+    textId: "Kontras, token, dan sistem komponen.",
+    textEn: "Contrast, tokens, and component systems.",
+    path: "/contrast-checker",
+  },
+  {
+    id: "identity",
+    labelId: "Logo & identitas",
+    labelEn: "Logo & identity",
+    textId: "Palet, tipografi, dan brand kit yang mudah dirujuk.",
+    textEn: "Palettes, typography, and a reusable brand kit.",
+    path: "/brand-kit-generator",
+  },
+  {
+    id: "motion",
+    labelId: "Motion & visual",
+    labelEn: "Motion & visual",
+    textId: "Warna dari gambar, gradien, dan eksperimen cepat.",
+    textEn: "Image colors, gradients, and rapid experiments.",
+    path: "/image-color-extractor",
+  },
+  {
+    id: "handoff",
+    labelId: "Handoff",
+    labelEn: "Handoff",
+    textId: "Ekspor keputusan desain ke format yang siap dipakai.",
+    textEn: "Export design decisions in implementation-ready formats.",
+    path: "/design-token-generator",
+  },
+] as const;
 
 export function HomePageView({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { locale, text } = useLocale();
@@ -72,8 +107,8 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
             style={{ color: "var(--text-secondary)" }}
           >
             {text(
-              "Toolkit untuk desainer UI yang ingin bergerak dari eksplorasi visual menuju sistem yang siap dipakai—langsung di browser, tanpa akun.",
-              "A toolkit for UI designers moving from visual exploration to a production-ready system—directly in the browser, with no account required.",
+              "Ruang kerja referensi untuk desainer UI/UX, graphic, logo, dan motion—dari eksplorasi visual hingga keputusan yang siap dipakai.",
+              "A reference workspace for UI/UX, graphic, logo, and motion designers—from visual exploration to implementation-ready decisions.",
             )}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -143,6 +178,59 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
         </dl>
       </section>
 
+      <section aria-labelledby="home-context-title" className="border-y py-8 sm:py-10">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,280px)_1fr] lg:gap-10">
+          <div>
+            <p
+              className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
+              style={{ color: "var(--amber)" }}
+            >
+              Start with a brief
+            </p>
+            <h2
+              id="home-context-title"
+              className="mt-3 text-2xl font-extrabold tracking-[-0.04em] sm:text-3xl"
+              style={{ color: "var(--text-primary)" }}
+            >
+              {text("Pilih konteks desainmu", "Choose your design context")}
+            </h2>
+            <p className="mt-2 text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+              {text(
+                "Mulai dari pekerjaan yang sedang kamu hadapi, lalu ikuti alat yang paling relevan.",
+                "Start from the work in front of you, then follow the most relevant tools.",
+              )}
+            </p>
+          </div>
+          <div className="grid border-t sm:grid-cols-2 lg:border-l lg:border-t-0">
+            {DESIGN_CONTEXTS.map((context, index) => (
+              <PageLink
+                key={context.id}
+                path={pathFor(context.path)}
+                onNavigate={onNavigate}
+                className={`group flex items-start justify-between gap-4 border-b p-4 sm:p-5 lg:px-6 ${index % 2 === 0 ? "sm:border-r" : ""}`}
+              >
+                <span>
+                  <strong className="block text-sm" style={{ color: "var(--text-primary)" }}>
+                    {text(context.labelId, context.labelEn)}
+                  </strong>
+                  <span
+                    className="mt-1 block text-xs leading-5"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {text(context.textId, context.textEn)}
+                  </span>
+                </span>
+                <ArrowUpRight
+                  size={18}
+                  className="shrink-0 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+                  style={{ color: "var(--accent)" }}
+                />
+              </PageLink>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section aria-labelledby="home-tools-title">
         <div className="grid gap-5 lg:grid-cols-12">
           <div className="lg:col-span-4">
@@ -150,7 +238,7 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
               className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
               style={{ color: "var(--magenta)" }}
             >
-              Toolkit
+              Reference library
             </p>
             <h2
               id="home-tools-title"
@@ -165,8 +253,8 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
             style={{ color: "var(--text-secondary)" }}
           >
             {text(
-              "Gunakan satu alat untuk pekerjaan cepat atau lanjutkan dari warna, tipografi, design token, hingga panduan brand yang konsisten.",
-              "Use one tool for a quick task or continue from color and typography to design tokens and consistent brand guidelines.",
+              "Gunakan satu alat untuk pekerjaan cepat atau susun keputusan visual yang bisa dirujuk kembali oleh tim dan developer.",
+              "Use one tool for a quick task or build visual decisions your team and developers can refer back to.",
             )}
           </p>
         </div>

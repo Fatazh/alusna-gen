@@ -175,6 +175,18 @@ function semanticColors(base: RGB, mode: ThemeMode): ColorRole[] {
     colorRole("primary-hover", "Primary Hover", primaryHover, "Primary hover state"),
     colorRole("primary-active", "Primary Active", primaryActive, "Primary pressed state"),
     colorRole("on-primary", "On Primary", textOn(primary), "Text and icons on primary"),
+    colorRole(
+      "on-primary-hover",
+      "On Primary Hover",
+      textOn(primaryHover),
+      "Text and icons on primary hover",
+    ),
+    colorRole(
+      "on-primary-active",
+      "On Primary Active",
+      textOn(primaryActive),
+      "Text and icons on primary pressed state",
+    ),
     colorRole("secondary", "Secondary", secondary, "Secondary actions, badges, tags"),
     colorRole("on-secondary", "On Secondary", textOn(secondary), "Text and icons on secondary"),
     colorRole("accent", "Accent", accent, "Highlights and illustrations"),
@@ -318,6 +330,18 @@ const COMPONENT_COLORS: ComponentColorToken[] = [
     reference: "primary-hover",
     usage: "Primary button hover",
   },
+  {
+    component: "button",
+    property: "hover-foreground",
+    reference: "on-primary-hover",
+    usage: "Primary button label on hover",
+  },
+  {
+    component: "button",
+    property: "active-foreground",
+    reference: "on-primary-active",
+    usage: "Primary button label while pressed",
+  },
   { component: "card", property: "background", reference: "surface", usage: "Card surface" },
   { component: "card", property: "foreground", reference: "text-primary", usage: "Card content" },
   { component: "card", property: "border", reference: "border", usage: "Card boundary" },
@@ -337,6 +361,8 @@ function makeContrastChecks(colors: ColorRole[]): ContrastCheck[] {
   const byToken = new Map(colors.map((color) => [color.token, color]));
   const pairs: Array<[string, string, string]> = [
     ["Primary action", "on-primary", "primary"],
+    ["Primary hover", "on-primary-hover", "primary-hover"],
+    ["Primary active", "on-primary-active", "primary-active"],
     ["Page content", "text-primary", "background"],
     ["Card content", "text-primary", "surface"],
     ["Secondary text", "text-secondary", "surface"],

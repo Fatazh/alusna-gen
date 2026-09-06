@@ -4,7 +4,7 @@ import { cn } from "../lib/cn";
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={cn("rounded-xl border", className)}
+      className={cn("rounded-2xl border shadow-[var(--shadow-soft)]", className)}
       style={{ borderColor: "var(--card-border)", backgroundColor: "var(--card-bg)" }}
     >
       {children}
@@ -23,11 +23,14 @@ export function CardHeader({
 }) {
   return (
     <div
-      className="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6"
+      className="flex items-start justify-between gap-4 border-b px-5 py-5 sm:px-7"
       style={{ borderColor: "var(--border)" }}
     >
       <div>
-        <h3 className="text-base font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+        <h3
+          className="text-[15px] font-bold tracking-[-0.02em]"
+          style={{ color: "var(--text-primary)" }}
+        >
           {title}
         </h3>
         {subtitle && (
@@ -42,5 +45,5 @@ export function CardHeader({
 }
 
 export function CardBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("p-5 sm:p-6", className)}>{children}</div>;
+  return <div className={cn("p-5 sm:p-7", className)}>{children}</div>;
 }

@@ -30,11 +30,31 @@ const LEVEL_META: Record<WCAGLevel, { label: string; color: string; bg: string }
   Fail: { label: "Fail", color: "text-rose-600 dark:text-rose-300", bg: "bg-rose-500/15" },
 };
 
-const PRESETS: { label: string; fg: RGB; bg: RGB }[] = [
-  { label: "Hitam di Putih", fg: { r: 0, g: 0, b: 0 }, bg: { r: 255, g: 255, b: 255 } },
-  { label: "Putih di Hitam", fg: { r: 255, g: 255, b: 255 }, bg: { r: 0, g: 0, b: 0 } },
-  { label: "Biru di Putih", fg: { r: 37, g: 99, b: 235 }, bg: { r: 255, g: 255, b: 255 } },
-  { label: "Kuning di Hitam", fg: { r: 234, g: 179, b: 8 }, bg: { r: 0, g: 0, b: 0 } },
+const PRESETS: { labelId: string; labelEn: string; fg: RGB; bg: RGB }[] = [
+  {
+    labelId: "Hitam di Putih",
+    labelEn: "Black on White",
+    fg: { r: 0, g: 0, b: 0 },
+    bg: { r: 255, g: 255, b: 255 },
+  },
+  {
+    labelId: "Putih di Hitam",
+    labelEn: "White on Black",
+    fg: { r: 255, g: 255, b: 255 },
+    bg: { r: 0, g: 0, b: 0 },
+  },
+  {
+    labelId: "Biru di Putih",
+    labelEn: "Blue on White",
+    fg: { r: 37, g: 99, b: 235 },
+    bg: { r: 255, g: 255, b: 255 },
+  },
+  {
+    labelId: "Kuning di Hitam",
+    labelEn: "Yellow on Black",
+    fg: { r: 234, g: 179, b: 8 },
+    bg: { r: 0, g: 0, b: 0 },
+  },
 ];
 
 export function ContrastModule() {
@@ -70,12 +90,12 @@ export function ContrastModule() {
                 className="mb-2 text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
-                Preset Cepat
+                {text("Preset Cepat", "Quick presets")}
               </p>
               <div className="flex flex-wrap gap-2">
                 {PRESETS.map((p) => (
                   <button
-                    key={p.label}
+                    key={p.labelId}
                     type="button"
                     onClick={() => {
                       setFgColor(p.fg);
@@ -87,7 +107,7 @@ export function ContrastModule() {
                     <span className="h-4 w-4 rounded" style={{ backgroundColor: rgbToHex(p.fg) }} />
                     <span>/</span>
                     <span className="h-4 w-4 rounded" style={{ backgroundColor: rgbToHex(p.bg) }} />
-                    <span>{p.label}</span>
+                    <span>{text(p.labelId, p.labelEn)}</span>
                   </button>
                 ))}
               </div>
@@ -111,7 +131,7 @@ export function ContrastModule() {
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
                   <ArrowDown size={13} className="mr-1 inline" aria-hidden="true" />
-                  ke Foreground
+                  {text("ke Foreground", "to foreground")}
                 </button>
                 <button
                   type="button"
@@ -122,7 +142,7 @@ export function ContrastModule() {
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
                   <ArrowDown size={13} className="mr-1 inline" aria-hidden="true" />
-                  ke Background
+                  {text("ke Background", "to background")}
                 </button>
               </div>
             </div>
@@ -134,7 +154,7 @@ export function ContrastModule() {
                   className="mb-2 block text-[11px] font-medium uppercase tracking-wider"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Foreground (Teks)
+                  {text("Foreground (Teks)", "Foreground (Text)")}
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -244,7 +264,7 @@ export function ContrastModule() {
                       backgroundColor: "transparent",
                     }}
                   >
-                    Tombol Outline
+                    {text("Tombol Outline", "Outline button")}
                   </button>
                 </div>
               </div>
@@ -264,7 +284,7 @@ export function ContrastModule() {
               style={{ backgroundColor: "var(--chip-bg)" }}
             >
               <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                Contrast Ratio
+                {text("Rasio Kontras", "Contrast ratio")}
               </p>
               <p className="mt-1 text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
                 {ratio.toFixed(2)}
@@ -288,18 +308,42 @@ export function ContrastModule() {
                 className="text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
-                WCAG 2.1 Requirements
+                {text("Persyaratan WCAG 2.1", "WCAG 2.1 requirements")}
               </p>
               {[
-                { label: "AA Normal Text", min: 4.5, desc: "Teks normal (< 18pt)" },
-                { label: "AA Large Text", min: 3, desc: "Teks besar (≥ 18pt atau 14pt bold)" },
-                { label: "AAA Normal Text", min: 7, desc: "Teks normal - Enhanced" },
-                { label: "AAA Large Text", min: 4.5, desc: "Teks besar - Enhanced" },
+                {
+                  labelId: "AA Normal Text",
+                  labelEn: "AA Normal Text",
+                  min: 4.5,
+                  descId: "Teks normal (< 18pt)",
+                  descEn: "Normal text (< 18pt)",
+                },
+                {
+                  labelId: "AA Large Text",
+                  labelEn: "AA Large Text",
+                  min: 3,
+                  descId: "Teks besar (≥ 18pt atau 14pt bold)",
+                  descEn: "Large text (≥ 18pt or 14pt bold)",
+                },
+                {
+                  labelId: "AAA Normal Text",
+                  labelEn: "AAA Normal Text",
+                  min: 7,
+                  descId: "Teks normal - Enhanced",
+                  descEn: "Normal text - Enhanced",
+                },
+                {
+                  labelId: "AAA Large Text",
+                  labelEn: "AAA Large Text",
+                  min: 4.5,
+                  descId: "Teks besar - Enhanced",
+                  descEn: "Large text - Enhanced",
+                },
               ].map((req) => {
                 const pass = ratio >= req.min;
                 return (
                   <div
-                    key={req.label}
+                    key={req.labelId}
                     className={cn(
                       "flex items-center justify-between rounded-lg px-3 py-2",
                       pass ? "bg-emerald-500/10" : "bg-rose-500/10",
@@ -314,10 +358,10 @@ export function ContrastModule() {
                             : "text-rose-600 dark:text-rose-300",
                         )}
                       >
-                        {req.label}
+                        {text(req.labelId, req.labelEn)}
                       </span>
                       <span className="ml-2 text-[10px]" style={{ color: "var(--text-muted)" }}>
-                        {req.desc}
+                        {text(req.descId, req.descEn)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -358,7 +402,7 @@ export function ContrastModule() {
               style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
             >
               <Swap size={15} className="mr-1 inline" aria-hidden="true" />
-              Tukar Foreground & Background
+              {text("Tukar Foreground & Background", "Swap foreground & background")}
             </button>
 
             {/* Copy CSS */}
@@ -367,7 +411,7 @@ export function ContrastModule() {
                 <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                   CSS
                 </span>
-                <CopyButton value={`color: ${fgHex}; background-color: ${bgHex};`} label="Salin" />
+                <CopyButton value={`color: ${fgHex}; background-color: ${bgHex};`} />
               </div>
               <pre
                 className="overflow-x-auto whitespace-pre-wrap text-[11px]"

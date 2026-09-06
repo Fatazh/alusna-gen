@@ -269,10 +269,10 @@ function FontSection({
                 }}
                 className="rounded-lg border px-4 py-3 text-left transition hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
                 style={{
-                  borderColor: active ? "rgb(99 102 241 / 0.65)" : "var(--border)",
-                  backgroundColor: active ? "rgb(99 102 241 / 0.1)" : undefined,
+                  borderColor: active ? "var(--accent)" : "var(--border)",
+                  backgroundColor: active ? "var(--accent-soft)" : undefined,
                   color: "var(--text-primary)",
-                  boxShadow: active ? "0 0 0 2px rgb(99 102 241 / 0.12)" : undefined,
+                  boxShadow: active ? "0 0 0 2px var(--focus-ring)" : undefined,
                 }}
               >
                 <span
@@ -287,7 +287,7 @@ function FontSection({
                     {option.category}
                   </span>
                   {active && (
-                    <span className="ml-auto font-semibold text-indigo-600 dark:text-indigo-300">
+                    <span className="ml-auto font-semibold" style={{ color: "var(--accent)" }}>
                       Aktif <Check size={12} className="ml-1 inline" aria-hidden="true" />
                     </span>
                   )}

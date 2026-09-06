@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CaretDown } from "@phosphor-icons/react/CaretDown";
 import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
 import { DownloadSimple } from "@phosphor-icons/react/DownloadSimple";
@@ -18,6 +18,7 @@ import {
 } from "../model/designSystem";
 import { downloadDesignSystemExport } from "../services/download";
 import { exportDesignSystem, type ExportFormat } from "../services/serializers";
+import { readDesignSystemDraft, writeDesignSystemDraft } from "../services/draftStorage";
 
 const EXPORT_FORMATS: Array<{ id: ExportFormat; label: string }> = [
   { id: "css", label: "CSS Variables" },
@@ -38,11 +39,12 @@ export function DesignSystemModule() {
   const { show } = useToast();
   const selectedColor = useStudio((state) => state.selectedColor);
   const activeFontFamily = useStudio((state) => state.activeFontFamily);
-  const [dsName, setDsName] = useState("brand");
-  const [mode, setMode] = useState<ThemeMode>("light");
-  const [spacingBase, setSpacingBase] = useState(4);
-  const [radiusBase, setRadiusBase] = useState(8);
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("css");
+  const [draft] = useState(readDesignSystemDraft);
+  const [dsName, setDsName] = useState(draft?.name ?? "brand");
+  const [mode, setMode] = useState<ThemeMode>(draft?.mode ?? "light");
+  const [spacingBase, setSpacingBase] = useState(draft?.spacingBase ?? 4);
+  const [radiusBase, setRadiusBase] = useState(draft?.radiusBase ?? 8);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>(draft?.exportFormat ?? "css");
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const system = useMemo(
@@ -62,6 +64,10 @@ export function DesignSystemModule() {
   );
   const failedContrastChecks = system.contrastChecks.filter((check) => !check.aaNormal).length;
 
+  useEffect(() => {
+    writeDesignSystemDraft({ name: dsName, mode, spacingBase, radiusBase, exportFormat });
+  }, [dsName, exportFormat, mode, radiusBase, spacingBase]);
+
   const toggleSection = (section: string) =>
     setExpandedSection((current) => (current === section ? null : section));
   const color = (token: string) => getDesignSystemColor(system, token).hex;
@@ -71,7 +77,7 @@ export function DesignSystemModule() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
       <Card>
         <CardHeader
           title={text("Generator Token & Tema", "Design Token & Theme Generator")}
@@ -81,6 +87,28 @@ export function DesignSystemModule() {
           )}
         />
         <CardBody className="space-y-5">
+          <div
+            className="flex flex-wrap items-end justify-between gap-3 border-b pb-4"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div>
+              <p
+                className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em]"
+                style={{ color: "var(--accent)" }}
+              >
+                {text("Ruang kerja sistem", "System workbench")}
+              </p>
+              <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+                {text(
+                  "Susun primitive, semantic, dan komponen dalam satu sumber keputusan.",
+                  "Shape primitive, semantic, and component decisions in one source of truth.",
+                )}
+              </p>
+            </div>
+            <span className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
+              {system.colors.length + system.shades.length} {text("token aktif", "active tokens")}
+            </span>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <label className="space-y-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
               <span>{text("Prefix token", "Token prefix")}</span>
@@ -164,6 +192,9 @@ export function DesignSystemModule() {
                 {system.colors.length} semantic · {system.shades.length} primitive ·{" "}
                 {system.componentColors.length} component aliases · {activeFontFamily}
               </p>
+              <p className="mt-1 text-[10px]" style={{ color: "var(--accent)" }}>
+                {text("Draft tersimpan selama sesi ini", "Draft saved for this session")}
+              </p>
             </div>
           </div>
         </CardBody>
@@ -186,7 +217,7 @@ export function DesignSystemModule() {
               }
             />
             <CardBody>
-              <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {system.contrastChecks.map((check) => (
                   <div
                     key={check.label}
@@ -368,7 +399,7 @@ export function DesignSystemModule() {
               {system.spacing.map((space) => (
                 <div key={space.name} className="flex flex-col items-center">
                   <div
-                    className="bg-indigo-500/60"
+                    className="bg-[var(--accent)] opacity-60"
                     style={{ width: Math.max(space.px, 4), height: Math.max(space.px, 4) }}
                   />
                   <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
@@ -393,8 +424,8 @@ export function DesignSystemModule() {
               {system.radius.map((radius) => (
                 <div key={radius.name} className="flex flex-col items-center">
                   <div
-                    className="h-12 w-12 border-2 border-indigo-500/60"
-                    style={{ borderRadius: radius.value }}
+                    className="h-12 w-12 border-2"
+                    style={{ borderRadius: radius.value, borderColor: "var(--accent)" }}
                   />
                   <p className="mt-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
                     {radius.name}
@@ -431,7 +462,7 @@ export function DesignSystemModule() {
         </div>
 
         <div className="space-y-4">
-          <Card className="sticky top-20">
+          <Card className="sticky top-24">
             <CardHeader
               title={text("Export Token", "Export Tokens")}
               subtitle={text(
@@ -681,7 +712,7 @@ function CollapsibleSection({
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="flex min-h-16 w-full items-center justify-between px-5 py-4 text-left"
+        className="flex min-h-16 w-full items-center justify-between px-5 py-4 text-left transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
       >
         <span>
           <span className="block text-sm font-semibold" style={{ color: "var(--text-primary)" }}>

@@ -92,6 +92,13 @@ export function toTailwindConfig(system: DesignSystem): string {
   system.shadows.forEach((shadow) => {
     lines.push(`  --shadow-${system.name}-${shadow.name}: ${shadow.css};`);
   });
+  system.typography.forEach((type) => {
+    const key = tokenKey(type.name);
+    lines.push(`  --text-${system.name}-${key}: ${type.size};`);
+    lines.push(`  --leading-${system.name}-${key}: ${type.lineHeight};`);
+    lines.push(`  --font-weight-${system.name}-${key}: ${type.fontWeight};`);
+    lines.push(`  --tracking-${system.name}-${key}: ${type.letterSpacing};`);
+  });
   lines.push("}");
   return lines.join("\n");
 }
@@ -214,7 +221,9 @@ export function toReactNativeTheme(system: DesignSystem): string {
           fontSize: numberFromCss(type.size) * 16,
           lineHeight: numberFromCss(type.size) * 16 * type.lineHeight,
           fontWeight: String(type.fontWeight),
-          letterSpacing: numberFromCss(type.letterSpacing),
+          letterSpacing: Number(
+            (numberFromCss(type.size) * 16 * numberFromCss(type.letterSpacing)).toFixed(4),
+          ),
         },
       ]),
     ),

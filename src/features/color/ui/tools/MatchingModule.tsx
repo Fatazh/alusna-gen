@@ -120,7 +120,8 @@ export function MatchingModule() {
           <button
             type="button"
             onClick={() => saveColor(selectedColor, getColorName(selectedColor).label)}
-            className="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-indigo-400"
+            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
           >
             {text("Simpan ke palet", "Save to palette")}
           </button>
@@ -397,8 +398,8 @@ function ClassicView({
                 onClick={() => onTypeChange(h.id)}
                 className="rounded-lg border px-3 py-2 text-left transition"
                 style={{
-                  borderColor: harmonyType === h.id ? "rgba(99,102,241,0.5)" : "var(--border)",
-                  backgroundColor: harmonyType === h.id ? "rgba(99,102,241,0.15)" : "transparent",
+                  borderColor: harmonyType === h.id ? "var(--accent)" : "var(--border)",
+                  backgroundColor: harmonyType === h.id ? "var(--accent-soft)" : "transparent",
                 }}
               >
                 <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -470,9 +471,9 @@ function ViewTab({
       onClick={onClick}
       className="rounded-xl border px-4 py-2 text-sm font-semibold transition"
       style={{
-        borderColor: active ? "rgba(99,102,241,0.5)" : "var(--border)",
-        backgroundColor: active ? "rgba(99,102,241,0.15)" : "transparent",
-        color: active ? "#6366f1" : "var(--text-secondary)",
+        borderColor: active ? "var(--accent)" : "var(--border)",
+        backgroundColor: active ? "var(--accent-soft)" : "transparent",
+        color: active ? "var(--accent)" : "var(--text-secondary)",
       }}
     >
       {children}

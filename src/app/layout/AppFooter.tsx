@@ -31,8 +31,11 @@ export function AppFooter({
   const homePath = locale === "en" ? "/en" : "/";
 
   return (
-    <footer className="border-t" style={{ borderColor: "var(--border)" }}>
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-7 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+    <footer
+      className="border-t"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--surface-soft)" }}
+    >
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-8 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p style={{ color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} {APP_BRAND.name} ·{" "}
           {locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}

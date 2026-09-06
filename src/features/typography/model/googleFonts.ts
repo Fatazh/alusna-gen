@@ -1,5 +1,5 @@
 import { GOOGLE_FONTS_CATALOG, GOOGLE_FONTS_CATALOG_META } from "../data/googleFonts.generated";
-import { type FontCategory } from "./font";
+import { FONT_WEIGHTS, type FontCategory } from "./font";
 
 export type FontStyle = "normal" | "italic";
 
@@ -23,24 +23,32 @@ export const GOOGLE_FONTS: FontDef[] = GOOGLE_FONTS_CATALOG.map((font) => {
       readonly italic?: readonly number[];
     };
   };
-  const weights = [...generated.weights];
-  const styles = [...generated.styles];
+  const variableWeights = generated.variableWeight
+    ? FONT_WEIGHTS.filter(
+        (weight) =>
+          weight >= generated.variableWeight!.min && weight <= generated.variableWeight!.max,
+      )
+    : [];
+  const styles = [...generated.styles] as FontStyle[];
+  const normalWeights = [
+    ...(generated.styleWeights?.normal ?? []),
+    ...(styles.includes("normal") ? variableWeights : []),
+  ];
+  const italicWeights = [
+    ...(generated.styleWeights?.italic ?? []),
+    ...(styles.includes("italic") ? variableWeights : []),
+  ];
+  const weights = [...new Set([...generated.weights, ...normalWeights, ...italicWeights])].sort(
+    (a, b) => a - b,
+  );
   return {
     family: generated.family,
     category: generated.category,
     weights,
     styles,
     styleWeights: {
-      normal: generated.styleWeights?.normal
-        ? [...generated.styleWeights.normal]
-        : styles.includes("normal")
-          ? weights
-          : [],
-      italic: generated.styleWeights?.italic
-        ? [...generated.styleWeights.italic]
-        : styles.includes("italic")
-          ? weights
-          : [],
+      normal: [...new Set(normalWeights)].sort((a, b) => a - b),
+      italic: [...new Set(italicWeights)].sort((a, b) => a - b),
     },
     subsets: [...generated.subsets],
     ...(generated.lastModified ? { lastModified: generated.lastModified } : {}),

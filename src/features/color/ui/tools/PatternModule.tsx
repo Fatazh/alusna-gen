@@ -103,9 +103,31 @@ export function PatternModule() {
   return (
     <section
       aria-label="Workspace Color Palette Generator"
-      className="overflow-hidden rounded-xl border"
+      className="overflow-hidden rounded-2xl border shadow-[var(--shadow-soft)]"
       style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
     >
+      <header
+        className="flex flex-wrap items-end justify-between gap-3 border-b px-5 py-4 sm:px-6"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div>
+          <p
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: "var(--accent)" }}
+          >
+            {text("Ruang kerja warna", "Color workbench")}
+          </p>
+          <h2
+            className="mt-1 text-lg font-bold tracking-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {text("Eksplorasi palet yang siap dirujuk", "Explore a palette you can reference")}
+          </h2>
+        </div>
+        <span className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
+          {activePalette} · {displayColors.length} {text("warna", "colors")}
+        </span>
+      </header>
       <div className="grid lg:grid-cols-[290px_minmax(0,1fr)]">
         <aside
           className="border-b p-5 sm:p-6 lg:border-b-0 lg:border-r"
@@ -115,7 +137,7 @@ export function PatternModule() {
             className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em]"
             style={{ color: "var(--text-muted)" }}
           >
-            Palette method
+            {text("Metode palet", "Palette method")}
           </p>
           <div
             className="mt-4 max-h-[330px] divide-y overflow-y-auto pr-2"
@@ -177,7 +199,9 @@ export function PatternModule() {
 
           <div className="mt-6 border-t pt-5" style={{ borderColor: "var(--border)" }}>
             <div className="flex items-center justify-between text-xs">
-              <span style={{ color: "var(--text-secondary)" }}>Color count</span>
+              <span style={{ color: "var(--text-secondary)" }}>
+                {text("Jumlah warna", "Color count")}
+              </span>
               <span className="font-mono font-medium" style={{ color: "var(--text-primary)" }}>
                 {displayColors.length}
               </span>
@@ -189,7 +213,7 @@ export function PatternModule() {
               style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
             >
               <Sparkle size={16} weight="fill" aria-hidden="true" />
-              Generate palette
+              {text("Buat palet", "Generate palette")}
             </button>
             <p
               className="mt-3 text-center text-[10px] leading-4"
@@ -301,7 +325,7 @@ export function PatternModule() {
                     className="text-base font-bold tracking-tight"
                     style={{ color: "var(--text-primary)" }}
                   >
-                    Saved colors
+                    {text("Warna tersimpan", "Saved colors")}
                   </h3>
                   <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
                     {text(

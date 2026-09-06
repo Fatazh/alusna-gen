@@ -161,7 +161,10 @@ export function PaletteTab({
         <CardBody className="py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-sm">
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-sm"
+                style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+              >
                 <ArrowsClockwise size={16} aria-hidden="true" />
               </div>
               <div>
@@ -193,7 +196,7 @@ export function PaletteTab({
               }}
               className={
                 "relative h-6 w-11 rounded-full transition-colors duration-200 " +
-                (autoAdjust ? "bg-indigo-500" : "bg-zinc-400 dark:bg-zinc-700")
+                (autoAdjust ? "bg-[var(--accent)]" : "bg-zinc-400 dark:bg-zinc-700")
               }
               aria-label={text("Toggle sesuaikan otomatis", "Toggle automatic color adjustment")}
             >
@@ -246,7 +249,7 @@ export function PaletteTab({
                     </button>
                     {/* Edit indicator */}
                     {item.editable && (
-                      <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[8px] text-white opacity-0 group-hover:opacity-100 transition z-10">
+                      <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--accent)] text-[8px] text-white opacity-0 transition group-hover:opacity-100 z-10">
                         <PencilSimple size={13} aria-hidden="true" />
                       </div>
                     )}
@@ -271,7 +274,12 @@ export function PaletteTab({
                     <div className="mt-1.5 flex justify-center">
                       <label
                         htmlFor={colorInputId}
-                        className="cursor-pointer rounded-md border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium text-indigo-700 transition hover:bg-indigo-500/20 dark:text-indigo-300"
+                        className="cursor-pointer rounded-md border px-2.5 py-1 text-[10px] font-medium transition hover:brightness-110"
+                        style={{
+                          borderColor: "var(--accent)",
+                          backgroundColor: "var(--accent-soft)",
+                          color: "var(--accent)",
+                        }}
                       >
                         <Palette size={13} className="mr-1 inline" aria-hidden="true" />
                         {text("Pilih Warna", "Choose color")}
@@ -335,7 +343,7 @@ export function PaletteTab({
                     }}
                     className={`group relative h-12 w-full rounded-lg border-2 transition hover:scale-105 ${
                       isActive
-                        ? "border-indigo-500 ring-2 ring-indigo-500/30"
+                        ? "border-[var(--accent)]"
                         : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
                     }`}
                     style={{ backgroundColor: scHex }}
@@ -345,7 +353,7 @@ export function PaletteTab({
                       {sc.name || scHex}
                     </span>
                     {isActive && (
-                      <div className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-500 text-[8px] text-white">
+                      <div className="absolute top-0.5 right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--accent)] text-[8px] text-white">
                         <Check size={10} weight="bold" aria-hidden="true" />
                       </div>
                     )}
@@ -397,7 +405,7 @@ export function PaletteTab({
                     if (s.target === "secondary") setSecondaryOverride(s.color);
                     else setAccentOverride(s.color);
                   }}
-                  className="group overflow-hidden rounded-xl border transition hover:scale-105 hover:border-indigo-500/50"
+                  className="group overflow-hidden rounded-xl border transition hover:scale-105 hover:border-[var(--accent)]"
                   style={{ borderColor: "var(--border)" }}
                 >
                   <div className="h-14 w-full" style={{ backgroundColor: hex }} />

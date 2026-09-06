@@ -3,6 +3,7 @@ import { generateDesignSystem, sanitizeFontFamily, sanitizeTokenName } from "./d
 import {
   toCssVariables,
   toJsonTokens,
+  toReactNativeTheme,
   toScssVariables,
   toTailwindConfig,
 } from "../services/serializers";
@@ -35,11 +36,14 @@ describe("design system exports", () => {
 
     expect(toTailwindConfig(system)).toContain("@theme {");
     expect(toTailwindConfig(system)).toContain("--color-product-primary: #6366F1;");
+    expect(toTailwindConfig(system)).toContain("--text-product-h1: 2rem;");
+    expect(toTailwindConfig(system)).toContain("--leading-product-h1: 1.2;");
     expect(toTailwindConfig(system)).not.toContain("tailwind.config.js");
     expect(toScssVariables(system)).toContain("$product-color-primary: #6366F1;");
     expect(toScssVariables(system)).toContain(
       "$product-button-background: $product-color-primary;",
     );
+    expect(toReactNativeTheme(system)).toContain('"letterSpacing": -0.64');
   });
 
   it("supports theme modes and adjustable foundation scales", () => {

@@ -18,10 +18,13 @@ export function AccessibilityModule() {
 
   const [type, setType] = useState<ColorBlindType>("deuteranopia");
 
-  const paletteRgbs: RGB[] = useMemo(
-    () => [selectedColor, ...savedColors.map((c) => c.rgb)],
-    [selectedColor, savedColors],
-  );
+  const paletteRgbs: RGB[] = useMemo(() => {
+    const unique = new Map<string, RGB>();
+    for (const rgb of [selectedColor, ...savedColors.map((c) => c.rgb)]) {
+      unique.set(rgbToHex(rgb), rgb);
+    }
+    return [...unique.values()];
+  }, [selectedColor, savedColors]);
 
   const sim = (rgb: RGB) => simulateColorBlindness(rgb, type);
 
@@ -64,7 +67,7 @@ export function AccessibilityModule() {
                   className={
                     "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
                     (type === t.id
-                      ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300"
+                      ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
                       : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200")
                   }
                 >
@@ -79,7 +82,7 @@ export function AccessibilityModule() {
                 className="col-span-full text-[11px] font-medium uppercase tracking-wider"
                 style={{ color: "var(--text-muted)" }}
               >
-                Asli
+                {text("Asli", "Original")}
               </p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {paletteRgbs.map((rgb, i) => (
@@ -141,7 +144,7 @@ export function AccessibilityModule() {
                     color: rgbToHex(sim(selectedColor)),
                   }}
                 >
-                  Tombol
+                  {text("Tombol", "Button")}
                 </div>
               </div>
             </div>
