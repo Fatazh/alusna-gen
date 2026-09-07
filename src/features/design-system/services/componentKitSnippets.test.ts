@@ -32,6 +32,23 @@ describe("component kit snippets", () => {
     }
   });
 
+  it("exports spacing-driven padding for the kit controls", () => {
+    const compact = generateDesignSystem({ r: 12, g: 123, b: 192 }, { spacingBase: 2 });
+    const spacious = generateDesignSystem({ r: 12, g: 123, b: 192 }, { spacingBase: 8 });
+    const compactColor = (token: string) => getDesignSystemColor(compact, token).hex;
+    const spaciousColor = (token: string) => getDesignSystemColor(spacious, token).hex;
+
+    expect(
+      buildComponentKitSnippet(compact, "actions", "primary", "md", compactColor, "css"),
+    ).toContain("padding: 0.25rem 0.375rem;");
+    expect(
+      buildComponentKitSnippet(spacious, "actions", "primary", "md", spaciousColor, "css"),
+    ).toContain("padding: 1rem 1.5rem;");
+    expect(
+      buildComponentKitSnippet(spacious, "overlays", "primary", "md", spaciousColor, "tailwind"),
+    ).toContain("p-[2rem]");
+  });
+
   it("keeps CSS, Tailwind, and React output aligned to active tokens", () => {
     const css = buildComponentKitSnippet(system, "actions", "primary", "md", color, "css");
     const tailwind = buildComponentKitSnippet(

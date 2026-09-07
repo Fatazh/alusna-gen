@@ -170,6 +170,25 @@ export function DesignSystemModule() {
               max={8}
               suffix="px"
               onChange={setSpacingBase}
+              description={text(
+                "Mengatur jarak dan padding pada preview Component Kit.",
+                "Controls gaps and padding in the Component Kit preview.",
+              )}
+              preview={
+                <span
+                  aria-hidden="true"
+                  data-spacing-control-preview
+                  className="inline-flex h-10 w-14 shrink-0 items-center justify-center border-2"
+                  style={{
+                    gap: `${system.spacingBase}px`,
+                    borderColor: "var(--accent)",
+                    backgroundColor: "var(--surface-soft)",
+                  }}
+                >
+                  <span className="h-4 w-2" style={{ backgroundColor: "var(--accent)" }} />
+                  <span className="h-4 w-2" style={{ backgroundColor: "var(--accent)" }} />
+                </span>
+              }
             />
             <RangeControl
               id="radius-base"

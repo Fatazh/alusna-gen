@@ -428,6 +428,7 @@ for (const locale of ["id", "en"] as const) {
     const rem = (pixels: number) => (pixels === 0 ? "0" : `${pixels / 16}rem`);
     await page.setViewportSize({ width: en ? 1440 : 390, height: 900 });
     await page.goto(`${en ? "/en" : ""}/design-token-generator/`);
+    const spacingSlider = page.locator("#spacing-base");
     const radiusSlider = page.locator("#radius-base");
     const preview = page.locator("[data-design-system-preview]");
     const handoff = page.locator("[data-component-kit-handoff]");
@@ -435,6 +436,18 @@ for (const locale of ["id", "en"] as const) {
       name: copy("Aksi utama", "Primary action"),
       exact: true,
     });
+
+    for (const base of [2, 8, 4]) {
+      await spacingSlider.press(base === 2 ? "Home" : base === 8 ? "End" : "Home");
+      if (base === 4) {
+        await spacingSlider.press("ArrowRight");
+        await spacingSlider.press("ArrowRight");
+      }
+      await expect(spacingSlider).toHaveValue(String(base));
+      await expect(page.locator("[data-spacing-control-preview]")).toHaveCSS("gap", `${base}px`);
+      await expect(preview).toHaveCSS("padding", `${base * 4}px`);
+      await expect(action).toHaveCSS("padding", `${base * 2}px ${base * 3}px`);
+    }
 
     for (const base of [0, 24, 8]) {
       await radiusSlider.press(base === 24 ? "End" : "Home");

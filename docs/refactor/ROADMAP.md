@@ -124,8 +124,8 @@ framework adapters.
 
 Status: **in progress**
 
-- [x] Address initial radius feedback: connect the base-radius slider to existing Component Kit
-      previews and CSS/Tailwind/React handoff; distinguish button size from corner rounding.
+- [x] Address scale feedback: connect spacing and base-radius sliders to existing Component Kit
+      previews and CSS/Tailwind/React handoff; distinguish button size from spacing and rounding.
 - [ ] Collect feedback from at least three real designer–developer handoff workflows.
 - [ ] Measure which snippet formats are copied and where output needs context or escaping.
 - [ ] Decide whether a downloadable package is justified by repeated usage.

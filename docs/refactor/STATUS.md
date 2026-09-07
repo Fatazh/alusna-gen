@@ -240,21 +240,24 @@ the selected host.
 - Component Kit handoff now supports CSS, Tailwind, and React snippets with deterministic token
   values and one-click copy behavior.
 
-## Radius preview correction — 2026-09-07
+## Spacing and radius preview correction — 2026-09-07
 
-- Objective: make the base-radius slider visibly affect the existing Component Kit previews and
+- Objective: make both system scale controls visibly affect the existing Component Kit previews and
   keep copied CSS, Tailwind, and React output consistent with those previews.
-- Files changed: `model/componentKitRadius.ts`, `ui/ComponentKit.tsx`,
+- Files changed: `model/componentKitRadius.ts`, `model/componentKitSpacing.ts`, `ui/ComponentKit.tsx`,
   `ui/DesignSystemModule.tsx`, and `services/componentKitSnippets.ts` plus its test under
   `src/features/design-system/`; `e2e/studio.spec.ts`; `src/app/trust/releaseNotes.ts`; this status
-  file and `docs/refactor/ROADMAP.md`.
+  file, `docs/refactor/ROADMAP.md`, and the configurable-port `playwright.config.ts`.
 - Decisions: share one component-radius role map between preview and handoff. Buttons use `md`,
   fields and badges `sm`, panels and alerts `lg`, and dialogs `xl`. Base radius zero produces
   square corners. Pill/switch shapes retain `full`, and native checkboxes retain browser styling.
   Button `sm/md/lg` controls change height/padding independently, with an explicit size label.
   A small inline radius sample gives immediate feedback beside the slider without adding another
   component gallery or competing shape setting.
-- Validation: Node.js 22 lint, dependency boundaries, 161 unit/contract tests across 22 files,
+- Spacing uses the generated scale for preview padding, section/control gaps, field and button
+  padding, tab spacing, dialog spacing, and matching handoff output. A small two-block spacing
+  sample gives immediate feedback beside its slider.
+- Validation: Node.js 22 lint, dependency boundaries, 162 unit/contract tests across 22 files,
   production build, 34 browser scenarios, and `git diff --check` passed; one optional sponsor
   scenario was skipped. Online `npm audit --omit=dev` reports zero vulnerabilities. Radius checks
   cover Indonesian/mobile and English/desktop at 0, 8, and 24 px, including size changes, snippet
@@ -307,7 +310,7 @@ the selected host.
   independence.
 - The 300-family snapshot increases the lazy Typography chunk to 10.10 kB gzip; review pagination
   and catalog size before raising the synchronization limit further.
-- The richer Design System increases its lazy chunk from 5.09 kB to 13.81 kB gzip. It remains
+- The richer Design System increases its lazy chunk from 5.09 kB to 14.31 kB gzip. It remains
   route-split, but future additions should avoid pulling editor-only dependencies into the entry.
 - DTCG output follows the 2025.10 schema structure, but compatibility has not yet been verified
   against every third-party design-token importer.

@@ -5,9 +5,10 @@ import { useLocale } from "../../../shared/i18n";
 import { useToast } from "../../../shared/ui/toastContext";
 import { getDesignSystemColor, type DesignSystem } from "../model/designSystem";
 import { getComponentKitRadii } from "../model/componentKitRadius";
+import { getComponentKitSpacing } from "../model/componentKitSpacing";
 import {
   buildComponentKitSnippet,
-  COMPONENT_KIT_SIZE_VALUES,
+  getComponentKitButtonMetrics,
   type ComponentKitButtonVariant,
   type ComponentKitControlSize,
   type ComponentKitHandoffFormat,
@@ -44,6 +45,7 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
 
   const color = (token: string) => getDesignSystemColor(system, token).hex;
   const radii = getComponentKitRadii(system);
+  const spacing = getComponentKitSpacing(system);
   const buttonStyle = (buttonVariant: ComponentKitButtonVariant): CSSProperties => {
     if (buttonVariant === "secondary") {
       return {
@@ -65,7 +67,7 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
       color: color("on-primary"),
     };
   };
-  const sizeStyle = COMPONENT_KIT_SIZE_VALUES[size];
+  const sizeStyle = getComponentKitButtonMetrics(system, size);
   const snippet = buildComponentKitSnippet(system, tab, variant, size, color, handoffFormat);
 
   return (
@@ -94,10 +96,15 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             </p>
           </div>
           <div
-            className="flex rounded-lg border p-1"
+            className="flex border"
             role="toolbar"
             aria-label={text("Kategori komponen", "Component categories")}
-            style={{ borderColor: "var(--border)" }}
+            style={{
+              borderColor: "var(--border)",
+              borderRadius: radii.panel,
+              padding: spacing.inlineGap,
+              gap: spacing.inlineGap,
+            }}
           >
             {KIT_TABS.map((option) => (
               <button
@@ -105,11 +112,20 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 type="button"
                 aria-pressed={tab === option.id}
                 onClick={() => setTab(option.id)}
-                className="rounded-md px-3 py-1.5 text-xs font-medium transition active:translate-y-px"
+                className="text-xs font-medium transition active:translate-y-px"
                 style={
                   tab === option.id
-                    ? { backgroundColor: "var(--chip-active-bg)", color: "var(--text-primary)" }
-                    : { color: "var(--text-muted)" }
+                    ? {
+                        backgroundColor: "var(--chip-active-bg)",
+                        color: "var(--text-primary)",
+                        borderRadius: radii.button,
+                        padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                      }
+                    : {
+                        color: "var(--text-muted)",
+                        borderRadius: radii.button,
+                        padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                      }
                 }
               >
                 {text(option.idLabel, option.enLabel)}
@@ -121,23 +137,27 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(15rem,0.6fr)]">
           <div
             data-design-system-preview
-            className="min-w-0 border p-4 sm:p-6"
+            className="min-w-0 border"
             style={{
               borderRadius: radii.panel,
+              padding: spacing.previewPadding,
               backgroundColor: color("background"),
               borderColor: color("border"),
               color: color("text-primary"),
               fontFamily: `${system.fontFamily}, sans-serif`,
             }}
           >
-            <div className="mb-5 flex items-center justify-between gap-3">
+            <div
+              className="flex items-center justify-between"
+              style={{ marginBottom: spacing.sectionGap, gap: spacing.controlGap }}
+            >
               <div>
                 <p className="text-sm font-semibold" style={{ color: color("text-primary") }}>
                   {text("Preview live", "Live preview")}
                 </p>
                 <p className="text-[11px]" style={{ color: color("text-secondary") }}>
-                  {system.name} · {system.mode} · {text("Radius dasar", "Base radius")}{" "}
-                  {system.radiusBase}px
+                  {system.name} · {system.mode} · {text("Spacing", "Spacing")} {system.spacingBase}
+                  px · {text("Radius", "Radius")} {system.radiusBase}px
                 </p>
               </div>
               <span
@@ -152,8 +172,8 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             </div>
 
             {tab === "actions" && (
-              <div className="space-y-5">
-                <div className="flex flex-wrap items-center gap-2">
+              <div style={{ display: "grid", rowGap: spacing.sectionGap }}>
+                <div className="flex flex-wrap items-center" style={{ gap: spacing.controlGap }}>
                   {(["primary", "secondary", "ghost"] as ComponentKitButtonVariant[]).map(
                     (item) => (
                       <button
@@ -161,11 +181,19 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                         type="button"
                         aria-pressed={variant === item}
                         onClick={() => setVariant(item)}
-                        className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium capitalize"
+                        className="rounded-md border text-[11px] font-medium capitalize"
                         style={
                           variant === item
-                            ? { borderColor: color("primary"), color: color("primary") }
-                            : { borderColor: color("border"), color: color("text-secondary") }
+                            ? {
+                                borderColor: color("primary"),
+                                color: color("primary"),
+                                padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                              }
+                            : {
+                                borderColor: color("border"),
+                                color: color("text-secondary"),
+                                padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                              }
                         }
                       >
                         {item}
@@ -175,7 +203,8 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   <div
                     role="group"
                     aria-label={text("Ukuran tombol", "Button size")}
-                    className="flex flex-wrap items-center gap-2"
+                    className="flex flex-wrap items-center"
+                    style={{ gap: spacing.controlGap }}
                   >
                     <span className="text-[11px]" style={{ color: color("text-secondary") }}>
                       {text("Ukuran tombol", "Button size")}
@@ -186,11 +215,19 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                         type="button"
                         aria-pressed={size === item}
                         onClick={() => setSize(item)}
-                        className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium uppercase"
+                        className="rounded-md border text-[11px] font-medium uppercase"
                         style={
                           size === item
-                            ? { borderColor: color("primary"), color: color("primary") }
-                            : { borderColor: color("border"), color: color("text-secondary") }
+                            ? {
+                                borderColor: color("primary"),
+                                color: color("primary"),
+                                padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                              }
+                            : {
+                                borderColor: color("border"),
+                                color: color("text-secondary"),
+                                padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
+                              }
                         }
                       >
                         {item}
@@ -198,7 +235,7 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center" style={{ gap: spacing.controlGap }}>
                   <button
                     type="button"
                     className="inline-flex items-center justify-center border font-semibold transition active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -226,11 +263,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     {text("Nonaktif", "Disabled")}
                   </button>
                   <span
-                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    className="text-[11px] font-semibold"
                     style={{
                       backgroundColor: color("secondary"),
                       color: color("on-secondary"),
                       borderRadius: radii.badge,
+                      padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
                     }}
                   >
                     {text("Baru", "New")}
@@ -240,7 +278,7 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             )}
 
             {tab === "forms" && (
-              <div className="max-w-lg space-y-4">
+              <div className="max-w-lg" style={{ display: "grid", rowGap: spacing.sectionGap }}>
                 <label
                   className="block text-xs font-medium"
                   style={{ color: color("text-primary") }}
@@ -249,9 +287,11 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   <input
                     value={inputValue}
                     onChange={(event) => setInputValue(event.target.value)}
-                    className="mt-1.5 w-full border px-3 py-2 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
+                    className="w-full border text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
                     style={{
                       borderRadius: radii.field,
+                      marginTop: spacing.inlineGap,
+                      padding: `${spacing.fieldPaddingY} ${spacing.fieldPaddingX}`,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -265,10 +305,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 >
                   {text("Mode tampilan", "Display mode")}
                   <select
-                    className="mt-1.5 w-full border px-3 py-2 text-sm outline-none"
+                    className="w-full border text-sm outline-none"
                     defaultValue="system"
                     style={{
                       borderRadius: radii.field,
+                      marginTop: spacing.inlineGap,
+                      padding: `${spacing.fieldPaddingY} ${spacing.fieldPaddingX}`,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -279,10 +321,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     <option value="dark">Dark</option>
                   </select>
                 </label>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap" style={{ gap: spacing.sectionGap }}>
                   <label
-                    className="inline-flex items-center gap-2 text-xs"
-                    style={{ color: color("text-secondary") }}
+                    className="inline-flex items-center text-xs"
+                    style={{ color: color("text-secondary"), gap: spacing.controlGap }}
                   >
                     <input
                       type="checkbox"
@@ -295,8 +337,8 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     type="button"
                     aria-pressed={enabled}
                     onClick={() => setEnabled((value) => !value)}
-                    className="inline-flex items-center gap-2 text-xs"
-                    style={{ color: color("text-secondary") }}
+                    className="inline-flex items-center text-xs"
+                    style={{ color: color("text-secondary"), gap: spacing.controlGap }}
                   >
                     <span
                       className="relative h-5 w-9 transition"
@@ -321,11 +363,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             )}
 
             {tab === "feedback" && (
-              <div className="space-y-4">
+              <div style={{ display: "grid", rowGap: spacing.sectionGap }}>
                 <div
-                  className="border px-3 py-2.5 text-sm"
+                  className="border text-sm"
                   style={{
                     borderRadius: radii.alert,
+                    padding: `${spacing.fieldPaddingY} ${spacing.fieldPaddingX}`,
                     backgroundColor: color("info"),
                     borderColor: color("info"),
                     color: color("on-info"),
@@ -333,52 +376,56 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   role="status"
                 >
                   <p className="font-semibold">{text("Draft tersimpan", "Draft saved")}</p>
-                  <p className="mt-0.5 text-xs opacity-85">
+                  <p className="text-xs opacity-85" style={{ marginTop: spacing.inlineGap }}>
                     {text(
                       "Semua perubahan tetap lokal di browser.",
                       "All changes remain local in your browser.",
                     )}
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center" style={{ gap: spacing.controlGap }}>
                   <span
-                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    className="text-[11px] font-semibold"
                     style={{
                       backgroundColor: color("success"),
                       color: color("on-success"),
                       borderRadius: radii.badge,
+                      padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
                     }}
                   >
                     {text("Berhasil", "Success")}
                   </span>
                   <span
-                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    className="text-[11px] font-semibold"
                     style={{
                       backgroundColor: color("warning"),
                       color: color("on-warning"),
                       borderRadius: radii.badge,
+                      padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
                     }}
                   >
                     {text("Perhatian", "Warning")}
                   </span>
                   <span
-                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    className="text-[11px] font-semibold"
                     style={{
                       backgroundColor: color("error"),
                       color: color("on-error"),
                       borderRadius: radii.badge,
+                      padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
                     }}
                   >
                     {text("Error", "Error")}
                   </span>
                 </div>
                 <p
-                  className="border px-3 py-2 text-xs"
+                  className="border text-xs"
                   role="alert"
                   style={{
                     borderColor: color("error"),
                     color: color("error"),
                     borderRadius: radii.alert,
+                    padding: `${spacing.fieldPaddingY} ${spacing.fieldPaddingX}`,
                   }}
                 >
                   {text(
@@ -390,12 +437,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             )}
 
             {tab === "overlays" && (
-              <div className="space-y-5">
+              <div style={{ display: "grid", rowGap: spacing.sectionGap }}>
                 <div
-                  className="flex gap-1 border-b"
+                  className="flex border-b"
                   role="tablist"
                   aria-label={text("Contoh tabs", "Tabs example")}
-                  style={{ borderColor: color("border") }}
+                  style={{ borderColor: color("border"), gap: spacing.inlineGap }}
                 >
                   {(
                     [
@@ -419,11 +466,19 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                         setOverlayTab(nextTab);
                         document.getElementById(`component-kit-tab-${nextTab}`)?.focus();
                       }}
-                      className="border-b-2 px-3 py-2 text-xs font-medium"
+                      className="border-b-2 text-xs font-medium"
                       style={
                         overlayTab === id
-                          ? { borderColor: color("primary"), color: color("primary") }
-                          : { borderColor: "transparent", color: "var(--text-muted)" }
+                          ? {
+                              borderColor: color("primary"),
+                              color: color("primary"),
+                              padding: `${spacing.tabPaddingY} ${spacing.tabPaddingX}`,
+                            }
+                          : {
+                              borderColor: "transparent",
+                              color: "var(--text-muted)",
+                              padding: `${spacing.tabPaddingY} ${spacing.tabPaddingX}`,
+                            }
                       }
                     >
                       {label}
@@ -435,11 +490,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   role="tabpanel"
                   aria-labelledby={`component-kit-tab-${overlayTab}`}
                   tabIndex={0}
-                  className="border p-4"
+                  className="border"
                   style={{
                     borderColor: color("border"),
                     backgroundColor: color("surface"),
                     borderRadius: radii.panel,
+                    padding: spacing.previewPadding,
                   }}
                 >
                   {overlayTab === "overview" ? (
@@ -447,7 +503,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                       <p className="text-sm font-semibold" style={{ color: color("text-primary") }}>
                         {text("Alur kerja terpusat", "Focused workflow")}
                       </p>
-                      <p className="mt-1 text-xs" style={{ color: color("text-secondary") }}>
+                      <p
+                        className="text-xs"
+                        style={{ color: color("text-secondary"), marginTop: spacing.inlineGap }}
+                      >
                         {text(
                           "Tabs menjaga konteks, dialog meminta keputusan, dan toast memberi konfirmasi singkat.",
                           "Tabs preserve context, dialogs request decisions, and toasts confirm short actions.",
@@ -455,20 +514,28 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                       </p>
                     </>
                   ) : (
-                    <div className="space-y-2 text-xs" style={{ color: color("text-secondary") }}>
+                    <div
+                      className="text-xs"
+                      style={{
+                        color: color("text-secondary"),
+                        display: "grid",
+                        rowGap: spacing.inlineGap,
+                      }}
+                    >
                       <p className="font-mono">tab.active → primary</p>
                       <p className="font-mono">dialog.surface → surface</p>
                       <p className="font-mono">toast.success → success</p>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap" style={{ gap: spacing.controlGap }}>
                   <button
                     type="button"
                     onClick={() => setDialogOpen(true)}
-                    className="border px-3 py-2 text-xs font-semibold"
+                    className="border text-xs font-semibold"
                     style={{
                       borderRadius: radii.button,
+                      padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
                       backgroundColor: color("primary"),
                       borderColor: color("primary"),
                       color: color("on-primary"),
@@ -481,9 +548,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     onClick={() =>
                       show(text("Toast berhasil ditampilkan", "Toast shown successfully"))
                     }
-                    className="border px-3 py-2 text-xs font-semibold"
+                    className="border text-xs font-semibold"
                     style={{
                       borderRadius: radii.button,
+                      padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -497,34 +565,55 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
           </div>
 
           <aside
-            className="min-w-0 rounded-xl border p-4"
-            style={{ borderColor: "var(--border)", backgroundColor: "var(--surface-soft)" }}
+            className="min-w-0 border"
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "var(--surface-soft)",
+              borderRadius: radii.panel,
+              padding: spacing.previewPadding,
+            }}
           >
-            <div className="mb-3 flex items-center justify-between gap-2">
+            <div
+              className="flex items-center justify-between"
+              style={{ marginBottom: spacing.sectionGap, gap: spacing.controlGap }}
+            >
               <div>
                 <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
                   {text("Token & handoff", "Tokens & handoff")}
                 </p>
-                <p className="mt-0.5 text-[10px]" style={{ color: "var(--text-muted)" }}>
+                <p
+                  className="text-[10px]"
+                  style={{ color: "var(--text-muted)", marginTop: spacing.inlineGap }}
+                >
                   {text("Siap dipakai developer", "Ready for developer handoff")}
                 </p>
               </div>
               <CopyButton value={snippet} label={text("Salin kode", "Copy code")} />
             </div>
-            <div className="space-y-2 border-b pb-3" style={{ borderColor: "var(--border)" }}>
+            <div
+              className="border-b"
+              style={{ borderColor: "var(--border)", paddingBottom: spacing.sectionGap }}
+            >
               {[
                 ["primary", color("primary")],
                 ["on-primary", color("on-primary")],
                 ["surface", color("surface")],
                 ["border", color("border")],
               ].map(([token, value]) => (
-                <div key={token} className="flex items-center justify-between gap-2 text-[10px]">
+                <div
+                  key={token}
+                  className="flex items-center justify-between text-[10px]"
+                  style={{
+                    gap: spacing.controlGap,
+                    marginTop: token === "primary" ? undefined : spacing.inlineGap,
+                  }}
+                >
                   <span className="font-mono" style={{ color: "var(--text-muted)" }}>
                     {token}
                   </span>
                   <span
-                    className="flex items-center gap-1.5 font-mono"
-                    style={{ color: "var(--text-secondary)" }}
+                    className="flex items-center font-mono"
+                    style={{ color: "var(--text-secondary)", gap: spacing.inlineGap }}
                   >
                     <span
                       className="h-3 w-3 rounded-sm border"
@@ -536,9 +625,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
               ))}
             </div>
             <div
-              className="mt-3 flex flex-wrap gap-1"
+              className="flex flex-wrap"
               role="toolbar"
               aria-label={text("Format handoff", "Handoff format")}
+              style={{ marginTop: spacing.sectionGap, gap: spacing.inlineGap }}
             >
               {HANDOFF_FORMATS.map((format) => (
                 <button
@@ -546,11 +636,19 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   type="button"
                   aria-pressed={handoffFormat === format.id}
                   onClick={() => setHandoffFormat(format.id)}
-                  className="rounded-md border px-2 py-1 text-[10px] font-medium"
+                  className="rounded-md border text-[10px] font-medium"
                   style={
                     handoffFormat === format.id
-                      ? { borderColor: color("primary"), color: color("primary") }
-                      : { borderColor: color("border"), color: color("text-secondary") }
+                      ? {
+                          borderColor: color("primary"),
+                          color: color("primary"),
+                          padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
+                        }
+                      : {
+                          borderColor: color("border"),
+                          color: color("text-secondary"),
+                          padding: `${spacing.badgePaddingY} ${spacing.badgePaddingX}`,
+                        }
                   }
                 >
                   {format.label}
@@ -559,11 +657,14 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             </div>
             <pre
               data-component-kit-handoff
-              className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border p-3 text-[10px] leading-relaxed"
+              className="max-h-48 overflow-auto whitespace-pre-wrap border text-[10px] leading-relaxed"
               style={{
                 backgroundColor: color("surface"),
                 borderColor: color("border"),
                 color: color("text-secondary"),
+                borderRadius: radii.field,
+                marginTop: spacing.sectionGap,
+                padding: spacing.fieldPaddingX,
               }}
             >
               {snippet}
@@ -587,11 +688,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             aria-modal="true"
             aria-labelledby="component-kit-dialog-title"
             aria-describedby="component-kit-dialog-description"
-            className="w-full max-w-md border p-5 shadow-2xl"
+            className="w-full max-w-md border shadow-2xl"
             style={{
               backgroundColor: color("surface"),
               borderColor: color("border"),
               borderRadius: radii.dialog,
+              padding: spacing.previewPadding,
             }}
           >
             <h4
@@ -603,23 +705,27 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             </h4>
             <p
               id="component-kit-dialog-description"
-              className="mt-2 text-sm"
-              style={{ color: color("text-secondary") }}
+              className="text-sm"
+              style={{ color: color("text-secondary"), marginTop: spacing.inlineGap }}
             >
               {text(
                 "Dialog menjaga fokus pengguna pada keputusan penting.",
                 "A dialog keeps the user focused on an important decision.",
               )}
             </p>
-            <div className="mt-5 flex justify-end gap-2">
+            <div
+              className="flex justify-end"
+              style={{ marginTop: spacing.sectionGap, gap: spacing.controlGap }}
+            >
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}
-                className="border px-3 py-2 text-xs font-semibold"
+                className="border text-xs font-semibold"
                 style={{
                   borderColor: color("border"),
                   color: color("text-primary"),
                   borderRadius: radii.button,
+                  padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
                 }}
               >
                 {text("Batal", "Cancel")}
@@ -630,9 +736,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   setDialogOpen(false);
                   show(text("Perubahan diterapkan", "Changes applied"));
                 }}
-                className="border px-3 py-2 text-xs font-semibold"
+                className="border text-xs font-semibold"
                 style={{
                   borderRadius: radii.button,
+                  padding: `${spacing.buttonPaddingY.sm} ${spacing.buttonPaddingX.sm}`,
                   backgroundColor: color("primary"),
                   borderColor: color("primary"),
                   color: color("on-primary"),
