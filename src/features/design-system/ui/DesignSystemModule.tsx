@@ -179,6 +179,22 @@ export function DesignSystemModule() {
               max={24}
               suffix="px"
               onChange={setRadiusBase}
+              description={text(
+                "Mengubah kelengkungan sudut preview Component Kit.",
+                "Changes the corner rounding in the Component Kit preview.",
+              )}
+              preview={
+                <span
+                  aria-hidden="true"
+                  data-radius-control-preview
+                  className="inline-block h-10 w-14 shrink-0 border-2"
+                  style={{
+                    borderRadius: `${system.radiusBase}px`,
+                    borderColor: "var(--accent)",
+                    backgroundColor: "var(--surface-soft)",
+                  }}
+                />
+              }
             />
           </div>
 
@@ -588,6 +604,8 @@ function RangeControl({
   max,
   suffix,
   onChange,
+  description,
+  preview,
 }: {
   id: string;
   label: string;
@@ -596,6 +614,8 @@ function RangeControl({
   max: number;
   suffix: string;
   onChange: (value: number) => void;
+  description?: string;
+  preview?: ReactNode;
 }) {
   return (
     <label htmlFor={id} className="space-y-2 text-xs" style={{ color: "var(--text-secondary)" }}>
@@ -606,16 +626,29 @@ function RangeControl({
           {suffix}
         </span>
       </span>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={1}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="w-full"
-      />
+      <span className="flex items-center gap-3">
+        {preview}
+        <input
+          id={id}
+          type="range"
+          min={min}
+          max={max}
+          step={1}
+          value={value}
+          aria-describedby={description ? `${id}-description` : undefined}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="min-w-0 w-full"
+        />
+      </span>
+      {description && (
+        <span
+          id={`${id}-description`}
+          className="block text-[11px]"
+          style={{ color: "var(--text-muted)" }}
+        >
+          {description}
+        </span>
+      )}
     </label>
   );
 }

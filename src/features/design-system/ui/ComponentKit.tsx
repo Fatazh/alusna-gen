@@ -4,6 +4,7 @@ import { CopyButton } from "../../../shared/ui/CopyButton";
 import { useLocale } from "../../../shared/i18n";
 import { useToast } from "../../../shared/ui/toastContext";
 import { getDesignSystemColor, type DesignSystem } from "../model/designSystem";
+import { getComponentKitRadii } from "../model/componentKitRadius";
 import {
   buildComponentKitSnippet,
   COMPONENT_KIT_SIZE_VALUES,
@@ -42,7 +43,7 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const color = (token: string) => getDesignSystemColor(system, token).hex;
-  const radius = system.radius.find((item) => item.name === "md")?.value ?? "0.5rem";
+  const radii = getComponentKitRadii(system);
   const buttonStyle = (buttonVariant: ComponentKitButtonVariant): CSSProperties => {
     if (buttonVariant === "secondary") {
       return {
@@ -120,8 +121,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(15rem,0.6fr)]">
           <div
             data-design-system-preview
-            className="min-w-0 rounded-xl border p-4 sm:p-6"
+            className="min-w-0 border p-4 sm:p-6"
             style={{
+              borderRadius: radii.panel,
               backgroundColor: color("background"),
               borderColor: color("border"),
               color: color("text-primary"),
@@ -134,7 +136,8 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   {text("Preview live", "Live preview")}
                 </p>
                 <p className="text-[11px]" style={{ color: color("text-secondary") }}>
-                  {system.name} · {system.mode}
+                  {system.name} · {system.mode} · {text("Radius dasar", "Base radius")}{" "}
+                  {system.radiusBase}px
                 </p>
               </div>
               <span
@@ -169,29 +172,39 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                       </button>
                     ),
                   )}
-                  {(["sm", "md", "lg"] as ComponentKitControlSize[]).map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      aria-pressed={size === item}
-                      onClick={() => setSize(item)}
-                      className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium uppercase"
-                      style={
-                        size === item
-                          ? { borderColor: color("primary"), color: color("primary") }
-                          : { borderColor: color("border"), color: color("text-secondary") }
-                      }
-                    >
-                      {item}
-                    </button>
-                  ))}
+                  <div
+                    role="group"
+                    aria-label={text("Ukuran tombol", "Button size")}
+                    className="flex flex-wrap items-center gap-2"
+                  >
+                    <span className="text-[11px]" style={{ color: color("text-secondary") }}>
+                      {text("Ukuran tombol", "Button size")}
+                    </span>
+                    {(["sm", "md", "lg"] as ComponentKitControlSize[]).map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        aria-pressed={size === item}
+                        onClick={() => setSize(item)}
+                        className="rounded-md border px-2.5 py-1.5 text-[11px] font-medium uppercase"
+                        style={
+                          size === item
+                            ? { borderColor: color("primary"), color: color("primary") }
+                            : { borderColor: color("border"), color: color("text-secondary") }
+                        }
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center rounded-lg border font-semibold transition active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2"
+                    className="inline-flex items-center justify-center border font-semibold transition active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       ...buttonStyle(variant),
+                      borderRadius: radii.button,
                       height: sizeStyle.height,
                       padding: sizeStyle.padding,
                       outlineColor: color("primary"),
@@ -202,19 +215,23 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   <button
                     type="button"
                     disabled
-                    className="inline-flex items-center justify-center rounded-lg border font-semibold opacity-50"
+                    className="inline-flex items-center justify-center border font-semibold opacity-50"
                     style={{
                       ...buttonStyle("ghost"),
                       height: sizeStyle.height,
                       padding: sizeStyle.padding,
-                      borderRadius: radius,
+                      borderRadius: radii.button,
                     }}
                   >
                     {text("Nonaktif", "Disabled")}
                   </button>
                   <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                    style={{ backgroundColor: color("secondary"), color: color("on-secondary") }}
+                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    style={{
+                      backgroundColor: color("secondary"),
+                      color: color("on-secondary"),
+                      borderRadius: radii.badge,
+                    }}
                   >
                     {text("Baru", "New")}
                   </span>
@@ -232,8 +249,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   <input
                     value={inputValue}
                     onChange={(event) => setInputValue(event.target.value)}
-                    className="mt-1.5 w-full rounded-lg border px-3 py-2 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
+                    className="mt-1.5 w-full border px-3 py-2 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
                     style={{
+                      borderRadius: radii.field,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -247,9 +265,10 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 >
                   {text("Mode tampilan", "Display mode")}
                   <select
-                    className="mt-1.5 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                    className="mt-1.5 w-full border px-3 py-2 text-sm outline-none"
                     defaultValue="system"
                     style={{
+                      borderRadius: radii.field,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -280,12 +299,16 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     style={{ color: color("text-secondary") }}
                   >
                     <span
-                      className="relative h-5 w-9 rounded-full transition"
-                      style={{ backgroundColor: enabled ? color("primary") : color("border") }}
+                      className="relative h-5 w-9 transition"
+                      style={{
+                        backgroundColor: enabled ? color("primary") : color("border"),
+                        borderRadius: radii.pill,
+                      }}
                     >
                       <span
-                        className="absolute top-0.5 h-4 w-4 rounded-full transition-transform"
+                        className="absolute top-0.5 h-4 w-4 transition-transform"
                         style={{
+                          borderRadius: radii.pill,
                           backgroundColor: color("on-primary"),
                           transform: enabled ? "translateX(1.1rem)" : "translateX(0.1rem)",
                         }}
@@ -300,8 +323,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             {tab === "feedback" && (
               <div className="space-y-4">
                 <div
-                  className="rounded-lg border px-3 py-2.5 text-sm"
+                  className="border px-3 py-2.5 text-sm"
                   style={{
+                    borderRadius: radii.alert,
                     backgroundColor: color("info"),
                     borderColor: color("info"),
                     color: color("on-info"),
@@ -318,28 +342,44 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                    style={{ backgroundColor: color("success"), color: color("on-success") }}
+                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    style={{
+                      backgroundColor: color("success"),
+                      color: color("on-success"),
+                      borderRadius: radii.badge,
+                    }}
                   >
                     {text("Berhasil", "Success")}
                   </span>
                   <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                    style={{ backgroundColor: color("warning"), color: color("on-warning") }}
+                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    style={{
+                      backgroundColor: color("warning"),
+                      color: color("on-warning"),
+                      borderRadius: radii.badge,
+                    }}
                   >
                     {text("Perhatian", "Warning")}
                   </span>
                   <span
-                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                    style={{ backgroundColor: color("error"), color: color("on-error") }}
+                    className="px-2.5 py-1 text-[11px] font-semibold"
+                    style={{
+                      backgroundColor: color("error"),
+                      color: color("on-error"),
+                      borderRadius: radii.badge,
+                    }}
                   >
                     {text("Error", "Error")}
                   </span>
                 </div>
                 <p
-                  className="rounded-lg border px-3 py-2 text-xs"
+                  className="border px-3 py-2 text-xs"
                   role="alert"
-                  style={{ borderColor: color("error"), color: color("error") }}
+                  style={{
+                    borderColor: color("error"),
+                    color: color("error"),
+                    borderRadius: radii.alert,
+                  }}
                 >
                   {text(
                     "Contoh pesan error inline untuk field yang belum lengkap.",
@@ -395,8 +435,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   role="tabpanel"
                   aria-labelledby={`component-kit-tab-${overlayTab}`}
                   tabIndex={0}
-                  className="rounded-lg border p-4"
-                  style={{ borderColor: color("border"), backgroundColor: color("surface") }}
+                  className="border p-4"
+                  style={{
+                    borderColor: color("border"),
+                    backgroundColor: color("surface"),
+                    borderRadius: radii.panel,
+                  }}
                 >
                   {overlayTab === "overview" ? (
                     <>
@@ -422,8 +466,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   <button
                     type="button"
                     onClick={() => setDialogOpen(true)}
-                    className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                    className="border px-3 py-2 text-xs font-semibold"
                     style={{
+                      borderRadius: radii.button,
                       backgroundColor: color("primary"),
                       borderColor: color("primary"),
                       color: color("on-primary"),
@@ -436,8 +481,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                     onClick={() =>
                       show(text("Toast berhasil ditampilkan", "Toast shown successfully"))
                     }
-                    className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                    className="border px-3 py-2 text-xs font-semibold"
                     style={{
+                      borderRadius: radii.button,
                       backgroundColor: color("surface"),
                       borderColor: color("border"),
                       color: color("text-primary"),
@@ -541,8 +587,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
             aria-modal="true"
             aria-labelledby="component-kit-dialog-title"
             aria-describedby="component-kit-dialog-description"
-            className="w-full max-w-md rounded-xl border p-5 shadow-2xl"
-            style={{ backgroundColor: color("surface"), borderColor: color("border") }}
+            className="w-full max-w-md border p-5 shadow-2xl"
+            style={{
+              backgroundColor: color("surface"),
+              borderColor: color("border"),
+              borderRadius: radii.dialog,
+            }}
           >
             <h4
               id="component-kit-dialog-title"
@@ -565,8 +615,12 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}
-                className="rounded-lg border px-3 py-2 text-xs font-semibold"
-                style={{ borderColor: color("border"), color: color("text-primary") }}
+                className="border px-3 py-2 text-xs font-semibold"
+                style={{
+                  borderColor: color("border"),
+                  color: color("text-primary"),
+                  borderRadius: radii.button,
+                }}
               >
                 {text("Batal", "Cancel")}
               </button>
@@ -576,8 +630,9 @@ export function ComponentKit({ system }: { system: DesignSystem }) {
                   setDialogOpen(false);
                   show(text("Perubahan diterapkan", "Changes applied"));
                 }}
-                className="rounded-lg border px-3 py-2 text-xs font-semibold"
+                className="border px-3 py-2 text-xs font-semibold"
                 style={{
+                  borderRadius: radii.button,
                   backgroundColor: color("primary"),
                   borderColor: color("primary"),
                   color: color("on-primary"),

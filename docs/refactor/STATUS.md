@@ -193,8 +193,10 @@ the selected host.
   React Native tokens; every format can be copied or downloaded as a browser-local file.
 - Color history is now a unique most-recently-used list: choosing an older swatch moves it to the
   front instead of creating another copy.
-- The Node.js 22 quality gate passes with 160 unit and contract tests across 22 files; browser
-  coverage now has 32 required passing scenarios plus one optional sponsor scenario.
+- Node.js 22 validation passes with 161 unit and contract tests across 22 files; browser
+  coverage now has 34 required passing scenarios plus one optional sponsor scenario.
+  Repository-wide formatting is blocked by the existing `scripts/debug-probe.mjs` warning;
+  changed files pass formatting checks.
 - The production entry is 68.09 kB gzip and the lazy Design System module is 9.37 kB gzip.
 - The design-reference audit fixed duplicate colors in the Accessibility Simulator, localized the
   remaining Contrast Checker labels on English routes, and added explicit hover/active foreground
@@ -238,9 +240,35 @@ the selected host.
 - Component Kit handoff now supports CSS, Tailwind, and React snippets with deterministic token
   values and one-click copy behavior.
 
+## Radius preview correction — 2026-09-07
+
+- Objective: make the base-radius slider visibly affect the existing Component Kit previews and
+  keep copied CSS, Tailwind, and React output consistent with those previews.
+- Files changed: `model/componentKitRadius.ts`, `ui/ComponentKit.tsx`,
+  `ui/DesignSystemModule.tsx`, and `services/componentKitSnippets.ts` plus its test under
+  `src/features/design-system/`; `e2e/studio.spec.ts`; `src/app/trust/releaseNotes.ts`; this status
+  file and `docs/refactor/ROADMAP.md`.
+- Decisions: share one component-radius role map between preview and handoff. Buttons use `md`,
+  fields and badges `sm`, panels and alerts `lg`, and dialogs `xl`. Base radius zero produces
+  square corners. Pill/switch shapes retain `full`, and native checkboxes retain browser styling.
+  Button `sm/md/lg` controls change height/padding independently, with an explicit size label.
+  A small inline radius sample gives immediate feedback beside the slider without adding another
+  component gallery or competing shape setting.
+- Validation: Node.js 22 lint, dependency boundaries, 161 unit/contract tests across 22 files,
+  production build, 34 browser scenarios, and `git diff --check` passed; one optional sponsor
+  scenario was skipped. Online `npm audit --omit=dev` reports zero vulnerabilities. Radius checks
+  cover Indonesian/mobile and English/desktop at 0, 8, and 24 px, including size changes, snippet
+  formats, session restoration, and no horizontal overflow. Square/rounded preview screenshots
+  were visually reviewed. Changed files pass Prettier; repository-wide `format:check` still reports
+  a pre-existing warning in the unchanged `scripts/debug-probe.mjs`.
+- Remaining risks: radius controls the generated kit, not the ALUSNA editor chrome. Existing native
+  control and pill shapes intentionally do not become square. Real handoff feedback is still needed.
+- Next planned task: continue Phase 14 with real designer–developer handoff workflows before adding
+  packages or more framework adapters.
+
 ## In progress
 
-- None.
+- Phase 14 real-world workflow validation; initial radius feedback addressed, broader usage pending.
 
 ## Known risks
 
@@ -279,12 +307,12 @@ the selected host.
   independence.
 - The 300-family snapshot increases the lazy Typography chunk to 10.10 kB gzip; review pagination
   and catalog size before raising the synchronization limit further.
-- The richer Design System increases its lazy chunk from 5.09 kB to 13.44 kB gzip. It remains
+- The richer Design System increases its lazy chunk from 5.09 kB to 13.81 kB gzip. It remains
   route-split, but future additions should avoid pulling editor-only dependencies into the entry.
 - DTCG output follows the 2025.10 schema structure, but compatibility has not yet been verified
   against every third-party design-token importer.
-- The 2026-09-04 online production dependency audit could not reach the npm endpoint before its
-  configured timeout; the cached offline audit reports 0 vulnerabilities.
+- The online production dependency audit was successfully rerun on 2026-09-07 and reports zero
+  vulnerabilities; this supersedes the cached-only result from 2026-09-04.
 - Design System drafts are currently persisted for the browser session only; long-term persistence
   would require a separate product decision and storage migration review.
 - Some legacy tool copy still needs a final English editorial pass; shared UI and the audited

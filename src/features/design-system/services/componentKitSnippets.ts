@@ -1,4 +1,5 @@
 import type { DesignSystem } from "../model/designSystem";
+import { getComponentKitRadii } from "../model/componentKitRadius";
 
 export type ComponentKitTab = "actions" | "forms" | "feedback" | "overlays";
 export type ComponentKitButtonVariant = "primary" | "secondary" | "ghost";
@@ -28,7 +29,15 @@ export function buildComponentKitSnippet(
     const normalized = name.replace(/[^a-zA-Z0-9_$]/g, "");
     return /^[a-zA-Z_$]/.test(normalized) ? normalized : `Brand${normalized}`;
   })();
-  const radius = system.radius.find((item) => item.name === "md")?.value ?? "0.5rem";
+  const radii = getComponentKitRadii(system);
+  const radius =
+    tab === "forms"
+      ? radii.field
+      : tab === "feedback"
+        ? radii.alert
+        : tab === "overlays"
+          ? radii.dialog
+          : radii.button;
   const buttonBackground = color(
     variant === "secondary" ? "secondary" : variant === "ghost" ? "surface" : "primary",
   );
@@ -57,11 +66,13 @@ export function buildComponentKitSnippet(
   background: ${color("surface")};
   color: ${color("text-primary")};
   border: 1px solid ${color("border")};
+  border-radius: ${radius};
 }
 
 .${cssName}-toast {
   background: ${color("success")};
   color: ${color("on-success")};
+  border-radius: ${radii.pill};
 }`;
     }
     return `.${cssName}-button {
@@ -69,6 +80,7 @@ export function buildComponentKitSnippet(
   color: ${buttonForeground};
   min-height: ${COMPONENT_KIT_SIZE_VALUES[size].height};
   padding: ${COMPONENT_KIT_SIZE_VALUES[size].padding};
+  border-radius: ${radius};
 }`;
   }
 
@@ -97,7 +109,7 @@ export function buildComponentKitSnippet(
   }
   if (tab === "overlays") {
     return `export function ${reactName}Dialog() {
-  return <div role="dialog" aria-modal="true" style={{ backgroundColor: "${color("surface")}", color: "${color("text-primary")}", borderColor: "${color("border")}" }}>Dialog content</div>;
+  return <div role="dialog" aria-modal="true" style={{ backgroundColor: "${color("surface")}", color: "${color("text-primary")}", borderColor: "${color("border")}", borderRadius: "${radius}" }}>Dialog content</div>;
 }`;
   }
   return `export function ${reactName}Button() {

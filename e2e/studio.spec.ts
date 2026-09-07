@@ -419,6 +419,72 @@ test("Design System builds modes, validates contrast, and exports current token 
   expect(download.suggestedFilename()).toBe("brand-dark.tokens.json");
 });
 
+for (const locale of ["id", "en"] as const) {
+  test(`Design System radius updates existing previews and handoff (${locale})`, async ({
+    page,
+  }, testInfo) => {
+    const en = locale === "en";
+    const copy = (id: string, english: string) => (en ? english : id);
+    const rem = (pixels: number) => (pixels === 0 ? "0" : `${pixels / 16}rem`);
+    await page.setViewportSize({ width: en ? 1440 : 390, height: 900 });
+    await page.goto(`${en ? "/en" : ""}/design-token-generator/`);
+    const radiusSlider = page.locator("#radius-base");
+    const preview = page.locator("[data-design-system-preview]");
+    const handoff = page.locator("[data-component-kit-handoff]");
+    const action = preview.getByRole("button", {
+      name: copy("Aksi utama", "Primary action"),
+      exact: true,
+    });
+
+    for (const base of [0, 24, 8]) {
+      await radiusSlider.press(base === 24 ? "End" : "Home");
+      if (base === 8) {
+        for (let step = 0; step < 8; step++) await radiusSlider.press("ArrowRight");
+      }
+      await expect(radiusSlider).toHaveValue(String(base));
+      await expect(page.locator("[data-radius-control-preview]")).toHaveCSS(
+        "border-radius",
+        `${base}px`,
+      );
+      await expect(preview).toHaveCSS("border-radius", `${base}px`);
+      await expect(action).toHaveCSS("border-radius", `${base * 0.75}px`);
+      // Size and variant selections must retain the global corner setting.
+      await preview.getByRole("button", { name: "lg", exact: true }).click();
+      await preview.getByRole("button", { name: "secondary", exact: true }).click();
+      await expect(action).toHaveCSS("border-radius", `${base * 0.75}px`);
+      await expect(action).toHaveCSS("height", "48px");
+      for (const format of ["CSS", "Tailwind", "React"]) {
+        await page.getByRole("button", { name: format, exact: true }).click();
+        await expect(handoff).toContainText(rem(base * 0.75));
+      }
+      if (base !== 8) {
+        await preview.screenshot({ path: testInfo.outputPath(`radius-${base}.png`) });
+      }
+      await page.getByRole("button", { name: copy("Form", "Forms"), exact: true }).click();
+      await expect(preview.getByRole("textbox")).toHaveCSS("border-radius", `${base * 0.5}px`);
+      await expect(preview.getByRole("combobox")).toHaveCSS("border-radius", `${base * 0.5}px`);
+      await expect(handoff).toContainText(`borderRadius: "${rem(base * 0.5)}"`);
+      await page.getByRole("button", { name: "Feedback", exact: true }).click();
+      await expect(preview.getByRole("status")).toHaveCSS("border-radius", `${base}px`);
+      await page.getByRole("button", { name: copy("Overlay", "Overlays"), exact: true }).click();
+      await expect(preview.getByRole("tabpanel")).toHaveCSS("border-radius", `${base}px`);
+      await page
+        .getByRole("button", { name: copy("Buka dialog", "Open dialog"), exact: true })
+        .click();
+      await expect(page.getByRole("dialog")).toHaveCSS("border-radius", `${base * 1.5}px`);
+      await page.getByRole("button", { name: copy("Batal", "Cancel"), exact: true }).click();
+      await expect(handoff).toContainText(`borderRadius: "${rem(base * 1.5)}"`);
+      await page.getByRole("button", { name: copy("Aksi", "Actions"), exact: true }).click();
+    }
+    await page.reload();
+    await expect(radiusSlider).toHaveValue("8");
+    await expect(action).toHaveCSS("border-radius", "6px");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      en ? 1440 : 390,
+    );
+  });
+}
+
 test("Experiment applies RGB intensities and derives a CMYK target", async ({ page }) => {
   await page.goto("/color-mixer/");
 

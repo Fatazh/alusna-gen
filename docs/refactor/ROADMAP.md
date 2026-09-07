@@ -122,8 +122,10 @@ framework adapters.
 
 ## Phase 14: Workflow validation gate
 
-Status: **planned**
+Status: **in progress**
 
+- [x] Address initial radius feedback: connect the base-radius slider to existing Component Kit
+      previews and CSS/Tailwind/React handoff; distinguish button size from corner rounding.
 - [ ] Collect feedback from at least three real designer–developer handoff workflows.
 - [ ] Measure which snippet formats are copied and where output needs context or escaping.
 - [ ] Decide whether a downloadable package is justified by repeated usage.
