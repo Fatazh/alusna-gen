@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
-import { rgbToHex, type RGB } from "../../model/color";
+import { rgbToHex, type RGB } from "@alusna/shared/color";
 import { useLocale } from "../../../../shared/i18n";
 import {
   COLOR_RECIPE_QUALITY_LABELS,
   evaluateColorRecipe,
   type ColorRecipe,
   type ColorRecipeIngredient,
-} from "../../model/colorRecipes";
+} from "@alusna/shared/colorRecipes";
 
 type ColorRecipeEditorProps = {
   target: RGB;

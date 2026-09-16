@@ -19,7 +19,10 @@ export function ToolGuideView({
       style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
     >
       <header className="max-w-4xl">
-        <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
+        <p
+          className="text-xs font-semibold uppercase tracking-wider"
+          style={{ color: "var(--accent)" }}
+        >
           {english ? "Practical guide" : "Panduan praktis"}
         </p>
         <h2 className="mt-2 text-2xl font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -94,7 +97,7 @@ function GuideList({ title, items }: { title: string; items: readonly string[] }
       <ul className="mt-2 space-y-2 text-sm leading-6 theme-text-sub">
         {items.map((item) => (
           <li key={item} className="flex gap-2">
-            <span aria-hidden="true" className="text-indigo-500">
+            <span aria-hidden="true" style={{ color: "var(--accent)" }}>
               •
             </span>
             <span>{item}</span>

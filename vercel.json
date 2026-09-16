@@ -3,6 +3,7 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [{ "source": "/((?!en/).*)", "destination": "/index.html" }],
   "redirects": [
     {
       "source": "/robot.txt",

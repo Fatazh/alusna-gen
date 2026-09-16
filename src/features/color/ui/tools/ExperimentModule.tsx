@@ -4,17 +4,25 @@ import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { Lightbulb } from "@phosphor-icons/react/Lightbulb";
 import { Plus } from "@phosphor-icons/react/Plus";
-import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "../../model/color";
-import { getColorName } from "../../model/colorNames";
-import { findColorRecipes, type ColorRecipe, type ColorRecipeMode } from "../../model/colorRecipes";
+import { mixColors, rgbToHex, hexToRgb, type MixMode, type RGB } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
+import {
+  findColorRecipes,
+  type ColorRecipe,
+  type ColorRecipeMode,
+} from "@alusna/shared/colorRecipes";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../Swatch";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { useLocale } from "../../../../shared/i18n";
+import { useHistoryState } from "../../../../shared/lib/useHistoryState";
+import { useUndoRedoShortcuts } from "../../../../shared/lib/useUndoRedoShortcuts";
 import { ColorRecipeEditor } from "./ColorRecipeEditor";
 
 type Slot = { id: number; hex: string; weight: number };
+
+type ExperimentSnapshot = { slots: Slot[]; mode: MixMode };
 
 const MODES: { id: MixMode; label: string; desc: string }[] = [
   { id: "average", label: "Average", desc: "Rata-rata sederhana" },
@@ -82,35 +90,30 @@ export function ExperimentModule() {
   // Monotonically increasing ID counter — safe against rapid clicks.
   const nextId = useRef(3);
 
-  const [slots, setSlots] = useState<Slot[]>([
-    { id: 1, hex: "#FF6B6B", weight: 1 },
-    { id: 2, hex: "#4ECDC4", weight: 1 },
-  ]);
-  const [mode, setMode] = useState<MixMode>("additive");
+  const experimentHistory = useHistoryState<ExperimentSnapshot>(() => ({
+    slots: [
+      { id: 1, hex: "#FF6B6B", weight: 1 },
+      { id: 2, hex: "#4ECDC4", weight: 1 },
+    ],
+    mode: "additive",
+  }));
+  const snapshot = experimentHistory.value;
+  const { slots, mode } = snapshot;
   const [targetHex, setTargetHex] = useState("#FFFF00");
   const [recipeMode, setRecipeMode] = useState<ColorRecipeMode>("additive");
-  const [past, setPast] = useState<Slot[][]>([]);
-  const [future, setFuture] = useState<Slot[][]>([]);
 
-  const pushHistory = (next: Slot[]) => {
-    setPast((p) => [...p, slots].slice(-50));
-    setFuture([]);
-    setSlots(next);
-  };
-  const undo = () => {
-    if (past.length === 0) return;
-    const prev = past[past.length - 1];
-    setFuture((f) => [slots, ...f]);
-    setSlots(prev);
-    setPast(past.slice(0, -1));
-  };
-  const redo = () => {
-    if (future.length === 0) return;
-    const next = future[0];
-    setPast((p) => [...p, slots]);
-    setSlots(next);
-    setFuture(future.slice(1));
-  };
+  useUndoRedoShortcuts({
+    undo: experimentHistory.undo,
+    redo: experimentHistory.redo,
+    canUndo: experimentHistory.canUndo,
+    canRedo: experimentHistory.canRedo,
+    enabled: true,
+  });
+
+  const pushSnapshot = (next: Partial<ExperimentSnapshot>) =>
+    experimentHistory.push({ slots: snapshot.slots, mode: snapshot.mode, ...next });
+
+  const setMode = (next: MixMode) => pushSnapshot({ mode: next });
 
   const result = useMemo(() => {
     const inputs = slots
@@ -129,26 +132,27 @@ export function ExperimentModule() {
   );
 
   const updateSlot = (id: number, partial: Partial<Slot>) => {
-    pushHistory(slots.map((s) => (s.id === id ? { ...s, ...partial } : s)));
+    pushSnapshot({ slots: slots.map((s) => (s.id === id ? { ...s, ...partial } : s)) });
   };
   const addSlot = () => {
     if (slots.length >= 6) return;
     const id = nextId.current++;
-    pushHistory([...slots, { id, hex: "#FFFFFF", weight: 1 }]);
+    pushSnapshot({ slots: [...slots, { id, hex: "#FFFFFF", weight: 1 }] });
   };
   const removeSlot = (id: number) => {
     if (slots.length <= 1) return;
-    pushHistory(slots.filter((s) => s.id !== id));
+    pushSnapshot({ slots: slots.filter((s) => s.id !== id) });
   };
 
   const applyRecipe = (recipe: ColorRecipe) => {
-    const next = recipe.ingredients.map((ingredient) => ({
-      id: nextId.current++,
-      hex: rgbToHex(ingredient.color),
-      weight: ingredient.ratio / 20,
-    }));
-    pushHistory(next);
-    setMode(recipeMode);
+    pushSnapshot({
+      slots: recipe.ingredients.map((ingredient) => ({
+        id: nextId.current++,
+        hex: rgbToHex(ingredient.color),
+        weight: ingredient.ratio / 20,
+      })),
+      mode: recipeMode,
+    });
   };
 
   const hasCustomWeights = slots.some((s) => s.weight !== 1);
@@ -359,22 +363,22 @@ export function ExperimentModule() {
               <div className="ml-auto flex gap-1.5">
                 <button
                   type="button"
-                  onClick={undo}
-                  disabled={past.length === 0}
+                  onClick={experimentHistory.undo}
+                  disabled={!experimentHistory.canUndo}
                   className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-                  title="Urungkan (undo)"
+                  title={text("Urungkan (Ctrl+Z)", "Undo (Ctrl+Z)")}
                 >
                   <ArrowCounterClockwise size={13} className="mr-1 inline" aria-hidden="true" />
                   Undo
                 </button>
                 <button
                   type="button"
-                  onClick={redo}
-                  disabled={future.length === 0}
+                  onClick={experimentHistory.redo}
+                  disabled={!experimentHistory.canRedo}
                   className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
-                  title="Ulangi (redo)"
+                  title={text("Ulangi (Ctrl+Y)", "Redo (Ctrl+Y)")}
                 >
                   <ArrowClockwise size={13} className="mr-1 inline" aria-hidden="true" />
                   Redo
@@ -400,7 +404,7 @@ export function ExperimentModule() {
             )}
 
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {slots.map((slot) => (
+              {slots.map((slot, slotIndex) => (
                 <div
                   key={slot.id}
                   className="rounded-xl border p-3"
@@ -409,6 +413,7 @@ export function ExperimentModule() {
                   <div className="flex items-center justify-between">
                     <input
                       type="color"
+                      aria-label={`${text("Warna", "Color")} ${slotIndex + 1}`}
                       value={slot.hex}
                       onChange={(e) => updateSlot(slot.id, { hex: e.target.value })}
                       className="h-10 w-12 rounded-lg"
@@ -426,6 +431,7 @@ export function ExperimentModule() {
                   </div>
                   <input
                     type="text"
+                    aria-label={`${text("Kode HEX warna", "Color HEX code")} ${slotIndex + 1}`}
                     value={slot.hex}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -461,6 +467,7 @@ export function ExperimentModule() {
                       min={0}
                       max={5}
                       step={0.05}
+                      aria-label={`${text("Bobot warna", "Color weight")} ${slotIndex + 1}`}
                       value={slot.weight}
                       onChange={(e) => updateSlot(slot.id, { weight: Number(e.target.value) })}
                       className="w-full"

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { rgbToHex, type RGB } from "../../model/color";
-import { getColorName } from "../../model/colorNames";
+import { rgbToHex, type RGB } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
@@ -10,8 +10,8 @@ import {
   shadesToCssVars,
   shadesToTailwind,
   type Shade,
-} from "../../model/shades";
-import { useToast } from "../../../../shared/ui/toastContext";
+} from "@alusna/shared/shades";
+import { useCopy } from "../../../../shared/lib/useCopy";
 import { useLocale } from "../../../../shared/i18n";
 
 export function ShadeModule() {
@@ -20,7 +20,7 @@ export function ShadeModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const saveColor = useStudio((s) => s.saveColor);
-  const { show } = useToast();
+  const { copy } = useCopy();
 
   const [name, setName] = useState("brand");
   const [format, setFormat] = useState<"vars" | "tailwind">("vars");
@@ -40,14 +40,9 @@ export function ShadeModule() {
     pushColorHistory(rgb);
   };
 
-  const copyHex = async (hex: string, e: React.MouseEvent) => {
+  const copyHex = (hex: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(hex);
-      show(text(`✓ ${hex} berhasil disalin!`, `✓ ${hex} copied!`));
-    } catch {
-      // fail silently
-    }
+    copy(hex);
   };
 
   return (
@@ -78,6 +73,7 @@ export function ShadeModule() {
                   return (
                     <div
                       key={sh.step}
+                      data-user-palette-preview
                       className="flex w-full items-center gap-3 rounded-lg px-3 py-2 transition hover:ring-1 hover:ring-white/30"
                       style={{ backgroundColor: hex }}
                     >
@@ -128,11 +124,16 @@ export function ShadeModule() {
         <CardHeader title={text("Ekspor Skala", "Export scale")} />
         <CardBody className="space-y-4">
           <div>
-            <label className="mb-1 block text-[11px]" style={{ color: "var(--text-muted)" }}>
+            <label
+              htmlFor="shade-palette-name"
+              className="mb-1 block text-[11px]"
+              style={{ color: "var(--text-muted)" }}
+            >
               {text("Nama palet", "Palette name")}
             </label>
             <input
               type="text"
+              id="shade-palette-name"
               value={name}
               onChange={(e) =>
                 // Only alphanumerics, dash & underscore are allowed: the name

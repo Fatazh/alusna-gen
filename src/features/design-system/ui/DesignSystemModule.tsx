@@ -597,6 +597,7 @@ export function DesignSystemModule() {
                 </div>
                 <pre
                   data-design-system-export-preview
+                  tabIndex={0}
                   className="max-h-[32rem] overflow-auto rounded-xl border p-4 text-[11px] leading-relaxed"
                   style={{
                     borderColor: "var(--border)",

@@ -11,7 +11,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -35,4 +35,7 @@ jobs:
           VITE_CONTACT_EMAIL: ci@alusna.dev
 
       - run: npx playwright install --with-deps chromium
+      # Accessibility gate runs FIRST so WCAG violations surface before the
+      # rest of the e2e suite.
+      - run: npx playwright test e2e/accessibility.spec.ts
       - run: npx playwright test

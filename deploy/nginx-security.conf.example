@@ -16,3 +16,7 @@ location /assets/ {
 location / {
     try_files $uri $uri/ =404;
 }
+
+# Jika analitik GA4 diaktifkan, ganti direktif CSP di atas dengan varian ini
+# (default tetap ketat tanpa GA4):
+# add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com; img-src 'self' blob: data: https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'none'; frame-ancestors 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests" always;

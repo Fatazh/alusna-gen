@@ -7,8 +7,14 @@ import { ToolPageIntro } from "./layout/ToolPageIntro";
 import { AppProviders } from "./providers/AppProviders";
 import { AdvertisingSlot } from "./monetization/AdvertisingSlot";
 import { useStudioRouter } from "./router/useStudioRouter";
+import { useToolShareUrl } from "./share/useToolShareUrl";
+import { KeyboardShortcutsDialog } from "./layout/KeyboardShortcutsDialog";
 import { usePageSeo } from "./seo/usePageSeo";
 import { usePageAnalytics } from "./analytics/usePageAnalytics";
+import { isAnalyticsEnabled } from "./analytics/analytics";
+import { ConsentBanner } from "./analytics/ConsentBanner";
+import { hasStoredConsent } from "./analytics/consent";
+import { isGa4Configured } from "./analytics/ga4";
 import { rgbToHex } from "../features/color/domain";
 import {
   loadAccessibilityModule,
@@ -23,6 +29,7 @@ import {
 import { loadFontModule } from "../features/typography/loaders";
 import { loadDesignSystemModule } from "../features/design-system/loaders";
 import { loadBrandKitModule } from "../features/brand-kit/loaders";
+import { isNotFoundPage } from "./router/routes";
 import { useStudio } from "../store/studio";
 import { LocaleProvider } from "../shared/i18n";
 import { findPageForModule, isHomePage, isToolPage, type ColorTab } from "./router/routes";
@@ -43,6 +50,9 @@ const TrustPageView = lazy(() =>
 );
 const HomePageView = lazy(() =>
   import("./home/HomePageView").then((module) => ({ default: module.HomePageView })),
+);
+const NotFoundViewLazy = lazy(() =>
+  import("./notfound/NotFoundView").then((module) => ({ default: module.NotFoundView })),
 );
 const ToolGuideView = lazy(() =>
   import("./content/ToolGuideView").then((module) => ({ default: module.ToolGuideView })),
@@ -67,7 +77,6 @@ export default function App() {
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const selectedColor = useStudio((s) => s.selectedColor);
   const colorHistory = useStudio((s) => s.colorHistory);
-  const activeFontFamily = useStudio((s) => s.activeFontFamily);
   const {
     colorTab,
     topTab,
@@ -76,6 +85,8 @@ export default function App() {
     switchColorTab,
     navigateToPath,
     switchLocale,
+    helpOpen,
+    setHelpOpen,
   } = useStudioRouter();
   const showingTool = isToolPage(currentPage);
   const showingHome = isHomePage(currentPage);
@@ -83,12 +94,15 @@ export default function App() {
   usePageSeo(currentPage);
   usePageAnalytics(currentPage);
 
-  const shareUrl = (() => {
-    const p = new URLSearchParams();
-    p.set("c", rgbToHex(selectedColor));
-    p.set("f", activeFontFamily);
-    return `${window.location.origin}${window.location.pathname}?${p.toString()}`;
-  })();
+  // The banner asks once per browser; consent is remembered in localStorage.
+  // It stays hidden when no GA4 destination is configured or analytics is
+  // master-switched off, so nothing is ever requested without a purpose.
+  const showConsentBanner =
+    !hasStoredConsent() &&
+    isGa4Configured() &&
+    isAnalyticsEnabled(import.meta.env.VITE_ANALYTICS_ENABLED);
+
+  const shareUrl = useToolShareUrl(currentPage);
 
   return (
     <AppProviders>
@@ -104,6 +118,7 @@ export default function App() {
             onNavigateHome={() => navigateToPath(currentPage.locale === "en" ? "/en" : "/")}
             onSwitchLocale={switchLocale}
             onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onShowShortcuts={() => setHelpOpen(true)}
             toolNavigationActive={showingTool}
           />
 
@@ -202,6 +217,12 @@ export default function App() {
                   <HomePageView onNavigate={navigateToPath} />
                 </Suspense>
               </div>
+            ) : isNotFoundPage(currentPage) ? (
+              <div className="py-8 sm:py-10">
+                <Suspense fallback={<ModuleLoading />}>
+                  <NotFoundViewLazy page={currentPage} />
+                </Suspense>
+              </div>
             ) : (
               <div className="py-8 sm:py-10">
                 <Suspense fallback={<ModuleLoading />}>
@@ -213,6 +234,17 @@ export default function App() {
 
           <AppFooter locale={currentPage.locale} onNavigate={navigateToPath} />
 
+          <KeyboardShortcutsDialog
+            open={helpOpen}
+            onClose={() => setHelpOpen(false)}
+            showColorTab={showingTool && topTab === "color"}
+            showUndoRedo={
+              showingTool &&
+              topTab === "color" &&
+              ["pattern", "matching", "experiment", "gradient"].includes(colorTab)
+            }
+          />
+
           {/* Recent colors bar */}
           {showingTool && colorHistory.length > 0 && (
             <HistoryBar
@@ -223,6 +255,10 @@ export default function App() {
               }}
               activeHex={rgbToHex(selectedColor)}
             />
+          )}
+
+          {showConsentBanner && (
+            <ConsentBanner visible onDecided={() => window.location.reload()} />
           )}
         </div>
       </LocaleProvider>

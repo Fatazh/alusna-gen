@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.2.0",
   "type": "module",
+  "workspaces": [
+    "packages/shared"
+  ],
   "engines": {
     "node": ">=22 <23"
   },
@@ -17,16 +20,18 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check:boundaries": "depcruise src --config .dependency-cruiser.cjs --output-type err",
+    "check:boundaries": "depcruise src packages --config .dependency-cruiser.cjs --output-type err",
     "check": "npm run lint && npm run format:check && npm run check:boundaries && npm test && npm run build"
   },
   "dependencies": {
+    "@alusna/shared": "*",
     "@phosphor-icons/react": "^2.1.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
     "@types/react": "^18.3.12",

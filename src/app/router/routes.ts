@@ -5,7 +5,7 @@ export type ColorTab =
   "pattern" | "matching" | "experiment" | "gradient" | "shades" | "image" | "a11y" | "contrast";
 export type TopModule = "color" | "font" | "design" | "brand";
 export type TrustPageId = "about" | "privacy" | "terms" | "advertising";
-export type PageKey = "home" | TopModule | ColorTab | TrustPageId;
+export type PageKey = "home" | TopModule | ColorTab | TrustPageId | "not-found";
 
 type PageBase = {
   key: PageKey;
@@ -23,6 +23,9 @@ export type ToolPage = PageBase & {
 export type HomePage = PageBase & { kind: "home" };
 export type TrustPage = PageBase & { kind: "trust"; id: TrustPageId };
 export type SeoPage = HomePage | ToolPage | TrustPage;
+/** Rendered for unknown URLs; marked noindex and never linked or prerendered as a sitemap entry. */
+export type NotFoundPage = PageBase & { kind: "not-found" };
+export type MetadataPage = SeoPage | NotFoundPage;
 
 type LocalizedCopy = { id: string; en: string };
 type ToolDefinition = {
@@ -268,8 +271,25 @@ function makeTrustPages(locale: Locale): TrustPage[] {
   }));
 }
 
+function makeNotFound(locale: Locale): NotFoundPage {
+  return {
+    kind: "not-found",
+    key: "not-found",
+    locale,
+    path: localizedPath(locale, "/"),
+    title: withBrandTitle(locale === "en" ? "Page Not Found" : "Halaman Tidak Ditemukan"),
+    heading: locale === "en" ? "Page not found" : "Halaman tidak ditemukan",
+    description:
+      locale === "en"
+        ? "The page you requested does not exist. Explore ALUSNA's free browser-based color, typography, and brand kit tools."
+        : "Halaman yang Anda cari tidak ada. Jelajahi alat warna, tipografi, dan brand kit ALUSNA gratis di browser.",
+  };
+}
+
 export const HOME_PAGE = makeHome("id");
 export const ENGLISH_HOME_PAGE = makeHome("en");
+export const NOT_FOUND_PAGE = makeNotFound("id");
+export const ENGLISH_NOT_FOUND_PAGE = makeNotFound("en");
 export const SEO_PAGES = makeTools("id");
 export const ENGLISH_SEO_PAGES = makeTools("en");
 export const TRUST_PAGES = makeTrustPages("id");
@@ -294,6 +314,17 @@ export function findSeoPage(pathname: string): SeoPage {
   );
 }
 
+/**
+ * Like findSeoPage but returns a dedicated noindex NotFoundPage for unknown
+ * paths instead of the homepage (prevents soft-404 duplicate content).
+ */
+export function findPublicPage(pathname: string): SeoPage | NotFoundPage {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  const match = PUBLIC_PAGES.find((page) => page.path === normalized);
+  if (match) return match;
+  return localeFromPath(normalized) === "en" ? ENGLISH_NOT_FOUND_PAGE : NOT_FOUND_PAGE;
+}
+
 export function findPageForModule(
   topTab: TopModule,
   colorTab: ColorTab = "pattern",
@@ -307,7 +338,7 @@ export function findPageForModule(
   );
 }
 
-export function findAlternatePage(page: SeoPage): SeoPage {
+export function findAlternatePage(page: SeoPage | NotFoundPage): SeoPage {
   const targetLocale: Locale = page.locale === "id" ? "en" : "id";
   return (
     PUBLIC_PAGES.find(
@@ -316,10 +347,14 @@ export function findAlternatePage(page: SeoPage): SeoPage {
   );
 }
 
-export function isToolPage(page: SeoPage): page is ToolPage {
+export function isNotFoundPage(page: SeoPage | NotFoundPage): page is NotFoundPage {
+  return page.kind === "not-found";
+}
+
+export function isToolPage(page: SeoPage | NotFoundPage): page is ToolPage {
   return page.kind === "tool";
 }
 
-export function isHomePage(page: SeoPage): page is HomePage {
+export function isHomePage(page: SeoPage | NotFoundPage): page is HomePage {
   return page.kind === "home";
 }

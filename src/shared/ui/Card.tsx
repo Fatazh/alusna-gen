@@ -27,12 +27,12 @@ export function CardHeader({
       style={{ borderColor: "var(--border)" }}
     >
       <div>
-        <h3
+        <h2
           className="text-[15px] font-bold tracking-[-0.02em]"
           style={{ color: "var(--text-primary)" }}
         >
           {title}
-        </h3>
+        </h2>
         {subtitle && (
           <p className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
             {subtitle}

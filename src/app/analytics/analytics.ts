@@ -1,9 +1,9 @@
 import { APP_EVENTS } from "../../shared/config/brand";
-import { type SeoPage } from "../router/routes";
+import { type MetadataPage } from "../router/routes";
 
 export type AnalyticsEvent = {
   name: "page_view";
-  pageKind: SeoPage["kind"];
+  pageKind: MetadataPage["kind"];
   pagePath: string;
 };
 
@@ -11,7 +11,7 @@ export function isAnalyticsEnabled(value: string | undefined): boolean {
   return value?.trim().toLowerCase() === "true";
 }
 
-export function createPageViewEvent(page: SeoPage): AnalyticsEvent {
+export function createPageViewEvent(page: MetadataPage): AnalyticsEvent {
   return {
     name: "page_view",
     pageKind: page.kind,

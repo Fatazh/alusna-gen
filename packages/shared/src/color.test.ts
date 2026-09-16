@@ -3,6 +3,7 @@ import {
   hexToRgb,
   rgbToHex,
   hexToRgba,
+  hexToRgbaStrict,
   rgbaToHex,
   rgbToHsl,
   hslToRgb,
@@ -71,6 +72,24 @@ describe("hexToRgba", () => {
   });
   it("returns null for invalid hex", () => {
     expect(hexToRgba("invalid")).toBeNull();
+  });
+
+  describe("hexToRgbaStrict", () => {
+    it("honors the 8-digit alpha channel", () => {
+      expect(hexToRgbaStrict("#FF000080")).toEqual({ r: 255, g: 0, b: 0, a: 0.502 });
+      expect(hexToRgbaStrict("FF000000")).toEqual({ r: 255, g: 0, b: 0, a: 0 });
+      expect(hexToRgbaStrict("#ff0000ff")).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+    });
+
+    it("falls back to full opacity for 3- and 6-digit hex", () => {
+      expect(hexToRgbaStrict("#f00")).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+      expect(hexToRgbaStrict("#FF0000")).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+    });
+
+    it("returns null for invalid input", () => {
+      expect(hexToRgbaStrict("#abcd")).toBeNull();
+      expect(hexToRgbaStrict("nope")).toBeNull();
+    });
   });
   it("clamps alpha to 0-1", () => {
     expect(hexToRgba("#000", 1.5)).toEqual({ r: 0, g: 0, b: 0, a: 1 });

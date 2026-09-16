@@ -6,6 +6,7 @@ import { Sun } from "@phosphor-icons/react/Sun";
 import { TextAa } from "@phosphor-icons/react/TextAa";
 import { type Icon } from "@phosphor-icons/react/lib";
 import { CopyButton } from "../../shared/ui/CopyButton";
+import { SupportButton } from "../monetization/SupportButton";
 import { APP_BRAND } from "../../shared/config/brand";
 import { type Locale } from "../../shared/i18n";
 import { findPageForModule, type ColorTab, type TopModule } from "../router/routes";
@@ -28,6 +29,7 @@ type StudioHeaderProps = {
   toolNavigationActive: boolean;
   locale: Locale;
   onSwitchLocale: () => void;
+  onShowShortcuts: () => void;
 };
 
 export function StudioHeader({
@@ -41,6 +43,7 @@ export function StudioHeader({
   toolNavigationActive,
   locale,
   onSwitchLocale,
+  onShowShortcuts,
 }: StudioHeaderProps) {
   return (
     <header
@@ -118,6 +121,18 @@ export function StudioHeader({
         </nav>
 
         <div className="col-start-2 row-start-1 flex min-w-0 items-center justify-end gap-1 sm:gap-2 xl:col-start-3 xl:gap-3">
+          <SupportButton />
+          <button
+            type="button"
+            onClick={onShowShortcuts}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border font-mono text-xs font-bold transition"
+            style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+            title={locale === "en" ? "Keyboard shortcuts (?)" : "Pintasan keyboard (?)"}
+            aria-label={locale === "en" ? "Keyboard shortcuts" : "Pintasan keyboard"}
+            aria-haspopup="dialog"
+          >
+            ?
+          </button>
           <button
             type="button"
             onClick={onSwitchLocale}

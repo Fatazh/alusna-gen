@@ -6,7 +6,7 @@ import {
   ALUSNA_STUDIO_STORAGE_VERSION,
 } from "./migrations/studioStorage";
 import { sanitizePersistedStudioState } from "./persistence/sanitizeStudioState";
-import { studioStateStorage } from "./persistence/studioStateStorage";
+import { studioStateStorageAsync } from "./persistence/studioStateStorageAsync";
 import { STUDIO_LIMITS } from "./studio.constants";
 import { type StudioState, type Theme } from "./studio.types";
 
@@ -133,13 +133,15 @@ export const useStudio = create<StudioState>()(
             : { uploadedFonts: [...s.uploadedFonts.slice(-(STUDIO_LIMITS.uploadedFonts - 1)), f] },
         ),
 
+      activeBrandKitShareState: null,
+
       activeFontFamily: "Inter",
       setActiveFontFamily: (family) => set({ activeFontFamily: family }),
     }),
     {
       name: ALUSNA_STUDIO_STORAGE_KEY,
       version: ALUSNA_STUDIO_STORAGE_VERSION,
-      storage: createJSONStorage(() => studioStateStorage),
+      storage: createJSONStorage(() => studioStateStorageAsync),
       // Accept only validated fields from persisted/tampered legacy data.
       merge: (persisted, current) => ({
         ...current,

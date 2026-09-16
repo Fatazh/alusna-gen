@@ -7,9 +7,10 @@ import {
   rgbToHsv,
   randomColor,
   hexToRgb,
-} from "../model/color";
-import { searchColorNames } from "../model/colorNames";
-import { bestTextOn } from "../model/color";
+  hexToRgbaStrict,
+} from "@alusna/shared/color";
+import { searchColorNames } from "@alusna/shared/colorNames";
+import { bestTextOn } from "@alusna/shared/color";
 import { useLocale } from "../../../shared/i18n";
 
 type ColorPickerProps = {
@@ -106,10 +107,19 @@ export function ColorPicker({
             }}
             onChange={(e) => {
               const v = e.target.value;
-              // Allow typing freely; only characters that could form a hex code.
-              if (!/^#?[0-9a-fA-F]{0,6}$/.test(v)) return;
+              // Allow typing freely; only characters that could form a hex
+              // code (3/6/8 digits — 8 honors an embedded alpha channel).
+              if (!/^#?[0-9a-fA-F]{0,8}$/.test(v)) return;
               setHexText(v);
               const clean = v.startsWith("#") ? v : `#${v}`;
+              if (/^#[0-9a-fA-F]{8}$/.test(clean)) {
+                const parsed = hexToRgbaStrict(clean);
+                if (parsed) {
+                  onRgbChange({ r: parsed.r, g: parsed.g, b: parsed.b });
+                  onAlphaChange?.(parsed.a);
+                }
+                return;
+              }
               // Apply immediately when a full 6-digit hex is entered.
               if (/^#[0-9a-fA-F]{6}$/.test(clean)) {
                 onRgbChange({

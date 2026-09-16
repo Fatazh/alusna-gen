@@ -5,7 +5,7 @@ import { Palette } from "@phosphor-icons/react/Palette";
 import { PencilSimple } from "@phosphor-icons/react/PencilSimple";
 import { bestTextOn, type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
-import { useToast } from "../../../shared/ui/toastContext";
+import { useCopy } from "../../../shared/lib/useCopy";
 import { TONE_PROFILES, type BrandKit } from "../model/brandKit";
 import { loadGoogleFont } from "../../typography";
 import { useLocale } from "../../../shared/i18n";
@@ -42,7 +42,7 @@ export function PaletteTab({
   setTextColorOverride: (c: RGB | null) => void;
 }) {
   const { text } = useLocale();
-  const { show } = useToast();
+  const { copy } = useCopy();
   const toneStyle = TONE_PROFILES[kit.tone].style;
 
   // Auto-adjust toggle
@@ -233,10 +233,7 @@ export function PaletteTab({
                       aria-label={`Copy ${hex}`}
                       className="relative h-24 w-full cursor-pointer rounded-xl border border-black/10 transition hover:scale-105 hover:shadow-lg dark:border-white/10"
                       style={{ backgroundColor: hex }}
-                      onClick={() => {
-                        navigator.clipboard.writeText(hex);
-                        show(`✓ ${hex} copied!`);
-                      }}
+                      onClick={() => copy(hex)}
                     >
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                         <span className="rounded-md bg-black/50 px-2 py-1 text-[10px] font-medium text-white backdrop-blur">
@@ -487,6 +484,7 @@ export function PaletteTab({
                   </div>
                 </div>
                 <div
+                  data-user-palette-preview
                   className="border"
                   style={{
                     borderColor: rgbToHex(kit.primaryColor) + "30",

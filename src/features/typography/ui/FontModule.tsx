@@ -463,7 +463,7 @@ export function FontModule() {
                       activeFontFamily === f.family ? "var(--chip-active-bg)" : "transparent",
                   }}
                 >
-                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     {f.family}
                   </div>
                   <div
@@ -477,7 +477,7 @@ export function FontModule() {
                   </div>
                   <div
                     className="mt-1 text-[9px] uppercase tracking-wide"
-                    style={{ color: "var(--text-muted)" }}
+                    style={{ color: "var(--text-secondary)" }}
                   >
                     {f.category} · {f.weights.length} {text("weight", "weights")}
                     {f.styles.includes("italic") ? " · italic" : ""}
@@ -732,6 +732,7 @@ export function FontModule() {
                         }}
                       />
                       <div
+                        data-user-palette-preview
                         style={{
                           fontFamily: sampleFont,
                           fontWeight: effectiveWeight,

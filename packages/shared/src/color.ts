@@ -42,6 +42,32 @@ export function hexToRgba(hex: string, alpha = 1): RGBA | null {
   return { ...rgb, a: clamp01(alpha) };
 }
 
+/**
+ * Parse 3-, 6-, or 8-digit hex honoring an embedded alpha channel:
+ * `#RRGGBBAA` yields `a` in 0..1 instead of silently dropping it (plain
+ * hexToRgb ignores the last two digits, which misleads users pasting
+ * translucent colors). Returns null for invalid input.
+ */
+export function hexToRgbaStrict(hex: string): RGBA | null {
+  let h = hex.trim().replace(/^#/, "");
+  if (h.length === 3) {
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (!/^[0-9a-fA-F]{8}$/.test(h)) {
+    const rgb = hexToRgb(hex);
+    return rgb ? { ...rgb, a: 1 } : null;
+  }
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+    a: Math.round((parseInt(h.slice(6, 8), 16) / 255) * 1000) / 1000,
+  };
+}
+
 export function rgbaToHex({ r, g, b, a }: RGBA): string {
   return rgbToHex({ r, g, b }, a);
 }

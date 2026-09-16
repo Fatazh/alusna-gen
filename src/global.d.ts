@@ -8,7 +8,10 @@ declare global {
     readonly VITE_SPONSOR_URL?: string;
     readonly VITE_SPONSOR_TITLE?: string;
     readonly VITE_SPONSOR_TEXT?: string;
+    readonly VITE_SUPPORT_URL?: string;
+    readonly VITE_SUPPORT_TITLE?: string;
     readonly VITE_ANALYTICS_ENABLED?: string;
+    readonly VITE_GA4_ID?: string;
   }
 
   interface ImportMeta {

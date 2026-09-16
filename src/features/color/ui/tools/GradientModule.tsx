@@ -1,13 +1,18 @@
-import { useMemo, useRef, useState } from "react";
-import { hexToRgb } from "../../model/color";
-import { getColorName } from "../../model/colorNames";
+import { useMemo, useRef } from "react";
+import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
+import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
+import { hexToRgb } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { useLocale } from "../../../../shared/i18n";
+import { useHistoryState } from "../../../../shared/lib/useHistoryState";
+import { useUndoRedoShortcuts } from "../../../../shared/lib/useUndoRedoShortcuts";
 
 type Stop = { id: number; hex: string; pos: number };
 type GradientType = "linear" | "radial" | "conic";
+type GradientSnapshot = { stops: Stop[]; type: GradientType; angle: number };
 
 const TYPES: { id: GradientType; label: string }[] = [
   { id: "linear", label: "Linear" },
@@ -22,12 +27,44 @@ export function GradientModule() {
   const saveColor = useStudio((s) => s.saveColor);
 
   const nextId = useRef(2);
-  const [stops, setStops] = useState<Stop[]>([
-    { id: 0, hex: "#6366F1", pos: 0 },
-    { id: 1, hex: "#EC4899", pos: 100 },
-  ]);
-  const [type, setType] = useState<GradientType>("linear");
-  const [angle, setAngle] = useState(90);
+  const gradientHistory = useHistoryState<GradientSnapshot>(() => ({
+    stops: [
+      { id: 0, hex: "#6366F1", pos: 0 },
+      { id: 1, hex: "#EC4899", pos: 100 },
+    ],
+    type: "linear",
+    angle: 90,
+  }));
+  const snapshot = gradientHistory.value;
+  const { stops, type, angle } = snapshot;
+
+  useUndoRedoShortcuts({
+    undo: gradientHistory.undo,
+    redo: gradientHistory.redo,
+    canUndo: gradientHistory.canUndo,
+    canRedo: gradientHistory.canRedo,
+    enabled: true,
+  });
+
+  const pushSnapshot = (partial: Partial<GradientSnapshot>) =>
+    gradientHistory.push({ ...snapshot, ...partial });
+  const setStops = (next: Stop[]) => pushSnapshot({ stops: next });
+  const setType = (next: GradientType) => pushSnapshot({ type: next });
+
+  // Slider drags fire change per pixel; coalesce each gesture into ONE undo
+  // entry: push the pre-drag state once on pointer down, then replace present.
+  const coalescing = useRef(false);
+  const beginCoalesce = () => {
+    coalescing.current = true;
+    gradientHistory.push(snapshot);
+  };
+  const endCoalesce = () => {
+    coalescing.current = false;
+  };
+  const moveCoalesced = (partial: Partial<GradientSnapshot>) => {
+    if (coalescing.current) gradientHistory.replacePresent({ ...snapshot, ...partial });
+    else pushSnapshot(partial);
+  };
 
   const sortedStops = useMemo(() => [...stops].sort((a, b) => a.pos - b.pos), [stops]);
 
@@ -39,15 +76,16 @@ export function GradientModule() {
   }, [sortedStops, type, angle]);
 
   const updateStop = (id: number, partial: Partial<Stop>) =>
-    setStops((prev) => prev.map((s) => (s.id === id ? { ...s, ...partial } : s)));
+    setStops(stops.map((s) => (s.id === id ? { ...s, ...partial } : s)));
   const addStop = () => {
     if (stops.length >= 8) return;
     const id = nextId.current++;
     const last = sortedStops[sortedStops.length - 1];
-    setStops((prev) => [...prev, { id, hex: "#FFFFFF", pos: last.pos }]);
+    setStops([...stops, { id, hex: "#FFFFFF", pos: last.pos }]);
   };
-  const removeStop = (id: number) =>
-    setStops((prev) => (prev.length > 2 ? prev.filter((s) => s.id !== id) : prev));
+  const removeStop = (id: number) => {
+    if (stops.length > 2) setStops(stops.filter((s) => s.id !== id));
+  };
 
   const chipClass = "rounded-full border px-3 py-1.5 text-xs font-medium transition";
   const getChipStyle = (active: boolean): React.CSSProperties =>
@@ -83,6 +121,30 @@ export function GradientModule() {
                   {t.label}
                 </button>
               ))}
+              <div className="ml-auto flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={gradientHistory.undo}
+                  disabled={!gradientHistory.canUndo}
+                  className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                  title={text("Urungkan (Ctrl+Z)", "Undo (Ctrl+Z)")}
+                >
+                  <ArrowCounterClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+                  Undo
+                </button>
+                <button
+                  type="button"
+                  onClick={gradientHistory.redo}
+                  disabled={!gradientHistory.canRedo}
+                  className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                  title={text("Ulangi (Ctrl+Y)", "Redo (Ctrl+Y)")}
+                >
+                  <ArrowClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+                  Redo
+                </button>
+              </div>
               {type !== "radial" && (
                 <div
                   className="flex items-center gap-2 rounded-full border px-3 py-1"
@@ -96,8 +158,11 @@ export function GradientModule() {
                     min={0}
                     max={360}
                     value={angle}
-                    onChange={(e) => setAngle(Number(e.target.value))}
+                    onPointerDown={beginCoalesce}
+                    onPointerUp={endCoalesce}
+                    onChange={(e) => moveCoalesced({ angle: Number(e.target.value) })}
                     className="w-24"
+                    aria-label={text("Sudut gradien", "Gradient angle")}
                   />
                   <span
                     className="font-mono text-[11px]"
@@ -110,7 +175,7 @@ export function GradientModule() {
             </div>
 
             <div className="space-y-3">
-              {stops.map((s) => (
+              {stops.map((s, stopIndex) => (
                 <div
                   key={s.id}
                   className="flex items-center gap-3 rounded-xl border p-3"
@@ -118,12 +183,14 @@ export function GradientModule() {
                 >
                   <input
                     type="color"
+                    aria-label={`${text("Warna stop", "Stop color")} ${stopIndex + 1}`}
                     value={s.hex}
                     onChange={(e) => updateStop(s.id, { hex: e.target.value })}
                     className="h-10 w-12 rounded-lg"
                   />
                   <input
                     type="text"
+                    aria-label={`${text("Kode HEX stop", "Stop HEX code")} ${stopIndex + 1}`}
                     value={s.hex}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -144,8 +211,17 @@ export function GradientModule() {
                       min={0}
                       max={100}
                       value={s.pos}
-                      onChange={(e) => updateStop(s.id, { pos: Number(e.target.value) })}
+                      onPointerDown={beginCoalesce}
+                      onPointerUp={endCoalesce}
+                      onChange={(e) =>
+                        moveCoalesced({
+                          stops: stops.map((stop) =>
+                            stop.id === s.id ? { ...stop, pos: Number(e.target.value) } : stop,
+                          ),
+                        })
+                      }
                       className="w-full"
+                      aria-label={`${text("Posisi stop", "Stop position")} ${s.hex}`}
                     />
                     <span
                       className="w-10 text-right font-mono text-[11px]"

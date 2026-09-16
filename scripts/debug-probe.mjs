@@ -3,13 +3,7 @@
 import { chromium } from "@playwright/test";
 
 const BASE = "http://localhost:5173";
-const ROUTES = [
-  "/",
-  "/en/",
-  "/color-palette-generator/",
-  "/gradient-generator/",
-  "/font-pairing/",
-];
+const ROUTES = ["/", "/en/", "/color-palette-generator/", "/gradient-generator/", "/font-pairing/"];
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();

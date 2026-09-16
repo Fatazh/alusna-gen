@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { type SeoPage } from "../router/routes";
+import { type MetadataPage } from "../router/routes";
 import { createPageViewEvent, emitAnalyticsEvent } from "./analytics";
 
-export function usePageAnalytics(page: SeoPage): void {
+export function usePageAnalytics(page: MetadataPage): void {
   useEffect(() => {
     emitAnalyticsEvent(createPageViewEvent(page));
   }, [page]);

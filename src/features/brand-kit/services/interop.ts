@@ -80,6 +80,17 @@ export function brandKitToW3cTokens(kit: BrandKit): string {
   );
 }
 
+export function brandKitToCssVars(kit: BrandKit): string {
+  const lines = [
+    `  --brand-primary: ${rgbToHex(kit.primaryColor)};`,
+    `  --brand-secondary: ${rgbToHex(kit.secondaryColor)};`,
+    `  --brand-accent: ${rgbToHex(kit.accentColor)};`,
+    `  --brand-bg: ${rgbToHex(kit.backgroundColor)};`,
+    `  --brand-text: ${rgbToHex(kit.textColor)};`,
+  ];
+  return `:root {\n${lines.join("\n")}\n}`;
+}
+
 export function brandKitToTailwindConfig(kit: BrandKit): string {
   return `/** @type {import('tailwindcss').Config} */
 export default {

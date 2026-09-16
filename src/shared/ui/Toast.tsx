@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { ToastContext } from "./toastContext";
+import { ToastContext, resolveToastPresentation, type ShowToastOptions } from "./toastContext";
 
 // ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
-type ToastItem = { id: number; message: string };
+type ToastItem = { id: number; message: string; options: ShowToastOptions };
 
 // ---------------------------------------------------------------------------
 // Provider
@@ -14,10 +14,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const nextId = useRef(0);
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
-  const show = useCallback((message: string) => {
+  const show = useCallback((message: string, options: ShowToastOptions = {}) => {
     const id = nextId.current++;
     const normalizedMessage = message.replace(/^\s*✓\s*/, "");
-    setToasts((prev) => [...prev, { id, message: normalizedMessage }]);
+    setToasts((prev) => [...prev, { id, message: normalizedMessage, options }]);
     const timer = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
       timersRef.current.delete(id);
@@ -40,26 +40,28 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
       {/* Toast container — fixed bottom-center */}
       <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2">
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className="pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur border border-emerald-500/30 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
-            style={{
-              animation: "toast-in 0.25s ease-out, toast-out 0.3s ease-in 1.4s forwards",
-            }}
-          >
-            <svg
-              className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-200"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              stroke="currentColor"
+        {toasts.map((t) => {
+          const presentation = resolveToastPresentation(t.options);
+          return (
+            <div
+              key={t.id}
+              role="status"
+              className={`pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur ${presentation.className}`}
+              style={presentation.style}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-            {t.message}
-          </div>
-        ))}
+              <svg
+                className="h-5 w-5 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={3}
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              {t.message}
+            </div>
+          );
+        })}
       </div>
 
       {/* Keyframes injected once */}

@@ -1,20 +1,30 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
+import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import { ArrowRight } from "@phosphor-icons/react/ArrowRight";
 import { LockSimple } from "@phosphor-icons/react/LockSimple";
 import { LockSimpleOpen } from "@phosphor-icons/react/LockSimpleOpen";
 import { Plus } from "@phosphor-icons/react/Plus";
 import { Sparkle } from "@phosphor-icons/react/Sparkle";
-import { PALETTES, bestTextOn, hexToRgb, rgbToHex, type RGB } from "../../model/color";
-import { getColorName } from "../../model/colorNames";
+import { PALETTES, bestTextOn, hexToRgb, rgbToHex, type RGB } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
 import { ColorDetail } from "../Swatch";
 import { useLocale } from "../../../../shared/i18n";
+import { useHistoryState } from "../../../../shared/lib/useHistoryState";
+import { useUndoRedoShortcuts } from "../../../../shared/lib/useUndoRedoShortcuts";
 
 const WORKSPACE_PALETTES = [
   { name: "ALUSNA", colors: ["#1E40AF", "#D81B60", "#F2B705", "#F2F4F7", "#111111"] },
   ...PALETTES,
 ];
+
+type PatternSnapshot = {
+  paletteName: string;
+  colors: string[];
+  locked: number[];
+};
 
 export function PatternModule() {
   const { text } = useLocale();
@@ -26,26 +36,41 @@ export function PatternModule() {
   const saveColor = useStudio((s) => s.saveColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
 
-  const [activePalette, setActivePalette] = useState(WORKSPACE_PALETTES[0].name);
-  const [displayColors, setDisplayColors] = useState<string[]>([...WORKSPACE_PALETTES[0].colors]);
-  const [locked, setLocked] = useState<Set<number>>(() => new Set());
+  const paletteHistory = useHistoryState<PatternSnapshot>(() => ({
+    paletteName: WORKSPACE_PALETTES[0].name,
+    colors: [...WORKSPACE_PALETTES[0].colors],
+    locked: [],
+  }));
+  const current = paletteHistory.value;
+  const locked = useMemo(() => new Set(current.locked), [current.locked]);
+
+  useUndoRedoShortcuts({
+    undo: paletteHistory.undo,
+    redo: paletteHistory.redo,
+    canUndo: paletteHistory.canUndo,
+    canRedo: paletteHistory.canRedo,
+    enabled: true,
+  });
 
   const paletteRgbs = useMemo(
-    () => displayColors.map((hex) => hexToRgb(hex)).filter(Boolean) as RGB[],
-    [displayColors],
+    () => current.colors.map((hex) => hexToRgb(hex)).filter(Boolean) as RGB[],
+    [current.colors],
   );
 
   const applyPalette = (name: string) => {
     const next =
       WORKSPACE_PALETTES.find((palette) => palette.name === name) ?? WORKSPACE_PALETTES[0];
-    setActivePalette(next.name);
-    setDisplayColors((current) =>
-      next.colors.map((color, index) => (locked.has(index) ? current[index] : color)),
-    );
+    paletteHistory.push({
+      paletteName: next.name,
+      colors: next.colors.map((color, index) =>
+        locked.has(index) ? (current.colors[index] ?? color) : color,
+      ),
+      locked: [...locked],
+    });
   };
 
   const generatePalette = () => {
-    const candidates = WORKSPACE_PALETTES.filter((palette) => palette.name !== activePalette);
+    const candidates = WORKSPACE_PALETTES.filter((palette) => palette.name !== current.paletteName);
     const next = candidates[Math.floor(Math.random() * candidates.length)] ?? WORKSPACE_PALETTES[0];
     applyPalette(next.name);
   };
@@ -57,22 +82,24 @@ export function PatternModule() {
   };
 
   const toggleLock = (index: number) => {
-    setLocked((current) => {
-      const next = new Set(current);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
+    const next = new Set(locked);
+    if (next.has(index)) next.delete(index);
+    else next.add(index);
+    paletteHistory.push({ ...current, locked: [...next] });
   };
 
   const exportCss = () =>
-    `:root {\n${displayColors.map((color, index) => `  --color-${index + 1}: ${color};`).join("\n")}\n}`;
+    `:root {\n${current.colors.map((color, index) => `  --color-${index + 1}: ${color};`).join("\n")}\n}`;
 
-  const exportJson = () => JSON.stringify({ name: activePalette, colors: displayColors }, null, 2);
+  const exportJson = () =>
+    JSON.stringify({ name: current.paletteName, colors: current.colors }, null, 2);
 
   const exportTailwind = () => {
-    const values = displayColors
-      .map((color, index) => `        "${activePalette.toLowerCase()}-${index + 1}": "${color}",`)
+    const values = current.colors
+      .map(
+        (color, index) =>
+          `        "${current.paletteName.toLowerCase()}-${index + 1}": "${color}",`,
+      )
       .join("\n");
     return `// tailwind.config.js\nexport default {\n  theme: {\n    extend: {\n      colors: {\n${values}\n      },\n    },\n  },\n};`;
   };
@@ -85,8 +112,8 @@ export function PatternModule() {
     canvas.height = height;
     const context = canvas.getContext("2d");
     if (!context) return;
-    const swatchWidth = width / displayColors.length;
-    displayColors.forEach((hex, index) => {
+    const swatchWidth = width / current.colors.length;
+    current.colors.forEach((hex, index) => {
       context.fillStyle = hex;
       context.fillRect(index * swatchWidth, 0, swatchWidth, height);
       const rgb = hexToRgb(hex);
@@ -95,7 +122,7 @@ export function PatternModule() {
       context.fillText(hex, index * swatchWidth + 18, height - 24);
     });
     const link = document.createElement("a");
-    link.download = `${activePalette}-palette.png`;
+    link.download = `${current.paletteName}-palette.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
@@ -124,9 +151,35 @@ export function PatternModule() {
             {text("Eksplorasi palet yang siap dirujuk", "Explore a palette you can reference")}
           </h2>
         </div>
-        <span className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
-          {activePalette} · {displayColors.length} {text("warna", "colors")}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
+            {current.paletteName} · {current.colors.length} {text("warna", "colors")}
+          </span>
+          <div className="flex gap-1.5">
+            <button
+              type="button"
+              onClick={paletteHistory.undo}
+              disabled={!paletteHistory.canUndo}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition disabled:opacity-30"
+              style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+              title={text("Urungkan (Ctrl+Z)", "Undo (Ctrl+Z)")}
+              aria-label={text("Urungkan palet", "Undo palette")}
+            >
+              <ArrowCounterClockwise size={15} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={paletteHistory.redo}
+              disabled={!paletteHistory.canRedo}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition disabled:opacity-30"
+              style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+              title={text("Ulangi (Ctrl+Y)", "Redo (Ctrl+Y)")}
+              aria-label={text("Ulangi palet", "Redo palette")}
+            >
+              <ArrowClockwise size={15} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </header>
       <div className="grid lg:grid-cols-[290px_minmax(0,1fr)]">
         <aside
@@ -144,7 +197,7 @@ export function PatternModule() {
             style={{ borderColor: "var(--border)" }}
           >
             {WORKSPACE_PALETTES.map((palette) => {
-              const active = palette.name === activePalette;
+              const active = palette.name === current.paletteName;
               return (
                 <button
                   key={palette.name}
@@ -203,7 +256,7 @@ export function PatternModule() {
                 {text("Jumlah warna", "Color count")}
               </span>
               <span className="font-mono font-medium" style={{ color: "var(--text-primary)" }}>
-                {displayColors.length}
+                {current.colors.length}
               </span>
             </div>
             <button

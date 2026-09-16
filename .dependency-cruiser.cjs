@@ -60,6 +60,18 @@ module.exports = {
       from: { path: "^src/app" },
       to: { path: "^src/features/[^/]+/(?!(domain|index|loaders)\\.ts$)" },
     },
+    {
+      name: "shared-package-does-not-depend-on-app-source",
+      severity: "error",
+      from: { path: "^packages/shared" },
+      to: { path: "^src/" },
+    },
+    {
+      name: "shared-package-stays-framework-free",
+      severity: "error",
+      from: { path: "^packages/shared" },
+      to: { path: "^(react|react-dom|zustand)($|/)" },
+    },
   ],
   options: {
     doNotFollow: {

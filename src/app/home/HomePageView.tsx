@@ -183,7 +183,7 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
           <div>
             <p
               className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "var(--amber)" }}
+              style={{ color: "var(--amber-strong)" }}
             >
               Start with a brief
             </p>
@@ -236,7 +236,7 @@ export function HomePageView({ onNavigate }: { onNavigate: (path: string) => voi
           <div className="lg:col-span-4">
             <p
               className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "var(--magenta)" }}
+              style={{ color: "var(--magenta-strong)" }}
             >
               Reference library
             </p>

@@ -42,7 +42,8 @@ Saat ini terdapat 145 unit/contract test dan 30 browser E2E wajib. Satu E2E tamb
 ## Struktur
 
 - `src/app`: composition shell, provider, layout, router, SEO, trust pages, dan monetisasi
-- `src/features/color`: model, service, UI, serta lazy loader alat warna
+- `packages/shared`: paket workspace `@alusna/shared` — domain murni lintas aplikasi (ADR 013)
+- `src/features/color`: service, UI, serta lazy loader alat warna (model warna berada di `packages/shared`)
 - `src/features/typography`: katalog/validasi font, browser font service, dan UI
 - `src/features/design-system`: generator token, serializer, dan UI
 - `src/features/brand-kit`: model, interop, serializer HTML, dan UI Brand Kit
@@ -51,7 +52,7 @@ Saat ini terdapat 145 unit/contract test dan 30 browser E2E wajib. Satu E2E tamb
 
 ## Penyimpanan dan privasi
 
-Warna, palet, tema, font upload, dan brand kit disimpan secara lokal di browser pada storage versioned `alusna-studio`. Data lama `cikp-studio` disalin secara aman ketika ALUSNA pertama kali dibuka dan tetap dipertahankan sebagai rollback copy. Gambar yang dipakai untuk ekstraksi palet tidak dikirim ke server. Font dan logo yang dipersistensikan disimpan sebagai base64 sehingga penggunaan banyak file besar dapat mencapai quota browser; aplikasi akan menampilkan peringatan apabila penyimpanan gagal.
+Warna, palet, tema, font upload, dan brand kit disimpan secara lokal di browser pada **IndexedDB** (database `alusna-studio`, store `kv`) melalui adapter versioned zustand persist; jauh di atas batas ±5MB localStorage yang sebelumnya menampung font dan logo base64. Impor data dari localStorage lama dilakukan sekali: data `alusna-studio` sinkron maupun legacy `cikp-studio` disalin ke IndexedDB saat pertama kali dibuka dan tetap dipertahankan di localStorage sebagai rollback copy. Bila IndexedDB tidak tersedia, aplikasi otomatis memakai localStorage. Gambar yang dipakai untuk ekstraksi palet tidak dikirim ke server dan diproses di **Web Worker** (dengan fallback main-thread) agar UI tidak pernah freeze. Font dan logo yang dipersistensikan disimpan sebagai base64; aplikasi akan menampilkan peringatan apabila penyimpanan gagal.
 
 Google Fonts dimuat dari `fonts.googleapis.com` dan `fonts.gstatic.com` ketika font terkait dipilih. Hal ini memerlukan koneksi internet dan mengirim permintaan ke layanan Google.
 
@@ -154,5 +155,30 @@ VITE_SPONSOR_TEXT=Deskripsi singkat sponsor
 ```
 
 Tautan sponsor diberi atribut `rel="sponsored"`, penempatannya dilabeli `Iklan / Sponsor`, dan pengguna dapat membuka `/kebijakan-iklan` untuk membaca disclosure. Konfigurasi yang tidak lengkap atau URL non-HTTP(S) tidak dirender.
+
+Tombol dukung/donasi adalah slot terpisah yang tidak ditandai sebagai iklan (donasi adalah dukungan komunitas, bukan penempatan komersial):
+
+```sh
+VITE_SUPPORT_URL=https://trakteer.id/alusna/tip
+VITE_SUPPORT_TITLE=Trakteer
+```
+
+Tombol ini tampil di header hanya ketika kedua variabel terisi, membuka tautan di tab baru dengan `rel="noopener noreferrer"`, dan tidak diberi atribut `sponsored`.
+
+### Analitik tanpa cookie (opsional, fail-closed)
+
+Pengukuran halaman nonaktif total secara bawaan. GA4 tanpa cookie hanya aktif bila KETIGA syarat terpenuhi:
+
+1. Konfigurasi build memuat ID pengukuran valid:
+
+   ```sh
+   VITE_ANALYTICS_ENABLED=true
+   VITE_GA4_ID=G-XXXXXXXXXX
+   ```
+
+2. Pengunjung menekan **Izinkan analitik** pada banner persetujuan (keputusan disimpan di `localStorage` kunci `alusna:analytics-consent`, dan dapat diubah dengan menghapus data situs).
+3. Sinyal Consent Mode v2 tetap `denied` dan tidak ada script GA4 yang dimuat sebelum persetujuan; sesudahnya hanya event `page_view` internal yang diteruskan — nama halaman saja, tanpa string kueri maupun konten pengguna.
+
+CSP produksi hanya mengizinkan `googletagmanager.com` ketika GA4 benar-benar dikonfigurasi saat build; tanpa konfigurasi itu, CSP ketat tanpa pihak ketiga tetap dipakai. Varian CSP untuk host statis tersedia sebagai komentar di `public/_headers` dan `deploy/nginx-security.conf.example`.
 
 Tidak ada script jaringan iklan pihak ketiga yang aktif secara default. Sebelum menambahkan Google AdSense atau penyedia serupa, tinjau CSP, cookie/identifier, consent, kebijakan privasi, dan persyaratan wilayah sesuai dokumentasi penyedia yang dipilih.

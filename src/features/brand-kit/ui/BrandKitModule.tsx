@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { BracketsCurly } from "@phosphor-icons/react/BracketsCurly";
 import { Buildings } from "@phosphor-icons/react/Buildings";
 import { Camera } from "@phosphor-icons/react/Camera";
@@ -14,6 +14,7 @@ import { UploadSimple } from "@phosphor-icons/react/UploadSimple";
 import { Wheelchair } from "@phosphor-icons/react/Wheelchair";
 import { type Icon } from "@phosphor-icons/react/lib";
 import { useStudio } from "../../../store/studio";
+import { decodeToolShareState } from "../../../shared/lib/toolShareState";
 import { type RGB, rgbToHex, rgbToHsl, rotateHue } from "../../color";
 import {
   brandKitToTailwindConfig,
@@ -21,6 +22,7 @@ import {
   parseBrandKitImport,
 } from "../services/interop";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
+import { downloadTextFile } from "../../../shared/services/download";
 import { useToast } from "../../../shared/ui/toastContext";
 import { PaletteTab } from "./PaletteTab";
 import { TypographyTab } from "./TypographyTab";
@@ -43,6 +45,36 @@ const TONE_ICONS: Record<BrandTone, Icon> = {
   bold: Lightning,
 };
 
+function readBrandKitShareState(): {
+  brandName?: string;
+  tagline?: string;
+  tone?: BrandTone;
+  primaryOverride?: RGB;
+  secondaryOverride?: RGB;
+  accentOverride?: RGB;
+  backgroundOverride?: RGB;
+  textColorOverride?: RGB;
+  headlineFontOverride?: string;
+  bodyFontOverride?: string;
+  monoFontOverride?: string;
+} | null {
+  const decoded = decodeToolShareState(new URLSearchParams(window.location.search));
+  if (!decoded?.b) return null;
+  return {
+    brandName: decoded.b.brandName,
+    tagline: decoded.b.tagline || undefined,
+    tone: decoded.b.tone as BrandTone,
+    primaryOverride: decoded.b.primaryColor,
+    secondaryOverride: decoded.b.secondaryColor,
+    accentOverride: decoded.b.accentColor,
+    backgroundOverride: decoded.b.backgroundColor,
+    textColorOverride: decoded.b.textColor,
+    headlineFontOverride: decoded.b.headlineFont,
+    bodyFontOverride: decoded.b.bodyFont,
+    monoFontOverride: decoded.b.monoFont,
+  };
+}
+
 export function BrandKitModule() {
   const { text } = useLocale();
   const selectedColor = useStudio((s) => s.selectedColor);
@@ -51,9 +83,10 @@ export function BrandKitModule() {
   const saveBrandKit = useStudio((s) => s.saveBrandKit);
   const deleteBrandKit = useStudio((s) => s.deleteBrandKit);
 
-  const [brandName, setBrandName] = useState("My Brand");
-  const [tagline, setTagline] = useState("");
-  const [tone, setTone] = useState<BrandTone>("modern");
+  const sharedBrandKit = useMemo(() => readBrandKitShareState(), []);
+  const [brandName, setBrandName] = useState(sharedBrandKit?.brandName ?? "My Brand");
+  const [tagline, setTagline] = useState(sharedBrandKit?.tagline ?? "");
+  const [tone, setTone] = useState<BrandTone>(sharedBrandKit?.tone ?? "modern");
   const [logoDataUrl, setLogoDataUrl] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<
     "palette" | "typography" | "guidelines" | "export" | "accessibility"
@@ -61,15 +94,31 @@ export function BrandKitModule() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
 
-  // Custom overrides
-  const [primaryOverride, setPrimaryOverride] = useState<RGB | null>(null);
-  const [secondaryOverride, setSecondaryOverride] = useState<RGB | null>(null);
-  const [accentOverride, setAccentOverride] = useState<RGB | null>(null);
-  const [backgroundOverride, setBackgroundOverride] = useState<RGB | null>(null);
-  const [textColorOverride, setTextColorOverride] = useState<RGB | null>(null);
-  const [headlineFontOverride, setHeadlineFontOverride] = useState<string | null>(null);
-  const [bodyFontOverride, setBodyFontOverride] = useState<string | null>(null);
-  const [monoFontOverride, setMonoFontOverride] = useState<string | null>(null);
+  // Custom overrides (initialized from a shared brand kit URL when present)
+  const [primaryOverride, setPrimaryOverride] = useState<RGB | null>(
+    sharedBrandKit?.primaryOverride ?? null,
+  );
+  const [secondaryOverride, setSecondaryOverride] = useState<RGB | null>(
+    sharedBrandKit?.secondaryOverride ?? null,
+  );
+  const [accentOverride, setAccentOverride] = useState<RGB | null>(
+    sharedBrandKit?.accentOverride ?? null,
+  );
+  const [backgroundOverride, setBackgroundOverride] = useState<RGB | null>(
+    sharedBrandKit?.backgroundOverride ?? null,
+  );
+  const [textColorOverride, setTextColorOverride] = useState<RGB | null>(
+    sharedBrandKit?.textColorOverride ?? null,
+  );
+  const [headlineFontOverride, setHeadlineFontOverride] = useState<string | null>(
+    sharedBrandKit?.headlineFontOverride ?? null,
+  );
+  const [bodyFontOverride, setBodyFontOverride] = useState<string | null>(
+    sharedBrandKit?.bodyFontOverride ?? null,
+  );
+  const [monoFontOverride, setMonoFontOverride] = useState<string | null>(
+    sharedBrandKit?.monoFontOverride ?? null,
+  );
 
   const effectivePrimary = primaryOverride ?? selectedColor;
 
@@ -111,6 +160,34 @@ export function BrandKitModule() {
       triadic2: rotateHue(effectivePrimary, 240),
     };
   }, [effectivePrimary]);
+
+  // Publish the actively edited kit to the store (debounced: persist writes
+  // on every store change, so raw per-keystroke publishing would hammer
+  // IndexedDB). useToolShareUrl then shares exactly what the user sees
+  // instead of silently falling back to the most recently saved kit.
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const next = {
+        name: brandName,
+        brandName,
+        tagline,
+        primaryColor: effectivePrimary,
+        secondaryColor: kit.secondaryColor,
+        accentColor: kit.accentColor,
+        backgroundColor: kit.backgroundColor,
+        textColor: kit.textColor,
+        headlineFont: kit.headlineFont,
+        bodyFont: kit.bodyFont,
+        monoFont: kit.monoFont,
+        tone,
+        ...(logoDataUrl ? { logoDataUrl } : {}),
+      };
+      const current = useStudio.getState().activeBrandKitShareState;
+      if (current && JSON.stringify(current) === JSON.stringify(next)) return;
+      useStudio.setState({ activeBrandKitShareState: next });
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [brandName, tagline, tone, effectivePrimary, kit, logoDataUrl]);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -208,13 +285,11 @@ export function BrandKitModule() {
 
   const handleExportHtml = useCallback(() => {
     const html = brandKitToHtml(kit);
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-guidelines.html`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadTextFile(
+      html,
+      `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-guidelines.html`,
+      "text/html",
+    );
     show(text("✓ Panduan brand diunduh!", "✓ Brand guidelines downloaded!"));
   }, [kit, brandName, show, text]);
 
@@ -237,24 +312,13 @@ export function BrandKitModule() {
       },
       guidelines: kit.guidelines,
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-kit.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadTextFile(
+      JSON.stringify(data, null, 2),
+      `${brandName.toLowerCase().replace(/\s+/g, "-")}-brand-kit.json`,
+      "application/json",
+    );
     show(text("✓ JSON Brand Kit diunduh!", "✓ Brand kit JSON downloaded!"));
   }, [kit, brandName, show, text]);
-
-  const downloadText = useCallback((content: string, filename: string, type: string) => {
-    const url = URL.createObjectURL(new Blob([content], { type }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-  }, []);
 
   const handleImportJson = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -356,6 +420,7 @@ export function BrandKitModule() {
                 </p>
                 <input
                   type="text"
+                  aria-label={text("Nama brand", "Brand name")}
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value || "My Brand")}
                   className="mt-1 w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:border-[var(--accent)]"
@@ -375,6 +440,7 @@ export function BrandKitModule() {
                 </p>
                 <input
                   type="text"
+                  aria-label={text("Tagline", "Tagline")}
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
                   placeholder="Your brand tagline..."
@@ -562,7 +628,7 @@ export function BrandKitModule() {
           onExportHtml={handleExportHtml}
           onExportJson={handleExportJson}
           onExportW3cTokens={() => {
-            downloadText(
+            downloadTextFile(
               brandKitToW3cTokens(kit),
               `${brandName.toLowerCase().replace(/\s+/g, "-")}-tokens.json`,
               "application/json",
@@ -570,7 +636,7 @@ export function BrandKitModule() {
             show(text("✓ Token W3C diunduh!", "✓ W3C design tokens downloaded!"));
           }}
           onExportTailwind={() => {
-            downloadText(
+            downloadTextFile(
               brandKitToTailwindConfig(kit),
               `${brandName.toLowerCase().replace(/\s+/g, "-")}-tailwind.config.js`,
               "text/javascript",

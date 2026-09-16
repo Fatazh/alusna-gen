@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { rgbToHex, contrastRatio, type RGB } from "../../model/color";
+import { rgbToHex, contrastRatio, type RGB } from "@alusna/shared/color";
 import {
   simulateColorBlindness,
   COLOR_BLIND_TYPES,
   type ColorBlindType,
-} from "../../model/colorBlind";
-import { getColorName } from "../../model/colorNames";
+} from "@alusna/shared/colorBlind";
+import { getColorName } from "@alusna/shared/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { useLocale } from "../../../../shared/i18n";
@@ -129,6 +129,7 @@ export function AccessibilityModule() {
                   {getColorName(selectedColor).label}
                 </p>
                 <p
+                  data-user-palette-preview
                   className="mt-1 text-sm"
                   style={{ color: rgbToHex(sim({ r: 240, g: 240, b: 240 })) }}
                 >
@@ -166,8 +167,12 @@ export function AccessibilityModule() {
             style={{ backgroundColor: "var(--chip-bg)" }}
           >
             <span
-              className="font-mono text-sm"
-              style={{ color: worstContrast >= 3 ? "#34D399" : "#FB7185" }}
+              className={
+                "font-mono text-sm font-semibold " +
+                (worstContrast >= 3
+                  ? "text-emerald-800 dark:text-emerald-300"
+                  : "text-rose-800 dark:text-rose-300")
+              }
             >
               {worstContrast.toFixed(2)}
             </span>

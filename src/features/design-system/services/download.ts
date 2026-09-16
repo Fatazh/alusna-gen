@@ -1,5 +1,6 @@
 import { type DesignSystem } from "../model/designSystem";
 import { EXPORT_FILE_META, exportDesignSystem, type ExportFormat } from "./serializers";
+import { downloadTextFile } from "../../../shared/services/download";
 
 export type DesignSystemExportFile = {
   filename: string;
@@ -22,10 +23,5 @@ export function createDesignSystemExportFile(
 
 export function downloadDesignSystemExport(system: DesignSystem, format: ExportFormat): void {
   const file = createDesignSystemExportFile(system, format);
-  const url = URL.createObjectURL(new Blob([file.content], { type: `${file.mime};charset=utf-8` }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = file.filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  downloadTextFile(file.content, file.filename, file.mime);
 }

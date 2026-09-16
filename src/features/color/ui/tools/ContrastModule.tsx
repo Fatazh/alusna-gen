@@ -3,7 +3,7 @@ import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
 import { ArrowDown } from "@phosphor-icons/react/ArrowDown";
 import { Swap } from "@phosphor-icons/react/Swap";
 import { XCircle } from "@phosphor-icons/react/XCircle";
-import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "../../model/color";
+import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "@alusna/shared/color";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
@@ -20,14 +20,14 @@ function getWCAGLevel(ratio: number): WCAGLevel {
 }
 
 const LEVEL_META: Record<WCAGLevel, { label: string; color: string; bg: string }> = {
-  AAA: { label: "AAA", color: "text-emerald-600 dark:text-emerald-300", bg: "bg-emerald-500/15" },
-  AA: { label: "AA", color: "text-green-600 dark:text-green-300", bg: "bg-green-500/15" },
+  AAA: { label: "AAA", color: "text-emerald-800 dark:text-emerald-300", bg: "bg-emerald-500/15" },
+  AA: { label: "AA", color: "text-green-800 dark:text-green-300", bg: "bg-green-500/15" },
   AALarge: {
     label: "AA Large",
-    color: "text-amber-600 dark:text-amber-300",
+    color: "text-amber-900 dark:text-amber-300",
     bg: "bg-amber-500/15",
   },
-  Fail: { label: "Fail", color: "text-rose-600 dark:text-rose-300", bg: "bg-rose-500/15" },
+  Fail: { label: "Fail", color: "text-rose-800 dark:text-rose-300", bg: "bg-rose-500/15" },
 };
 
 const PRESETS: { labelId: string; labelEn: string; fg: RGB; bg: RGB }[] = [
@@ -159,6 +159,7 @@ export function ContrastModule() {
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
+                    aria-label={text("Warna depan", "Foreground color")}
                     value={fgHex}
                     onChange={(e) => {
                       const rgb = hexToRgb(e.target.value);
@@ -168,6 +169,7 @@ export function ContrastModule() {
                   />
                   <input
                     type="text"
+                    aria-label={text("Kode HEX warna depan", "Foreground HEX code")}
                     value={fgHex}
                     onChange={(e) => {
                       const rgb = hexToRgb(e.target.value);
@@ -192,6 +194,7 @@ export function ContrastModule() {
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
+                    aria-label={text("Warna latar", "Background color")}
                     value={bgHex}
                     onChange={(e) => {
                       const rgb = hexToRgb(e.target.value);
@@ -201,6 +204,7 @@ export function ContrastModule() {
                   />
                   <input
                     type="text"
+                    aria-label={text("Kode HEX warna latar", "Background HEX code")}
                     value={bgHex}
                     onChange={(e) => {
                       const rgb = hexToRgb(e.target.value);
@@ -354,8 +358,8 @@ export function ContrastModule() {
                         className={cn(
                           "text-sm font-medium",
                           pass
-                            ? "text-emerald-600 dark:text-emerald-300"
-                            : "text-rose-600 dark:text-rose-300",
+                            ? "text-emerald-800 dark:text-emerald-300"
+                            : "text-rose-800 dark:text-rose-300",
                         )}
                       >
                         {text(req.labelId, req.labelEn)}
@@ -374,13 +378,13 @@ export function ContrastModule() {
                       {pass ? (
                         <CheckCircle
                           size={18}
-                          className="text-emerald-500"
+                          className="text-emerald-800 dark:text-emerald-300"
                           aria-label={text("Lulus", "Pass")}
                         />
                       ) : (
                         <XCircle
                           size={18}
-                          className="text-rose-500"
+                          className="text-rose-800 dark:text-rose-300"
                           aria-label={text("Tidak lulus", "Fail")}
                         />
                       )}

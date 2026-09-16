@@ -3,16 +3,24 @@ import react from "@vitejs/plugin-react";
 import { findAlternatePage, PUBLIC_PAGES } from "./src/app/router/routes.ts";
 import { createStaticPageContent } from "./src/app/seo/staticPageContent.ts";
 import { APP_BRAND } from "./src/shared/config/brand.ts";
+import { resolveGa4MeasurementId } from "./src/app/analytics/ga4Config.ts";
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-function productionCsp(): Plugin {
+function isAnalyticsMasterSwitchEnabled(value: string | undefined): boolean {
+  return value?.trim().toLowerCase() === "true";
+}
+
+function productionCsp(ga4Enabled: boolean): Plugin {
   return {
     name: `${APP_BRAND.name.toLowerCase()}-production-csp`,
     enforce: "post",
     transformIndexHtml(html) {
-      return html.replace("script-src 'self' 'unsafe-inline';", "script-src 'self';");
+      return html.replace(
+        "script-src 'self' 'unsafe-inline';",
+        ga4Enabled ? "script-src 'self' https://www.googletagmanager.com;" : "script-src 'self';",
+      );
     },
   };
 }
@@ -94,10 +102,16 @@ function staticSeoPages(siteUrl: string): Plugin {
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, ".", "VITE_");
+  // GA4 sources are allowlisted only when the destination is genuinely
+  // configured AND the master switch is on; otherwise the strict CSP stands.
+  const ga4Enabled =
+    command === "build" &&
+    isAnalyticsMasterSwitchEnabled(env.VITE_ANALYTICS_ENABLED) &&
+    resolveGa4MeasurementId(env.VITE_GA4_ID) !== null;
   return {
     plugins: [
       react(),
-      ...(command === "build" ? [productionCsp()] : []),
+      ...(command === "build" ? [productionCsp(ga4Enabled)] : []),
       staticSeoPages(env.VITE_SITE_URL ?? ""),
     ],
     server: { port: 5173 },

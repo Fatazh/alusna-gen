@@ -1,5 +1,5 @@
 import { APP_BRAND } from "../../shared/config/brand";
-import { type SeoPage } from "../router/routes";
+import { type MetadataPage } from "../router/routes";
 import { findAlternatePage } from "../router/routes";
 import { LOCALE_META } from "../../shared/i18n";
 
@@ -12,7 +12,7 @@ export function buildCanonicalUrl(
   return `${origin}${path}`;
 }
 
-export function createStructuredData(page: SeoPage, canonicalUrl: string) {
+export function createStructuredData(page: MetadataPage, canonicalUrl: string) {
   const inLanguage = LOCALE_META[page.locale].schemaLanguage;
   if (page.kind === "home") {
     return {
@@ -23,6 +23,18 @@ export function createStructuredData(page: SeoPage, canonicalUrl: string) {
       description: page.description,
       url: canonicalUrl,
       inLanguage,
+    };
+  }
+
+  if (page.kind === "not-found") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${page.heading} — ${APP_BRAND.name}`,
+      description: page.description,
+      url: canonicalUrl,
+      inLanguage,
+      isPartOf: { "@type": "WebSite", name: APP_BRAND.name },
     };
   }
 
@@ -54,14 +66,23 @@ export function createStructuredData(page: SeoPage, canonicalUrl: string) {
   };
 }
 
-export function applyPageMetadata(page: SeoPage): void {
+export function applyPageMetadata(page: MetadataPage): void {
+  const isNotFound: boolean = page.kind === "not-found";
+  // NotFoundPage carries the homepage path on purpose: it renders at unknown
+  // URLs, and its canonical must stay the site root (never itself).
+  const canonicalPath = isNotFound ? (page.locale === "en" ? "/en" : "/") : page.path;
   const canonicalUrl = buildCanonicalUrl(
-    page.path,
+    canonicalPath,
     window.location.origin,
     import.meta.env.VITE_SITE_URL,
   );
   document.title = page.title;
   document.documentElement.lang = LOCALE_META[page.locale].htmlLang;
+
+  upsertMeta('meta[name="robots"]', {
+    name: "robots",
+    content: isNotFound ? "noindex, follow" : "index, follow",
+  });
   upsertMeta('meta[name="description"]', { name: "description", content: page.description });
   upsertMeta('meta[property="og:title"]', { property: "og:title", content: page.title });
   upsertMeta('meta[property="og:site_name"]', {

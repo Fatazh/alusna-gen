@@ -9,9 +9,10 @@ import { Palette } from "@phosphor-icons/react/Palette";
 import { Wind } from "@phosphor-icons/react/Wind";
 import { rgbToHex } from "../../color";
 import { Card, CardHeader, CardBody } from "../../../shared/ui/Card";
-import { useToast } from "../../../shared/ui/toastContext";
+import { useCopy } from "../../../shared/lib/useCopy";
 import { useLocale } from "../../../shared/i18n";
 import { type BrandKit } from "../model/brandKit";
+import { brandKitToCssVars } from "../services/interop";
 
 // ---------------------------------------------------------------------------
 // Export Tab
@@ -30,7 +31,7 @@ export function ExportTab({
   onExportW3cTokens: () => void;
   onExportTailwind: () => void;
 }) {
-  const { show } = useToast();
+  const { copy } = useCopy();
   const { text } = useLocale();
 
   const jsonPreview = useMemo(() => {
@@ -193,10 +194,9 @@ export type BrandTheme = typeof brandTheme;`;
             </button>
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(jsonPreview);
-                show(text("✓ JSON Brand Kit disalin!", "✓ Brand kit JSON copied!"));
-              }}
+              onClick={() =>
+                copy(jsonPreview, text("✓ JSON Brand Kit disalin!", "✓ Brand kit JSON copied!"))
+              }
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-[var(--accent)]"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
@@ -214,11 +214,12 @@ export type BrandTheme = typeof brandTheme;`;
             </button>
             <button
               type="button"
-              onClick={() => {
-                const cssVars = `:root {\n  --brand-primary: ${rgbToHex(kit.primaryColor)};\n  --brand-secondary: ${rgbToHex(kit.secondaryColor)};\n  --brand-accent: ${rgbToHex(kit.accentColor)};\n  --brand-bg: ${rgbToHex(kit.backgroundColor)};\n  --brand-text: ${rgbToHex(kit.textColor)};\n}`;
-                navigator.clipboard.writeText(cssVars);
-                show(text("✓ CSS Variables disalin!", "✓ CSS Variables copied!"));
-              }}
+              onClick={() =>
+                copy(
+                  brandKitToCssVars(kit),
+                  text("✓ CSS Variables disalin!", "✓ CSS Variables copied!"),
+                )
+              }
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-[var(--accent)]"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
@@ -236,10 +237,9 @@ export type BrandTheme = typeof brandTheme;`;
             </button>
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(scssPreview);
-                show(text("✓ SCSS Variables disalin!", "✓ SCSS Variables copied!"));
-              }}
+              onClick={() =>
+                copy(scssPreview, text("✓ SCSS Variables disalin!", "✓ SCSS Variables copied!"))
+              }
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-[var(--accent)]"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
@@ -257,10 +257,12 @@ export type BrandTheme = typeof brandTheme;`;
             </button>
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(reactNativePreview);
-                show(text("✓ Tema React Native disalin!", "✓ React Native theme copied!"));
-              }}
+              onClick={() =>
+                copy(
+                  reactNativePreview,
+                  text("✓ Tema React Native disalin!", "✓ React Native theme copied!"),
+                )
+              }
               className="flex items-center gap-3 rounded-xl border p-4 text-left transition hover:border-[var(--accent)]"
               style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
             >
@@ -291,10 +293,7 @@ export type BrandTheme = typeof brandTheme;`;
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(jsonPreview);
-                  show(text("✓ JSON disalin!", "✓ JSON copied!"));
-                }}
+                onClick={() => copy(jsonPreview, text("✓ JSON disalin!", "✓ JSON copied!"))}
                 className="rounded-lg border px-3 py-1.5 text-xs transition"
                 style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
               >
@@ -302,10 +301,7 @@ export type BrandTheme = typeof brandTheme;`;
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(scssPreview);
-                  show(text("✓ SCSS disalin!", "✓ SCSS copied!"));
-                }}
+                onClick={() => copy(scssPreview, text("✓ SCSS disalin!", "✓ SCSS copied!"))}
                 className="rounded-lg border px-3 py-1.5 text-xs transition"
                 style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
               >
@@ -313,10 +309,12 @@ export type BrandTheme = typeof brandTheme;`;
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(reactNativePreview);
-                  show(text("✓ React Native disalin!", "✓ React Native copied!"));
-                }}
+                onClick={() =>
+                  copy(
+                    reactNativePreview,
+                    text("✓ React Native disalin!", "✓ React Native copied!"),
+                  )
+                }
                 className="rounded-lg border px-3 py-1.5 text-xs transition"
                 style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
               >

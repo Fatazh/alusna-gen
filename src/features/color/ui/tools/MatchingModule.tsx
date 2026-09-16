@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { ArrowClockwise } from "@phosphor-icons/react/ArrowClockwise";
+import { ArrowCounterClockwise } from "@phosphor-icons/react/ArrowCounterClockwise";
 import {
   harmony,
   rgbToHex,
@@ -6,16 +8,18 @@ import {
   type RGB,
   contrastRatio,
   bestTextOn,
-} from "../../model/color";
-import { getColorName } from "../../model/colorNames";
-import { getSmartPairings, ROLE_META, type ColorPair } from "../../model/colorMatch";
+} from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
+import { getSmartPairings, ROLE_META, type ColorPair } from "@alusna/shared/colorMatch";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { Swatch, ColorDetail } from "../Swatch";
 import { ColorPicker } from "../ColorPicker";
 import { cn } from "../../../../shared/lib/cn";
-import { useToast } from "../../../../shared/ui/toastContext";
+import { useCopy } from "../../../../shared/lib/useCopy";
 import { useLocale } from "../../../../shared/i18n";
+import { useHistoryState } from "../../../../shared/lib/useHistoryState";
+import { useUndoRedoShortcuts } from "../../../../shared/lib/useUndoRedoShortcuts";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -30,6 +34,7 @@ const HARMONIES: { id: HarmonyType; label: string; desc: string }[] = [
 ];
 
 type View = "smart" | "classic";
+type MatchingSnapshot = { view: View; harmonyType: HarmonyType };
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -43,8 +48,22 @@ export function MatchingModule() {
   const setSelectedAlpha = useStudio((s) => s.setSelectedAlpha);
   const saveColor = useStudio((s) => s.saveColor);
 
-  const [view, setView] = useState<View>("smart");
-  const [harmonyType, setHarmonyType] = useState<HarmonyType>("complementary");
+  const matchingHistory = useHistoryState<MatchingSnapshot>(() => ({
+    view: "smart",
+    harmonyType: "complementary",
+  }));
+  const { view, harmonyType } = matchingHistory.value;
+  const setView = (next: View) => matchingHistory.push({ ...matchingHistory.value, view: next });
+  const setHarmonyType = (next: HarmonyType) =>
+    matchingHistory.push({ ...matchingHistory.value, harmonyType: next });
+
+  useUndoRedoShortcuts({
+    undo: matchingHistory.undo,
+    redo: matchingHistory.redo,
+    canUndo: matchingHistory.canUndo,
+    canRedo: matchingHistory.canRedo,
+    enabled: true,
+  });
 
   const selectWithHistory = (rgb: RGB) => {
     setSelectedColor(rgb);
@@ -69,6 +88,30 @@ export function MatchingModule() {
           <ViewTab active={view === "classic"} onClick={() => setView("classic")}>
             {text("Harmoni Klasik", "Classic harmony")}
           </ViewTab>
+          <div className="ml-auto flex gap-1.5">
+            <button
+              type="button"
+              onClick={matchingHistory.undo}
+              disabled={!matchingHistory.canUndo}
+              className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
+              style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+              title={text("Urungkan (Ctrl+Z)", "Undo (Ctrl+Z)")}
+            >
+              <ArrowCounterClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+              Undo
+            </button>
+            <button
+              type="button"
+              onClick={matchingHistory.redo}
+              disabled={!matchingHistory.canRedo}
+              className="rounded-md border px-2.5 py-1 text-[11px] font-medium transition disabled:opacity-30"
+              style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+              title={text("Ulangi (Ctrl+Y)", "Redo (Ctrl+Y)")}
+            >
+              <ArrowClockwise size={13} className="mr-1 inline" aria-hidden="true" />
+              Redo
+            </button>
+          </div>
         </div>
 
         {/* ── SMART VIEW ── */}
@@ -190,16 +233,11 @@ function PairCard({
   const hex = rgbToHex(pair.rgb);
   const textCol = bestTextOn(pair.rgb);
   const colorInfo = getColorName(pair.rgb);
-  const { show } = useToast();
+  const { copy } = useCopy();
 
-  const copyHex = async (e: React.MouseEvent) => {
+  const copyHex = (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(hex);
-      show(`✓ ${hex} berhasil disalin!`);
-    } catch {
-      // fail silently
-    }
+    copy(hex);
   };
 
   return (
@@ -299,6 +337,7 @@ function PalettePreview({ primary, pairs }: { primary: RGB; pairs: ColorPair[] }
         Preview Penggunaan
       </p>
       <div
+        data-user-palette-preview
         className="rounded-2xl border p-5 space-y-4"
         style={{ backgroundColor: bgHex, borderColor: "var(--border)" }}
       >

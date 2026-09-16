@@ -1,8 +1,8 @@
-import { type RGB, rgbToHex, bestTextOn, describe, formatRgba } from "../model/color";
-import { getColorName } from "../model/colorNames";
+import { type RGB, rgbToHex, bestTextOn, describe, formatRgba } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
 import { CopyButton } from "../../../shared/ui/CopyButton";
 import { cn } from "../../../shared/lib/cn";
-import { useToast } from "../../../shared/ui/toastContext";
+import { useCopy } from "../../../shared/lib/useCopy";
 import { useLocale } from "../../../shared/i18n";
 import { Plus } from "@phosphor-icons/react/Plus";
 
@@ -44,8 +44,8 @@ export function ColorDetail({ rgb, alpha = 1, showAlpha = false, className }: Co
           className={cn(
             "rounded-full px-2 py-0.5 text-[10px] font-medium",
             colorInfo.isVariant
-              ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
-              : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300",
+              ? "bg-amber-500/15 text-amber-900 dark:text-amber-300"
+              : "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300",
           )}
         >
           {colorInfo.isVariant ? text("Varian", "Variant") : text("Tepat", "Exact")}
@@ -109,21 +109,16 @@ export function Swatch({
   const hex = rgbToHex(rgb);
   const textColor = bestTextOn(rgb);
   const dims = size === "sm" ? "h-20" : size === "lg" ? "h-40" : "h-28";
-  const { show } = useToast();
+  const { copy } = useCopy();
   const { text } = useLocale();
 
   // Auto-resolve name when no explicit label is provided.
   const colorInfo = getColorName(rgb);
   const displayLabel = label ?? colorInfo.label;
 
-  const copyHex = async (e: React.MouseEvent) => {
+  const copyHex = (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(hex);
-      show(text(`✓ ${hex} berhasil disalin!`, `✓ ${hex} copied!`));
-    } catch {
-      // fail silently
-    }
+    copy(hex);
   };
 
   return (

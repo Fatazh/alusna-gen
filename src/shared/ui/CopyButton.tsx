@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { Check } from "@phosphor-icons/react/Check";
 import { Copy } from "@phosphor-icons/react/Copy";
 import { cn } from "../lib/cn";
-import { useToast } from "./toastContext";
+import { useCopy } from "../lib/useCopy";
 import { useLocale } from "../i18n";
 
 type CopyButtonProps = {
@@ -13,25 +12,14 @@ type CopyButtonProps = {
 };
 
 export function CopyButton({ value, className, label, ariaLabel }: CopyButtonProps) {
-  const [copied, setCopied] = useState(false);
-  const { show } = useToast();
+  const { copy, copiedValue } = useCopy();
   const { text } = useLocale();
-
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      show(text(`"${value}" berhasil disalin!`, `"${value}" copied!`));
-      setTimeout(() => setCopied(false), 1200);
-    } catch {
-      // Clipboard may be unavailable; fail silently.
-    }
-  };
+  const copied = copiedValue === value;
 
   return (
     <button
       type="button"
-      onClick={onCopy}
+      onClick={() => copy(value)}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition",
         copied

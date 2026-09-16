@@ -15,6 +15,26 @@ export type StudioStorageMigrationPlan =
   | { action: "write-target"; value: string }
   | { action: "none"; reason: "target-invalid" | "legacy-missing" | "legacy-invalid" };
 
+/**
+ * Re-sanitize a target envelope whose version is missing or newer than the
+ * app knows. The sanitizer whitelist already drops unknown fields, so
+ * adopting the recognized state beats throwing user data away (the old
+ * behavior discarded the whole envelope on any version mismatch).
+ */
+function adoptResanitizableTarget(targetRaw: string): StudioStorageMigrationPlan {
+  const parsed = parseEnvelope(targetRaw);
+  if (!parsed) return { action: "none", reason: "target-invalid" };
+  const sanitized = sanitizePersistedStudioState(parsed.state);
+  if (Object.keys(sanitized).length === 0) return { action: "none", reason: "target-invalid" };
+  return {
+    action: "write-target",
+    value: JSON.stringify({
+      state: sanitized,
+      version: ALUSNA_STUDIO_STORAGE_VERSION,
+    }),
+  };
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -45,9 +65,10 @@ export function planStudioStorageMigration(
 ): StudioStorageMigrationPlan {
   if (targetRaw !== null) {
     const target = parseEnvelope(targetRaw);
-    return target?.version === ALUSNA_STUDIO_STORAGE_VERSION
+    if (!target) return { action: "none", reason: "target-invalid" };
+    return target.version === ALUSNA_STUDIO_STORAGE_VERSION
       ? { action: "keep-target" }
-      : { action: "none", reason: "target-invalid" };
+      : adoptResanitizableTarget(targetRaw);
   }
 
   if (legacyRaw === null) return { action: "none", reason: "legacy-missing" };

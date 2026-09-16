@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { rgbToHex } from "../../color";
 import { generateBrandKit } from "../model/brandKit";
-import { brandKitToTailwindConfig, brandKitToW3cTokens, parseBrandKitImport } from "./interop";
+import {
+  brandKitToCssVars,
+  brandKitToTailwindConfig,
+  brandKitToW3cTokens,
+  parseBrandKitImport,
+} from "./interop";
 import { APP_BRAND } from "../../../shared/config/brand";
 
 const exportedBrandKit = JSON.stringify({
@@ -41,5 +47,17 @@ describe("brand kit interoperability", () => {
     expect(tokens.$description).toContain(APP_BRAND.name);
     expect(tokens.font.headline.$type).toBe("fontFamily");
     expect(brandKitToTailwindConfig(kit)).toContain("colors: { brand:");
+  });
+
+  it("serializes brand kit colors as CSS custom properties", () => {
+    const kit = generateBrandKit({ r: 99, g: 102, b: 241 }, "Acme", "modern");
+    const css = brandKitToCssVars(kit);
+    expect(css).toContain(":root {");
+    expect(css).toContain("--brand-primary: #6366F1;");
+    expect(css).toContain("--brand-secondary: " + rgbToHex(kit.secondaryColor) + ";");
+    expect(css).toContain("--brand-accent: " + rgbToHex(kit.accentColor) + ";");
+    expect(css).toContain("--brand-bg: " + rgbToHex(kit.backgroundColor) + ";");
+    expect(css).toContain("--brand-text: " + rgbToHex(kit.textColor) + ";");
+    expect(css.trim().endsWith("}")).toBe(true);
   });
 });

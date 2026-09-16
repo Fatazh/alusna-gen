@@ -14,12 +14,16 @@ import { type RGB, type HSL, rgbToHsl, hslToRgb, bestTextOn } from "./color";
 export type PairRole = "dominan" | "pendukung" | "aksen" | "cadangan" | "netral" | "teks";
 
 export const ROLE_META: Record<PairRole, { label: string; color: string; bg: string }> = {
-  dominan: { label: "Dominan", color: "text-red-300", bg: "bg-red-500/15" },
-  pendukung: { label: "Pendukung", color: "text-amber-300", bg: "bg-amber-500/15" },
-  aksen: { label: "Aksen", color: "text-purple-300", bg: "bg-purple-500/15" },
-  cadangan: { label: "Cadangan", color: "text-sky-300", bg: "bg-sky-500/15" },
-  netral: { label: "Netral", color: "text-zinc-300", bg: "bg-zinc-500/15" },
-  teks: { label: "Teks", color: "text-emerald-300", bg: "bg-emerald-500/15" },
+  dominan: { label: "Dominan", color: "text-red-800 dark:text-red-300", bg: "bg-red-500/15" },
+  pendukung: {
+    label: "Pendukung",
+    color: "text-amber-900 dark:text-amber-300",
+    bg: "bg-amber-500/15",
+  },
+  aksen: { label: "Aksen", color: "text-purple-800 dark:text-purple-300", bg: "bg-purple-500/15" },
+  cadangan: { label: "Cadangan", color: "text-sky-800 dark:text-sky-300", bg: "bg-sky-500/15" },
+  netral: { label: "Netral", color: "text-zinc-800 dark:text-zinc-300", bg: "bg-zinc-500/15" },
+  teks: { label: "Teks", color: "text-emerald-800 dark:text-emerald-300", bg: "bg-emerald-500/15" },
 };
 
 export type ColorPair = {

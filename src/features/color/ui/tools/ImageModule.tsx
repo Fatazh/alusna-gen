@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { rgbToHex, type RGB } from "../../model/color";
-import { getColorName } from "../../model/colorNames";
+import { rgbToHex, type RGB } from "@alusna/shared/color";
+import { getColorName } from "@alusna/shared/colorNames";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { extractPalette } from "../../services/imagePalette";
-import { useToast } from "../../../../shared/ui/toastContext";
+import { useCopy } from "../../../../shared/lib/useCopy";
 import { APP_BRAND } from "../../../../shared/config/brand";
 import { useLocale } from "../../../../shared/i18n";
 
@@ -13,7 +13,7 @@ export function ImageModule() {
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const saveColor = useStudio((s) => s.saveColor);
-  const { show } = useToast();
+  const { copy } = useCopy();
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [colors, setColors] = useState<RGB[]>([]);
@@ -69,14 +69,9 @@ export function ImageModule() {
     }
   };
 
-  const copyHex = async (hex: string, e: React.MouseEvent) => {
+  const copyHex = (hex: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(hex);
-      show(`✓ ${hex} berhasil disalin!`);
-    } catch {
-      // fail silently
-    }
+    copy(hex);
   };
 
   return (

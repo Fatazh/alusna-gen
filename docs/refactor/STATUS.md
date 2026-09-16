@@ -269,6 +269,60 @@ the selected host.
 - Next planned task: continue Phase 14 with real designer–developer handoff workflows before adding
   packages or more framework adapters.
 
+## Shared color domain extraction — 2026-09-14
+
+- Objective: move the pure color model into an npm workspace package consumed by reference instead
+  of copying, preparing for future multi-app reuse.
+- Files changed: `src/features/color/model/*` moved to `packages/shared/src/*` with `git mv`
+  (history preserved); `src/features/color/index.ts` and `domain.ts` became re-export barrels;
+  twelve color UI/service files switched direct model imports to `@alusna/shared/*` specifiers;
+  root `package.json` gained `workspaces` and the `@alusna/shared` dependency; `tsconfig.json`
+  includes `packages/shared/src`; `.dependency-cruiser.cjs` gained
+  `shared-package-does-not-depend-on-app-source` and `shared-package-stays-framework-free` rules;
+  `check:boundaries` now cruises `src packages`.
+- Decisions: the package ships TypeScript source directly with subpath exports
+  (`@alusna/shared/color`, `colorBlind`, `colorMatch`, `colorNames`, `colorRecipes`, `shades`) so
+  no build step is needed; the `features/color/domain` import path stays stable, keeping all store
+  and app consumers untouched; the four moved test files run through the shared Vitest setup.
+- Validation: `npm run check` passes end-to-end (lint, format, boundaries with 170 modules and no
+  violations, 162 unit/contract tests, production build); the 81 moved tests also run standalone
+  from `packages/shared`. The pre-existing `scripts/debug-probe.mjs` formatting warning was fixed,
+  so repository-wide `format:check` is green again.
+- Remaining risks: only the color domain is extracted so far; the same pattern can later absorb
+  typography, design-system, and brand-kit models. Runtime config (`import.meta.env`) remains
+  app-owned.
+
+## Consent-gated cookieless GA4 — 2026-09-16
+
+- Objective: complete the interrupted consent-gated GA4 integration so page measurement remains
+  fully off until a visitor explicitly approves it, without weakening the strict production CSP.
+- Files changed: `src/app/analytics/ga4Config.ts` (new shared measurement-ID validator),
+  `ga4.ts` (uses the shared validator; adds the `useGa4Forwarder` app-lifetime hook),
+  `ConsentBanner.tsx` (fixed unused import; `hasStoredConsent` moved to `consent.ts`),
+  `AppProviders.tsx` (mounts the GA4 forwarder once), `StudioApp.tsx` (renders the banner only
+  when GA4 is configured, analytics is master-enabled, and no decision is stored yet),
+  `src/global.d.ts` (`VITE_GA4_ID`), `.env.example` and `.env.production.example` (GA4 opt-in
+  block), `vite.config.ts` (GA4 sources allowlisted only when the build actually configures GA4,
+  otherwise the strict CSP stands), `public/_headers` and
+  `deploy/nginx-security.conf.example` (commented GA4 CSP variant for static hosts),
+  `trustCopy.ts` (privacy-policy section 6 now describes the banner and cookieless behavior in
+  both locales), `README.md` (enablement runbook), plus `consent.test.ts` and `ga4.test.ts`.
+  The new `ga4Config.ts` is also listed in `tsconfig.node.json`, following the existing
+  convention for every module `vite.config.ts` imports.
+- Validation: `npm run check` passes end-to-end (lint, format, boundaries with 202 modules and no
+  violations, 227 unit/contract tests across 31 files, production build). The tests caught and
+  fixed a latent bug: `sendPageView` referenced `APP_BRAND` without importing it, so any forwarded
+  page view would have thrown once GA4 was enabled.
+- Decisions: the banner asks once per browser and the decision persists in
+  `localStorage` (`alusna:analytics-consent`); changing it later means clearing site data, which
+  matches the existing privacy stance. Consent Mode v2 signals are declared `denied` before the
+  gtag script can load, and only allowlisted `page_view` events (page kind + path, no query
+  strings) are forwarded after a grant. The measurement-ID regex lives in one module shared by
+  app runtime and `vite.config.ts` so the CSP can never drift from the runtime gate.
+- Remaining risks: GA4 is still disabled by default and unverified against a real measurement ID;
+  the static-host GA4 CSP variant is commented guidance, not an active header. Regional consent
+  requirements (e.g. EU) still need a review before production enablement.
+
 ## In progress
 
 - Phase 14 real-world workflow validation; initial radius feedback addressed, broader usage pending.

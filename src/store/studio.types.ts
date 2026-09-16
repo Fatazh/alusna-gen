@@ -30,6 +30,13 @@ export type SavedBrandKit = {
 
 export type Theme = "dark" | "light";
 
+/**
+ * Live mirror of the brand kit currently being edited in the Brand Kit tool.
+ * Published by BrandKitModule so share links reflect what the user sees;
+ * transient (never persisted — see partialize in studio.ts).
+ */
+export type ActiveBrandKitShareState = Omit<SavedBrandKit, "id" | "createdAt">;
+
 export type StudioState = {
   activeModule: "color" | "font";
   setActiveModule: (module: "color" | "font") => void;
@@ -63,6 +70,8 @@ export type StudioState = {
 
   uploadedFonts: UploadedFont[];
   addUploadedFont: (font: UploadedFont) => void;
+
+  activeBrandKitShareState: ActiveBrandKitShareState | null;
 
   activeFontFamily: string;
   setActiveFontFamily: (family: string) => void;

@@ -6,10 +6,7 @@ import {
   SEO_PAGES,
   TRUST_PAGES,
 } from "../src/app/router/routes";
-import {
-  ALUSNA_STUDIO_STORAGE_KEY,
-  LEGACY_STUDIO_STORAGE_KEY,
-} from "../src/store/migrations/studioStorage";
+import { LEGACY_STUDIO_STORAGE_KEY } from "../src/store/migrations/studioStorage";
 
 test.describe("public tool routes", () => {
   for (const route of SEO_PAGES) {
@@ -224,6 +221,20 @@ test("footer navigates between a tool and privacy information", async ({ page })
   await expect(page).toHaveURL(/\/contrast-checker\/?$/);
 });
 
+test("configured support button appears in header only when fully configured", async ({ page }) => {
+  test.skip(
+    !process.env.VITE_SUPPORT_URL || !process.env.VITE_SUPPORT_TITLE,
+    "Support configuration is optional.",
+  );
+
+  await page.goto("/");
+  const support = page.locator('[data-support-placement="header"]');
+  await expect(support).toBeVisible();
+  await expect(support).toHaveAttribute("rel", /noopener/);
+  await expect(support).not.toHaveAttribute("rel", /sponsored/);
+  await expect(support).toHaveAttribute("href", process.env.VITE_SUPPORT_URL as string);
+});
+
 test("configured sponsor placement is explicit and links to disclosure", async ({ page }) => {
   test.skip(
     !process.env.VITE_SPONSOR_URL || !process.env.VITE_SPONSOR_TITLE,
@@ -241,6 +252,144 @@ test("configured sponsor placement is explicit and links to disclosure", async (
   await expect(
     placement.getByRole("link", { name: "Cara ALUSNA menangani iklan dan afiliasi" }),
   ).toHaveAttribute("href", "/kebijakan-iklan");
+});
+
+test("keyboard shortcuts toggle a dialog and digit keys switch color sub-tools", async ({
+  page,
+}) => {
+  await page.goto("/color-palette-generator/");
+
+  await page.keyboard.press("3");
+  await expect(page).toHaveURL(/\/color-mixer\/?$/);
+
+  await page.keyboard.press("?");
+  const dialog = page.getByRole("dialog", { name: "Pintasan Keyboard" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText("Alat warna", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("Generator gradient")).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+
+  await page.getByRole("button", { name: "Pintasan keyboard" }).click();
+  await expect(page.getByRole("dialog", { name: "Pintasan Keyboard" })).toBeVisible();
+  await page.getByRole("button", { name: "Tutup", exact: true }).last().click();
+  await expect(page.getByRole("dialog", { name: "Pintasan Keyboard" })).toBeHidden();
+});
+
+test("pattern tool undo and redo restores palette, locks, and keyboard works", async ({ page }) => {
+  await page.goto("/color-palette-generator/");
+
+  await expect(page.getByText("ALUSNA · 5 warna")).toBeVisible();
+
+  await page
+    .getByRole("button", { name: /Sunset/ })
+    .first()
+    .click();
+  await expect(page.getByText("Sunset · 5 warna")).toBeVisible();
+
+  await page.keyboard.press("Control+z");
+  await expect(page.getByText("ALUSNA · 5 warna")).toBeVisible();
+
+  await page.keyboard.press("Control+y");
+  await expect(page.getByText("Sunset · 5 warna")).toBeVisible();
+
+  const undoButton = page.getByRole("button", { name: "Urungkan palet" });
+  await undoButton.click();
+  await expect(page.getByText("ALUSNA · 5 warna")).toBeVisible();
+  await expect(undoButton).toBeDisabled();
+
+  await page.getByRole("button", { name: "Ulangi palet" }).click();
+  await expect(page.getByText("Sunset · 5 warna")).toBeVisible();
+});
+
+test("matching tool undo and redo restores view and harmony type via keyboard", async ({
+  page,
+}) => {
+  await page.goto("/color-matching/");
+
+  const undoButton = page.getByRole("button", { name: "Undo", exact: true });
+  await expect(undoButton).toBeDisabled();
+
+  await page.getByRole("button", { name: "Harmoni Klasik" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Matching Color — Harmoni Klasik" }),
+  ).toBeVisible();
+
+  const triadic = page.getByRole("button", { name: /Triadic/ });
+  await triadic.click();
+  await expect(triadic).toHaveAttribute("style", /var\(--accent\)/);
+
+  await page.keyboard.press("Control+z");
+  await expect(triadic).not.toHaveAttribute("style", /var\(--accent\)/);
+
+  await page.keyboard.press("Control+y");
+  await expect(triadic).toHaveAttribute("style", /var\(--accent\)/);
+
+  await undoButton.click();
+  await expect(triadic).not.toHaveAttribute("style", /var\(--accent\)/);
+
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Matching Color — Rekomendasi Cerdas" }),
+  ).toBeVisible();
+  await expect(undoButton).toBeDisabled();
+});
+
+test("gradient tool undo and redo restores stops and type via keyboard", async ({ page }) => {
+  await page.goto("/gradient-generator/");
+
+  await page.getByRole("button", { name: /Tambah stop/ }).click();
+  await expect(page.getByRole("button", { name: "Hapus" })).toHaveCount(3);
+
+  await page.keyboard.press("Control+z");
+  await expect(page.getByRole("button", { name: "Hapus" })).toHaveCount(0);
+
+  await page.keyboard.press("Control+y");
+  await expect(page.getByRole("button", { name: "Hapus" })).toHaveCount(3);
+
+  await page.getByRole("button", { name: "Radial" }).click();
+  await expect(page.getByText(/radial-gradient\(/)).toBeVisible();
+
+  await page.keyboard.press("Control+z");
+  await expect(page.getByText(/linear-gradient\(/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Redo", exact: true }).click();
+  await expect(page.getByText(/radial-gradient\(/)).toBeVisible();
+});
+
+test("experiment tool undo and redo restores mixing mode via keyboard", async ({ page }) => {
+  await page.goto("/color-mixer/");
+
+  await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  await page.getByRole("button", { name: "Average" }).click();
+  await expect(page.getByRole("button", { name: "Average" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  await page.keyboard.press("Control+z");
+  await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  await page.keyboard.press("Control+y");
+  await expect(page.getByRole("button", { name: "Average" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  const undoButton = page.getByRole("button", { name: "Undo", exact: true });
+  await undoButton.click();
+  await expect(page.getByRole("button", { name: "Additive" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });
 
 test("top-level navigation updates the URL and supports browser history", async ({ page }) => {
@@ -366,6 +515,27 @@ test("Design System builds modes, validates contrast, and exports current token 
 
   await page.getByRole("button", { name: "Form", exact: true }).click();
   await expect(page.getByLabel("Nama proyek")).toBeVisible();
+  const syncSwitch = page.getByRole("switch", { name: "Sinkronkan" });
+  await expect(syncSwitch).toBeVisible();
+  await expect(syncSwitch).toHaveAttribute("aria-checked", "true");
+  const switchThumb = syncSwitch.locator("span span");
+  const thumbInTrack = syncSwitch.locator("span").first();
+  await expect
+    .poll(async () => {
+      const track = await thumbInTrack.boundingBox();
+      const knob = await switchThumb.boundingBox();
+      if (!track || !knob) return null;
+      return knob.x + knob.width <= track.x + track.width + 0.5;
+    })
+    .toBe(true);
+  const trackBgOn = await thumbInTrack.evaluate((el) => getComputedStyle(el).backgroundColor);
+  await syncSwitch.click();
+  await expect(syncSwitch).toHaveAttribute("aria-checked", "false");
+  await expect
+    .poll(async () => thumbInTrack.evaluate((el) => getComputedStyle(el).backgroundColor))
+    .not.toBe(trackBgOn);
+  await syncSwitch.click();
+  await expect(syncSwitch).toHaveAttribute("aria-checked", "true");
   await page.getByRole("button", { name: "Feedback", exact: true }).click();
   await expect(page.getByRole("alert")).toBeVisible();
   await page.getByRole("button", { name: "Overlay", exact: true }).click();
@@ -380,7 +550,11 @@ test("Design System builds modes, validates contrast, and exports current token 
   await page.getByRole("button", { name: "Batal" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("button", { name: "Tampilkan toast" }).click();
-  await expect(page.getByText("Toast berhasil ditampilkan")).toBeVisible();
+  const toast = page.getByRole("status").filter({ hasText: "Toast berhasil ditampilkan" });
+  await expect(toast).toBeVisible();
+  await expect
+    .poll(async () => toast.evaluate((el) => getComputedStyle(el).backgroundColor))
+    .not.toBe("rgb(209, 250, 229)");
   await page.getByRole("button", { name: "Aksi", exact: true }).click();
   const handoff = page.locator("[data-component-kit-handoff]");
   await expect(handoff).toContainText(".brand-button");
@@ -580,11 +754,18 @@ test("legacy CIKP storage migrates to ALUSNA without deleting the rollback copy"
   await expect(page.locator("html")).not.toHaveClass(/dark/);
 
   const stored = await page.evaluate(
-    ({ targetKey, legacyKey }) => ({
-      target: localStorage.getItem(targetKey),
-      legacy: localStorage.getItem(legacyKey),
-    }),
-    { targetKey: ALUSNA_STUDIO_STORAGE_KEY, legacyKey: LEGACY_STUDIO_STORAGE_KEY },
+    ({ legacyKey }) =>
+      new Promise<{ target: string | null; legacy: string | null }>((resolve) => {
+        const legacy = localStorage.getItem(legacyKey);
+        const open = indexedDB.open("alusna-studio", 1);
+        open.onsuccess = () => {
+          const db = open.result;
+          const tx = db.transaction("kv", "readonly");
+          const read = tx.objectStore("kv").get("state");
+          read.onsuccess = () => resolve({ target: read.result ?? null, legacy });
+        };
+      }),
+    { legacyKey: LEGACY_STUDIO_STORAGE_KEY },
   );
 
   expect(JSON.parse(String(stored.target))).toEqual({ state: { theme: "light" }, version: 1 });
