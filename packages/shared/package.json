@@ -1,0 +1,22 @@
+{
+  "name": "@alusna/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-agnostic domain layer of ALUSNA, consumed by reference instead of copying.",
+  "exports": {
+    "./color": "./src/color.ts",
+    "./colorBlind": "./src/colorBlind.ts",
+    "./colorMatch": "./src/colorMatch.ts",
+    "./colorNames": "./src/colorNames.ts",
+    "./colorRecipes": "./src/colorRecipes.ts",
+    "./shades": "./src/shades.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "scripts": {
+    "test": "vitest run"
+  }
+}
