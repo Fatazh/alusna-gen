@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "compliance-check": {
+      "source": "anthropics/knowledge-work-plugins",
+      "sourceType": "github",
+      "skillPath": "legal/skills/compliance-check/SKILL.md",
+      "computedHash": "79f858886034316f46dc667c147d6a89ccc2df5e224bae947b7464e5024e1e4d"
+    },
+    "draft": {
+      "source": "anthropics/claude-for-legal",
+      "sourceType": "github",
+      "skillPath": "legal-clinic/skills/draft/SKILL.md",
+      "computedHash": "f6f23bf61868c1df371f42b1a3b8d7fc97ccd4787f6fe4752a378591bd8ab664"
+    },
+    "legal-response": {
+      "source": "anthropics/knowledge-work-plugins",
+      "sourceType": "github",
+      "skillPath": "legal/skills/legal-response/SKILL.md",
+      "computedHash": "28ea79e44e396616f6c1b86b9859e98cf44c37ddce65d57c4e42c7ee69aa3335"
+    },
+    "legal-risk-assessment": {
+      "source": "anthropics/knowledge-work-plugins",
+      "sourceType": "github",
+      "skillPath": "legal/skills/legal-risk-assessment/SKILL.md",
+      "computedHash": "7305866282d5f10d4ca7acd1d8569b767f9f64a017016cb4da72c38e2d4ff2cc"
+    },
+    "legal-writing": {
+      "source": "anthropics/claude-for-legal",
+      "sourceType": "github",
+      "skillPath": "law-student/skills/legal-writing/SKILL.md",
+      "computedHash": "e90a58c594cad90dd8ba719988c966d2c097eea99ef8d4f7834aa176ddaef297"
+    },
+    "review": {
+      "source": "anthropics/claude-for-legal",
+      "sourceType": "github",
+      "skillPath": "commercial-legal/skills/review/SKILL.md",
+      "computedHash": "99213cbae11cea1ed0bc7c9ad2095d4dfe17a5af5772304589a5bb4cc868479a"
+    }
+  }
+}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, follow" />
+    <title>Halaman Tidak Ditemukan | ALUSNA</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #eef0f3;
+        color: #171a1f;
+        padding: 24px;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #12151a;
+          color: #eef0f3;
+        }
+        .card {
+          border-color: #2a2f37 !important;
+        }
+        a.btn {
+          color: #12151a !important;
+        }
+      }
+      .card {
+        max-width: 560px;
+        width: 100%;
+        text-align: center;
+        border: 1px solid #d8dce2;
+        border-radius: 16px;
+        padding: 48px 32px;
+        background: #fff;
+      }
+      .code {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        color: #2f5fae;
+      }
+      h1 {
+        margin-top: 12px;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+      p {
+        margin-top: 12px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #555b66;
+      }
+      .actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      a.btn {
+        display: inline-block;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a.primary {
+        background: #2f5fae;
+        color: #fff;
+      }
+      a.secondary {
+        border: 1px solid #d8dce2;
+        color: #171a1f;
+      }
+    </style>
+    <script>
+      // English speakers get the localized variant (static hosts only).
+      if (navigator.language && navigator.language.toLowerCase().indexOf("en") === 0) {
+        location.replace("/en/404.html");
+      }
+    </script>
+  </head>
+  <body>
+    <div class="card">
+      <div class="code">404</div>
+      <h1>Halaman tidak ditemukan</h1>
+      <p>
+        Halaman yang Anda cari tidak ada atau sudah dipindahkan. Jelajahi alat warna, tipografi, dan
+        brand kit ALUSNA yang gratis dan berjalan sepenuhnya di browser.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="/">Kembali ke beranda</a>
+        <a class="btn secondary" href="/color-palette-generator">Buat palet warna</a>
+      </div>
+    </div>
+  </body>
+</html>
