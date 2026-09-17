@@ -323,6 +323,25 @@ the selected host.
   the static-host GA4 CSP variant is commented guidance, not an active header. Regional consent
   requirements (e.g. EU) still need a review before production enablement.
 
+## Boot performance hardening — 2026-09-17
+
+- Production feedback (white flash, layout shift CLS ≈ 0.36, text flicker on slow connections)
+  triaged to three root causes: a render-blocking Google Fonts `@import` chain for the default UI
+  fonts, an unsized header logo image, and a CPU-bound `background-position` shimmer animation.
+- Default UI fonts (Manrope variable + IBM Plex Mono 400/500/600, latin subset, ~70 KB total) are
+  now self-hosted under `public/fonts` via `src/fonts.css`; the Google Fonts `@import` was removed
+  from `index.css` and the two critical files are preloaded in `index.html` with `crossorigin`.
+  The Typography module's optional Google Fonts loading through `fontLoader.ts` is unchanged — it
+  is a user-facing feature disclosed in the trust copy — so Google hostnames intentionally remain
+  in the CSP.
+- The header logo `<img>` declares intrinsic dimensions (2207×763) so layout space is reserved
+  before the file arrives; `html/body/#root { height: 100% }` was already in place.
+- The skeleton shimmer now animates a `transform: translateX` overlay (GPU-composited) instead of
+  `background-position`, and honors `prefers-reduced-motion`.
+- `/fonts/*` is served with one-year immutable caching via `vercel.json` headers and `public/_headers`.
+- Boot sequence audit: `boot.js` intentionally stays synchronous in `<head>` as the boot error trap;
+  `boot.css` is 1.3 KB with dark-mode handling; `main.tsx` hides `#boot-loading` once React mounts.
+
 ## In progress
 
 - Phase 14 real-world workflow validation; initial radius feedback addressed, broader usage pending.

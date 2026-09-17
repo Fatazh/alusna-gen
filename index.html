@@ -5,8 +5,29 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#6366F1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Font UI kritis di-host sendiri dan di-preload: sebelumnya font baru
+         diunduh SETELAH CSS aplikasi (dulu via @import Google Fonts yang
+         render-blocking berlapis), sehingga teks muncul sekilas dengan font
+         sistem lalu berkedip saat font asli tiba di koneksi lambat. -->
+    <link
+      rel="preload"
+      href="/fonts/manrope-var-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/ibm-plex-mono-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <!-- Response-header CSP remains the production authority. Vite development
-         permits its inline refresh preamble; productionCsp() removes that permission. -->
+         permits its inline refresh preamble; productionCsp() removes that permission.
+         Host fonts.googleapis.com/fonts.gstatic.com TETAP diizinkan untuk fitur
+         font pilihan pengguna di modul Typography (fontLoader.ts); font UI default
+         kini self-hosted dan tidak lagi bergantung padanya. -->
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' blob: data:; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src 'none'; media-src 'none'; manifest-src 'self'; upgrade-insecure-requests"

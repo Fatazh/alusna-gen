@@ -63,6 +63,8 @@ export function StudioHeader({
           <img
             src={theme === "dark" ? "/logo.svg" : "/logo.png"}
             alt={`${APP_BRAND.name} — ${locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}`}
+            width={2207}
+            height={763}
             className="h-9 w-auto rounded-md object-contain sm:h-11"
           />
         </a>

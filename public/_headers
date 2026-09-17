@@ -10,6 +10,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Font self-hosted: hash versi di nama berkas (diperbarui manual saat ganti font)
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # Jika analitik GA4 diaktifkan (banner disetujui + VITE_ANALYTICS_ENABLED=true +
 # VITE_GA4_ID valid), CSP produksi dari vite.config sudah mengizinkan script
 # googletagmanager.com. Untuk header statis host, ganti baris CSP di atas dengan:

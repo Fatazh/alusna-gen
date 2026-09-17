@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "./fonts.css";
 
 @tailwind base;
 @tailwind components;
@@ -350,26 +350,47 @@ input[type="color"]::-moz-color-swatch {
   left: 0;
 }
 
-/* Skeleton loading */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Skeleton loading — dianimasikan dengan transform (dikomposisi GPU) agar
+   tidak memicu paint/layout ulang di perangkat lambat. Panjang gradasi
+   dibuat 200% agar overlay penutupnya selalu lebih lebar dari track. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e4e4e7;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  background: linear-gradient(90deg, transparent 25%, #d4d4d8 50%, transparent 75%);
+  animation: shimmer 1.5s infinite;
+  will-change: transform;
 }
 
 .dark .skeleton {
-  background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  background: #27272a;
 }
 
-.skeleton {
-  background: linear-gradient(90deg, #e4e4e7 25%, #d4d4d8 50%, #e4e4e7 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.dark .skeleton::after {
+  background: linear-gradient(90deg, transparent 25%, #3f3f46 50%, transparent 75%);
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
 }
 
 /* Focus ring */
