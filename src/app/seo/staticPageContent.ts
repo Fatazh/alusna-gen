@@ -1,11 +1,9 @@
 import { APP_BRAND } from "../../shared/config/brand.ts";
+import { escapeHtml } from "../../shared/lib/escapeHtml.ts";
 import { getRelatedTools, getToolGuide } from "../content/toolGuides.ts";
 import { ENGLISH_SEO_PAGES, SEO_PAGES, type SeoPage } from "../router/routes.ts";
 import { RELEASE_NOTES } from "../trust/releaseNotes.ts";
 import { TRUST_COPY, TRUST_PAGE_UPDATED } from "../trust/trustCopy.ts";
-
-const escapeHtml = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const link = (path: string, label: string) =>
   `<a href="${escapeHtml(path)}">${escapeHtml(label)}</a>`;

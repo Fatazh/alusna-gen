@@ -1,4 +1,4 @@
-import { type RGB } from "./color";
+import { clamp01, type RGB } from "./color";
 
 export type ColorBlindType =
   | "normal"
@@ -42,10 +42,9 @@ export function simulateColorBlindness(rgb: RGB, type: ColorBlindType): RGB {
   const nr = r * m[0] + g * m[1] + b * m[2];
   const ng = r * m[3] + g * m[4] + b * m[5];
   const nb = r * m[6] + g * m[7] + b * m[8];
-  const clamp = (v: number) => Math.max(0, Math.min(1, v));
   return {
-    r: Math.round(clamp(nr) * 255),
-    g: Math.round(clamp(ng) * 255),
-    b: Math.round(clamp(nb) * 255),
+    r: Math.round(clamp01(nr) * 255),
+    g: Math.round(clamp01(ng) * 255),
+    b: Math.round(clamp01(nb) * 255),
   };
 }

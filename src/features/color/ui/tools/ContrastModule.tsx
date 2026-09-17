@@ -1,9 +1,16 @@
 import { useMemo, useState } from "react";
-import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
 import { ArrowDown } from "@phosphor-icons/react/ArrowDown";
+import { CheckCircle } from "@phosphor-icons/react/CheckCircle";
+import { Sparkle } from "@phosphor-icons/react/Sparkle";
 import { Swap } from "@phosphor-icons/react/Swap";
 import { XCircle } from "@phosphor-icons/react/XCircle";
-import { rgbToHex, contrastRatio, hexToRgb, type RGB } from "@alusna/shared/color";
+import {
+  contrastRatio,
+  hexToRgb,
+  rgbToHex,
+  suggestAccessibleColor,
+  type RGB,
+} from "@alusna/shared/color";
 import { useStudio } from "../../../../store/studio";
 import { Card, CardBody, CardHeader } from "../../../../shared/ui/Card";
 import { CopyButton } from "../../../../shared/ui/CopyButton";
@@ -64,6 +71,23 @@ export function ContrastModule() {
   const [bgColor, setBgColor] = useState<RGB>({ r: 255, g: 255, b: 255 });
   const [fgColor, setFgColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
   const ratio = useMemo(() => contrastRatio(fgColor, bgColor), [fgColor, bgColor]);
+
+  const suggestedFg = useMemo(
+    () => (ratio < 4.5 ? suggestAccessibleColor(fgColor, bgColor, 4.5) : null),
+    [fgColor, bgColor, ratio],
+  );
+  const suggestedBg = useMemo(
+    () => (ratio < 4.5 ? suggestAccessibleColor(bgColor, fgColor, 4.5) : null),
+    [fgColor, bgColor, ratio],
+  );
+  const suggestedFgRatio = useMemo(
+    () => (suggestedFg ? contrastRatio(suggestedFg, bgColor) : 0),
+    [suggestedFg, bgColor],
+  );
+  const suggestedBgRatio = useMemo(
+    () => (suggestedBg ? contrastRatio(fgColor, suggestedBg) : 0),
+    [suggestedBg, fgColor],
+  );
 
   const level = getWCAGLevel(ratio);
   const meta = LEVEL_META[level];
@@ -393,6 +417,103 @@ export function ContrastModule() {
                 );
               })}
             </div>
+
+            {/* Smart Fix for WCAG AA */}
+            {ratio < 4.5 && (suggestedFg || suggestedBg) && (
+              <div
+                className="rounded-xl border p-3.5 space-y-3"
+                style={{ borderColor: "var(--border)", backgroundColor: "var(--chip-bg)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkle size={16} className="text-amber-500 shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                      {text("Saran Perbaikan WCAG AA (4.5:1)", "WCAG AA (4.5:1) Smart Fix")}
+                    </p>
+                    <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                      {text(
+                        "Sesuaikan lightness warna terdekat agar lulus standar keterbacaan.",
+                        "Adjust nearest lightness to meet readability standards.",
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  {suggestedFg && (
+                    <button
+                      type="button"
+                      onClick={() => setFgColor(suggestedFg)}
+                      className="flex items-center justify-between rounded-lg border p-2.5 text-left transition hover:border-[var(--accent)]"
+                      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="h-6 w-6 rounded border shrink-0"
+                          style={{
+                            backgroundColor: rgbToHex(suggestedFg),
+                            borderColor: "var(--border)",
+                          }}
+                        />
+                        <div>
+                          <p
+                            className="text-xs font-medium"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {text("Perbaiki Teks", "Fix text color")}
+                          </p>
+                          <p
+                            className="font-mono text-[10px]"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            {rgbToHex(suggestedFg)}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        {suggestedFgRatio.toFixed(1)}:1
+                      </span>
+                    </button>
+                  )}
+
+                  {suggestedBg && (
+                    <button
+                      type="button"
+                      onClick={() => setBgColor(suggestedBg)}
+                      className="flex items-center justify-between rounded-lg border p-2.5 text-left transition hover:border-[var(--accent)]"
+                      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="h-6 w-6 rounded border shrink-0"
+                          style={{
+                            backgroundColor: rgbToHex(suggestedBg),
+                            borderColor: "var(--border)",
+                          }}
+                        />
+                        <div>
+                          <p
+                            className="text-xs font-medium"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {text("Perbaiki Latar", "Fix background")}
+                          </p>
+                          <p
+                            className="font-mono text-[10px]"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            {rgbToHex(suggestedBg)}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        {suggestedBgRatio.toFixed(1)}:1
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Swap button */}
             <button

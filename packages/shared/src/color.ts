@@ -9,7 +9,7 @@ export type CMYK = { c: number; m: number; y: number; k: number };
 export type ColorFormat = "hex" | "rgb" | "rgba" | "cmyk" | "hsl";
 
 const clamp = (n: number, min = 0, max = 255) => Math.min(max, Math.max(min, n));
-const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+export const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const round = (n: number) => Math.round(n);
 
 export function hexToRgb(hex: string): RGB | null {
@@ -307,6 +307,51 @@ export function contrastRatio(a: RGB, b: RGB): number {
 // Above this luminance, black text gives better contrast; below, white text does.
 export function bestTextOn(bg: RGB): "#FFFFFF" | "#000000" {
   return relativeLuminance(bg) > 0.179 ? "#000000" : "#FFFFFF";
+}
+
+/**
+ * Suggests an adjusted version of `target` color by adjusting its HSL lightness
+ * to reach at least `targetRatio` (default 4.5 for WCAG AA) against `fixed` color,
+ * choosing the minimal lightness delta from the original color.
+ * Returns the original color if it already satisfies `targetRatio`.
+ */
+export function suggestAccessibleColor(target: RGB, fixed: RGB, targetRatio = 4.5): RGB | null {
+  if (contrastRatio(target, fixed) >= targetRatio) {
+    return target;
+  }
+
+  const { h, s, l: initialL } = rgbToHsl(target);
+
+  let darkerCandidate: RGB | null = null;
+  let lighterCandidate: RGB | null = null;
+
+  // Search darker direction (step by 0.5% lightness)
+  for (let l = Math.floor(initialL); l >= 0; l -= 0.5) {
+    const candidate = hslToRgb({ h, s, l });
+    if (contrastRatio(candidate, fixed) >= targetRatio) {
+      darkerCandidate = candidate;
+      break;
+    }
+  }
+
+  // Search lighter direction (step by 0.5% lightness)
+  for (let l = Math.ceil(initialL); l <= 100; l += 0.5) {
+    const candidate = hslToRgb({ h, s, l });
+    if (contrastRatio(candidate, fixed) >= targetRatio) {
+      lighterCandidate = candidate;
+      break;
+    }
+  }
+
+  if (darkerCandidate && lighterCandidate) {
+    const hslDarker = rgbToHsl(darkerCandidate);
+    const hslLighter = rgbToHsl(lighterCandidate);
+    const distDarker = Math.abs(hslDarker.l - initialL);
+    const distLighter = Math.abs(hslLighter.l - initialL);
+    return distDarker <= distLighter ? darkerCandidate : lighterCandidate;
+  }
+
+  return darkerCandidate ?? lighterCandidate ?? null;
 }
 
 // ---------- Mixing ----------

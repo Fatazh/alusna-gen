@@ -124,6 +124,30 @@ describe("studio storage limits", () => {
     expect(useStudio.getState().colorHistory).toEqual([red, blue]);
   });
 
+  it("clears color history on demand", () => {
+    const red = { r: 255, g: 0, b: 0 };
+    useStudio.setState({ colorHistory: [red] });
+
+    useStudio.getState().clearColorHistory();
+
+    expect(useStudio.getState().colorHistory).toEqual([]);
+  });
+
+  it("saves palette directly from rgb array", () => {
+    const colors = [
+      { r: 255, g: 0, b: 0 },
+      { r: 0, g: 255, b: 0 },
+      { r: 0, g: 0, b: 255 },
+    ];
+    useStudio.getState().savePalette("Primary Trio", colors);
+
+    const saved = useStudio.getState().paletteLibrary.find((p) => p.name === "Primary Trio");
+    expect(saved).toBeDefined();
+    expect(saved?.colors).toHaveLength(3);
+    expect(saved?.colors[0].rgb).toEqual(colors[0]);
+    expect(saved?.colors[0].name).toBe("#FF0000");
+  });
+
   it("caps new saved colors, palettes, brand kits, and uploaded fonts", () => {
     const { id: _id, createdAt: _createdAt, ...brandKit } = validBrandKit();
     for (let index = 0; index < STUDIO_LIMITS.savedColors + 1; index += 1) {

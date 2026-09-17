@@ -18,6 +18,7 @@ import { ColorPicker } from "../ColorPicker";
 import { cn } from "../../../../shared/lib/cn";
 import { useCopy } from "../../../../shared/lib/useCopy";
 import { useLocale } from "../../../../shared/i18n";
+import { useToast } from "../../../../shared/ui/toastContext";
 import { useHistoryState } from "../../../../shared/lib/useHistoryState";
 import { useUndoRedoShortcuts } from "../../../../shared/lib/useUndoRedoShortcuts";
 
@@ -41,12 +42,14 @@ type MatchingSnapshot = { view: View; harmonyType: HarmonyType };
 // ---------------------------------------------------------------------------
 export function MatchingModule() {
   const { text } = useLocale();
+  const { show } = useToast();
   const selectedColor = useStudio((s) => s.selectedColor);
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
   const selectedAlpha = useStudio((s) => s.selectedAlpha);
   const setSelectedAlpha = useStudio((s) => s.setSelectedAlpha);
   const saveColor = useStudio((s) => s.saveColor);
+  const savePalette = useStudio((s) => s.savePalette);
 
   const matchingHistory = useHistoryState<MatchingSnapshot>(() => ({
     view: "smart",
@@ -75,6 +78,35 @@ export function MatchingModule() {
     () => harmony(selectedColor, harmonyType),
     [selectedColor, harmonyType],
   );
+
+  const handleSaveHarmonyToLibrary = () => {
+    if (view === "smart") {
+      const paletteColors = [selectedColor, ...smartPairs.map((p) => p.rgb)];
+      const primaryName = getColorName(selectedColor).label;
+      const name = `Smart Match - ${primaryName}`;
+      savePalette(name, paletteColors);
+      show(
+        text(
+          `Palet "${name}" (${paletteColors.length} warna) disimpan ke library!`,
+          `Palette "${name}" (${paletteColors.length} colors) saved to library!`,
+        ),
+        { tone: "success" },
+      );
+    } else {
+      const currentHarmonyMeta = HARMONIES.find((h) => h.id === harmonyType);
+      const harmonyLabel = currentHarmonyMeta ? currentHarmonyMeta.label : harmonyType;
+      const primaryName = getColorName(selectedColor).label;
+      const name = `${harmonyLabel} - ${primaryName}`;
+      savePalette(name, harmonyColors);
+      show(
+        text(
+          `Palet "${name}" (${harmonyColors.length} warna) disimpan ke library!`,
+          `Palette "${name}" (${harmonyColors.length} colors) saved to library!`,
+        ),
+        { tone: "success" },
+      );
+    }
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -121,6 +153,7 @@ export function MatchingModule() {
             pairs={smartPairs}
             onSelect={selectWithHistory}
             onSave={(rgb) => saveColor(rgb, getColorName(rgb).label)}
+            onSavePalette={handleSaveHarmonyToLibrary}
           />
         )}
 
@@ -133,6 +166,7 @@ export function MatchingModule() {
             onTypeChange={setHarmonyType}
             onSelect={selectWithHistory}
             onSave={(rgb) => saveColor(rgb, getColorName(rgb).label)}
+            onSavePalette={handleSaveHarmonyToLibrary}
           />
         )}
 
@@ -160,14 +194,26 @@ export function MatchingModule() {
         <CardBody className="space-y-4">
           <Swatch rgb={selectedColor} size="lg" showCode={false} />
           <ColorDetail rgb={selectedColor} alpha={selectedAlpha} showAlpha />
-          <button
-            type="button"
-            onClick={() => saveColor(selectedColor, getColorName(selectedColor).label)}
-            className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110"
-            style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
-          >
-            {text("Simpan ke palet", "Save to palette")}
-          </button>
+          <div className="space-y-2 pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+            <button
+              type="button"
+              onClick={() => saveColor(selectedColor, getColorName(selectedColor).label)}
+              className="w-full rounded-lg px-3 py-2 text-xs font-medium transition hover:brightness-110"
+              style={{ backgroundColor: "var(--accent)", color: "var(--accent-contrast)" }}
+            >
+              {text("Simpan ke palet", "Save to palette")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveHarmonyToLibrary}
+              className="w-full rounded-lg border px-3 py-2 text-xs font-medium transition hover:bg-[var(--surface-hover)]"
+              style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+            >
+              {view === "smart"
+                ? text("Simpan rekomendasi ke library", "Save recommendations to library")
+                : text("Simpan harmoni ke library", "Save harmony to library")}
+            </button>
+          </div>
         </CardBody>
       </Card>
     </div>
@@ -182,11 +228,13 @@ function SmartView({
   pairs,
   onSelect,
   onSave,
+  onSavePalette,
 }: {
   primary: RGB;
   pairs: ColorPair[];
   onSelect: (rgb: RGB) => void;
   onSave: (rgb: RGB) => void;
+  onSavePalette: () => void;
 }) {
   const { text } = useLocale();
   return (
@@ -212,6 +260,18 @@ function SmartView({
 
           {/* Live preview mockup */}
           <PalettePreview primary={primary} pairs={pairs} />
+
+          <button
+            type="button"
+            onClick={onSavePalette}
+            className="w-full rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-[var(--surface-hover)]"
+            style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+          >
+            {text(
+              "Simpan kombinasi ini sebagai palet di Library",
+              "Save this combination as palette in Library",
+            )}
+          </button>
         </CardBody>
       </Card>
     </div>
@@ -408,6 +468,7 @@ function ClassicView({
   onTypeChange,
   onSelect,
   onSave,
+  onSavePalette,
 }: {
   primary: RGB;
   harmonyType: HarmonyType;
@@ -415,6 +476,7 @@ function ClassicView({
   onTypeChange: (t: HarmonyType) => void;
   onSelect: (rgb: RGB) => void;
   onSave: (rgb: RGB) => void;
+  onSavePalette: () => void;
 }) {
   const { text } = useLocale();
   return (
@@ -463,6 +525,18 @@ function ClassicView({
               />
             ))}
           </div>
+
+          <button
+            type="button"
+            onClick={onSavePalette}
+            className="w-full rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-[var(--surface-hover)]"
+            style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+          >
+            {text(
+              "Simpan seluruh harmoni ini sebagai palet di Library",
+              "Save this harmony as palette in Library",
+            )}
+          </button>
 
           {/* Contrast preview */}
           <ClassicContrastPreview colors={colors} />

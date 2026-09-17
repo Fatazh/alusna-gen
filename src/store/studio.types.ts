@@ -52,6 +52,7 @@ export type StudioState = {
 
   paletteLibrary: NamedPalette[];
   saveCurrentPaletteAs: (name: string) => void;
+  savePalette: (name: string, colors: RGB[]) => void;
   loadPalette: (id: string) => void;
   renamePalette: (id: string, name: string) => void;
   deletePalette: (id: string) => void;
@@ -63,6 +64,7 @@ export type StudioState = {
 
   colorHistory: RGB[];
   pushColorHistory: (rgb: RGB) => void;
+  clearColorHistory: () => void;
 
   savedColors: SavedColor[];
   saveColor: (rgb: RGB, name?: string) => void;

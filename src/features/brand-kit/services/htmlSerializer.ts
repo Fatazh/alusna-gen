@@ -1,15 +1,6 @@
 import { rgbToHex } from "../../color";
 import { type BrandKit, TONE_PROFILES } from "../model/brandKit";
-
-/** Escape user-controlled strings before interpolating into exported HTML. */
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { escapeHtml } from "../../../shared/lib/escapeHtml";
 
 export function brandKitToHtml(kit: BrandKit): string {
   const p = kit.primaryColor;

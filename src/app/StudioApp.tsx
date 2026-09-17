@@ -49,9 +49,9 @@ const BrandKitModule = lazy(loadBrandKitModule);
 const TrustPageView = lazy(() =>
   import("./trust/TrustPageView").then((module) => ({ default: module.TrustPageView })),
 );
-const HomePageView = lazy(() =>
-  import("./home/HomePageView").then((module) => ({ default: module.HomePageView })),
-);
+import { HomePageView } from "./home/HomePageView";
+import { useEffect } from "react";
+
 const NotFoundViewLazy = lazy(() =>
   import("./notfound/NotFoundView").then((module) => ({ default: module.NotFoundView })),
 );
@@ -76,6 +76,7 @@ export default function App() {
 
   const setSelectedColor = useStudio((s) => s.setSelectedColor);
   const pushColorHistory = useStudio((s) => s.pushColorHistory);
+  const clearColorHistory = useStudio((s) => s.clearColorHistory);
   const selectedColor = useStudio((s) => s.selectedColor);
   const colorHistory = useStudio((s) => s.colorHistory);
   const {
@@ -104,6 +105,10 @@ export default function App() {
     isAnalyticsEnabled(import.meta.env.VITE_ANALYTICS_ENABLED);
 
   const shareUrl = useToolShareUrl(currentPage);
+
+  useEffect(() => {
+    window.__hideBootLoading?.();
+  }, []);
 
   return (
     <AppProviders>
@@ -214,9 +219,7 @@ export default function App() {
               </>
             ) : showingHome ? (
               <div className="py-8 sm:py-10">
-                <Suspense fallback={<ModuleLoading />}>
-                  <HomePageView onNavigate={navigateToPath} />
-                </Suspense>
+                <HomePageView onNavigate={navigateToPath} />
               </div>
             ) : isNotFoundPage(currentPage) ? (
               <div className="py-8 sm:py-10">
@@ -254,6 +257,7 @@ export default function App() {
                 setSelectedColor(rgb);
                 pushColorHistory(rgb);
               }}
+              onClear={clearColorHistory}
               activeHex={rgbToHex(selectedColor)}
             />
           )}

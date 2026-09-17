@@ -6,9 +6,9 @@ import {
   planStudioStorageMigration,
 } from "../migrations/studioStorage";
 
-type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
-function notifyStorageError(): void {
+export function notifyStorageError(): void {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event(APP_EVENTS.storageError));
   }

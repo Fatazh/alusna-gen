@@ -1,13 +1,15 @@
+import { Trash } from "@phosphor-icons/react/Trash";
 import { rgbToHex, type RGB } from "../../features/color/domain";
 import { useLocale } from "../../shared/i18n";
 
 type HistoryBarProps = {
   colors: RGB[];
   onPick: (rgb: RGB) => void;
+  onClear?: () => void;
   activeHex: string;
 };
 
-export function HistoryBar({ colors, onPick, activeHex }: HistoryBarProps) {
+export function HistoryBar({ colors, onPick, onClear, activeHex }: HistoryBarProps) {
   const { text } = useLocale();
   return (
     <div
@@ -41,6 +43,19 @@ export function HistoryBar({ colors, onPick, activeHex }: HistoryBarProps) {
             );
           })}
         </div>
+        {onClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--focus-ring)]"
+            style={{ color: "var(--text-muted)" }}
+            title={text("Bersihkan riwayat warna", "Clear color history")}
+            aria-label={text("Bersihkan riwayat warna", "Clear color history")}
+          >
+            <Trash size={13} aria-hidden="true" />
+            <span>{text("Bersihkan", "Clear")}</span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,19 +1,11 @@
 import { type StateStorage } from "zustand/middleware";
-import { APP_EVENTS } from "../../shared/config/brand";
 import {
   ALUSNA_STUDIO_STORAGE_KEY,
   LEGACY_STUDIO_STORAGE_KEY,
   planStudioStorageMigration,
 } from "../migrations/studioStorage";
 import { idbDel, idbGet, idbSet, STUDIO_IDB_KEY } from "./idb";
-
-type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
-
-function notifyStorageError(): void {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(APP_EVENTS.storageError));
-  }
-}
+import { type StorageLike, notifyStorageError } from "./studioStateStorage";
 
 /**
  * Async StateStorage backed by IndexedDB with a one-shot import of the legacy

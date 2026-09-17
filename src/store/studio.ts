@@ -51,6 +51,7 @@ export const useStudio = create<StudioState>()(
             ].slice(0, HISTORY_CAP),
           };
         }),
+      clearColorHistory: () => set({ colorHistory: [] }),
 
       theme: "light" as Theme,
       setTheme: (t) => set({ theme: t }),
@@ -91,6 +92,24 @@ export const useStudio = create<StudioState>()(
                 id: uid(),
                 name: trimmed,
                 colors: s.savedColors.map((c) => ({ ...c })),
+              },
+            ],
+          };
+        }),
+      savePalette: (name, colors) =>
+        set((s) => {
+          const trimmed = name.trim() || `Palet ${s.paletteLibrary.length + 1}`;
+          return {
+            paletteLibrary: [
+              ...s.paletteLibrary.slice(-(MAX_PALETTES - 1)),
+              {
+                id: uid(),
+                name: trimmed,
+                colors: colors.map((rgb) => ({
+                  id: uid(),
+                  rgb,
+                  name: rgbToHex(rgb),
+                })),
               },
             ],
           };

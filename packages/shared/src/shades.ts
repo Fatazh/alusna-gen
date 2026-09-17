@@ -1,4 +1,4 @@
-import { hslToRgb, rgbToHsl, type RGB } from "./color";
+import { hslToRgb, rgbToHex, rgbToHsl, type RGB } from "./color";
 
 // Tailwind-like 50..950 scale (lightness targets per step).
 const SHADE_STOPS: { step: number; l: number }[] = [
@@ -30,24 +30,13 @@ export function generateShades(base: RGB): Shade[] {
 }
 
 export function shadesToCssVars(name: string, shades: Shade[]): string {
-  const root = shades
-    .map((sh) => {
-      const hex = `#${toHex(sh.rgb.r)}${toHex(sh.rgb.g)}${toHex(sh.rgb.b)}`;
-      return `  --${name}-${sh.step}: ${hex.toUpperCase()};`;
-    })
-    .join("\n");
+  const root = shades.map((sh) => `  --${name}-${sh.step}: ${rgbToHex(sh.rgb)};`).join("\n");
   return `:root {\n${root}\n}`;
 }
 
 export function shadesToTailwind(name: string, shades: Shade[]): string {
   const obj = shades
-    .map((sh) => `        ${sh.step}: '#${toHex(sh.rgb.r)}${toHex(sh.rgb.g)}${toHex(sh.rgb.b)}',`)
+    .map((sh) => `        ${sh.step}: '${rgbToHex(sh.rgb).toLowerCase()}',`)
     .join("\n");
   return `// tailwind.config.js\nexport default {\n  theme: {\n    extend: {\n      colors: {\n        ${name}: {\n${obj}\n        },\n      },\n    },\n  },\n};`;
-}
-
-function toHex(n: number): string {
-  return Math.max(0, Math.min(255, Math.round(n)))
-    .toString(16)
-    .padStart(2, "0");
 }

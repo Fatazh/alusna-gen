@@ -22,6 +22,7 @@
     "src/app/trust/releaseNotes.ts",
     "src/app/trust/trustCopy.ts",
     "src/shared/config/brand.ts",
-    "src/shared/i18n/locale.ts"
+    "src/shared/i18n/locale.ts",
+    "src/shared/lib/escapeHtml.ts"
   ]
 }

@@ -26,6 +26,7 @@ import {
   formatCmyk,
   formatHsl,
   describe as describeColor,
+  suggestAccessibleColor,
   type RGB,
 } from "./color";
 
@@ -364,5 +365,39 @@ describe("formatRgba", () => {
   });
   it("rounds alpha", () => {
     expect(formatRgba({ r: 0, g: 0, b: 0, a: 1 / 3 })).toBe("rgba(0, 0, 0, 0.33)");
+  });
+});
+
+describe("suggestAccessibleColor", () => {
+  it("returns the original color if it already satisfies the target ratio", () => {
+    const black = { r: 0, g: 0, b: 0 };
+    const white = { r: 255, g: 255, b: 255 };
+    expect(suggestAccessibleColor(black, white, 4.5)).toEqual(black);
+  });
+
+  it("adjusts color darker when failing against white background", () => {
+    const blue = { r: 59, g: 130, b: 246 }; // #3B82F6, contrast ~3.68:1
+    const white = { r: 255, g: 255, b: 255 };
+    expect(contrastRatio(blue, white)).toBeLessThan(4.5);
+
+    const adjusted = suggestAccessibleColor(blue, white, 4.5);
+    expect(adjusted).not.toBeNull();
+    expect(contrastRatio(adjusted!, white)).toBeGreaterThanOrEqual(4.5);
+    // Hue should be preserved within 2 degrees
+    expect(Math.abs(rgbToHsl(adjusted!).h - rgbToHsl(blue).h)).toBeLessThanOrEqual(2);
+    // Adjusted color should be darker (lower lightness)
+    expect(rgbToHsl(adjusted!).l).toBeLessThan(rgbToHsl(blue).l);
+  });
+
+  it("adjusts color lighter when failing against black background", () => {
+    const darkBlue = { r: 30, g: 58, b: 138 }; // #1E3A8A, contrast ~1.7:1
+    const black = { r: 0, g: 0, b: 0 };
+    expect(contrastRatio(darkBlue, black)).toBeLessThan(4.5);
+
+    const adjusted = suggestAccessibleColor(darkBlue, black, 4.5);
+    expect(adjusted).not.toBeNull();
+    expect(contrastRatio(adjusted!, black)).toBeGreaterThanOrEqual(4.5);
+    // Adjusted color should be lighter (higher lightness)
+    expect(rgbToHsl(adjusted!).l).toBeGreaterThan(rgbToHsl(darkBlue).l);
   });
 });

@@ -8,7 +8,7 @@ type UndoRedoCallbacks = {
   enabled: boolean;
 };
 
-function isTextEntryTarget(target: EventTarget | null): boolean {
+export function isTextEntryTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return (
     target.tagName === "INPUT" ||

@@ -1,6 +1,6 @@
 # Refactor Status
 
-Last updated: 2026-09-07
+Last updated: 2026-09-18
 
 ## Current objective
 
@@ -10,6 +10,16 @@ the selected host.
 
 ## Completed
 
+- P0, P1, and P2 Studio Improvements implemented and verified:
+  - Localized all image upload validation messages in `ImageModule.tsx` (Indonesian/English).
+  - Added "Bersihkan / Clear" color history in `HistoryBar.tsx` backed by `clearColorHistory` in `useStudio`.
+  - Implemented image drag-and-drop & clipboard paste (`Ctrl+V`) in `ImageModule.tsx`.
+  - Added WCAG AA (4.5:1) smart auto-fix helper `suggestAccessibleColor` in `@alusna/shared/color` and one-click fix buttons in `ContrastModule.tsx`.
+  - Added `savePalette` store action and connected "Save to library" / "Simpan ke library" bridges in `ImageModule.tsx` and `MatchingModule.tsx`.
+  - Added Client-Side Studio Backup & Restore (`BackupRestoreDialog.tsx`) in `AppFooter.tsx` using sanitized local JSON export and import.
+  - Deduplication & anti-slop refactor: unified `escapeHtml`, `isTextEntryTarget`, `clamp01`, `rgbToHex` in shades, shared storage helpers, and updated legacy "ColorKit" brand references.
+  - Core Web Vitals CLS optimization: statically bundled `HomePageView` to eliminate `Suspense` `<ModuleLoading />` layout shifts, deferred `__hideBootLoading` to React commit lifecycle, switched preloaded UI fonts to `font-display: optional`, and assigned explicit `aspectRatio` to header logo.
+  - Verified with `npm run check` (0 lint errors, 0 boundary violations, 232 unit tests passing, production build green).
 - Git repository initialized on `main`.
 - Pre-refactor snapshot committed as `10a9f8e`.
 - Baseline unit tests: 87 passed.
@@ -341,6 +351,24 @@ the selected host.
 - `/fonts/*` is served with one-year immutable caching via `vercel.json` headers and `public/_headers`.
 - Boot sequence audit: `boot.js` intentionally stays synchronous in `<head>` as the boot error trap;
   `boot.css` is 1.3 KB with dark-mode handling; `main.tsx` hides `#boot-loading` once React mounts.
+
+## P0 quick fixes & color history management — 2026-09-18
+
+- Objective: localize image validation errors across locales and provide explicit user control to clear color history in the bottom bar.
+- Files changed: `src/features/color/ui/tools/ImageModule.tsx`, `src/store/studio.types.ts`, `src/store/studio.ts`, `src/store/studio.test.ts`, `src/app/layout/HistoryBar.tsx`, `src/app/StudioApp.tsx`, and this status document.
+- Decisions: wrap image upload size, format, and SVG rejection errors in `text()` to support English routes; add `clearColorHistory` action in Zustand studio store and expose an accessible "Clear" / "Bersihkan" button with Trash icon in `HistoryBar` that pushes to the right end via `ml-auto`.
+- Validation: `npm run check` passed end-to-end (ESLint, Prettier format check, dependency cruiser boundaries with 205 modules and 0 violations, 228 passing Vitest unit/contract tests across 31 files, and production build).
+- Remaining risks: none; changes are strictly additive, non-breaking, and respect dependency boundaries.
+- Next planned task: proceed to P1 priorities (Drag-and-Drop & Clipboard paste in ImageModule, and WCAG Contrast Auto-Fix in ContrastModule).
+
+## P1 workflow enhancements & WCAG auto-fix — 2026-09-18
+
+- Objective: add drag & drop and clipboard paste (`Ctrl+V`) support to Image Color Extractor, and add smart WCAG AA (4.5:1) auto-fix recommendations to Contrast Checker.
+- Files changed: `packages/shared/src/color.ts`, `packages/shared/src/color.test.ts`, `src/features/color/ui/tools/ImageModule.tsx`, `src/features/color/ui/tools/ContrastModule.tsx`, and this status document.
+- Decisions: implement `suggestAccessibleColor` in `@alusna/shared/color` as a pure, framework-free HSL lightness search seeking the minimal lightness delta that satisfies $\ge 4.5:1$ against the fixed color; expose interactive smart fix buttons in `ContrastModule` for foreground and background when `ratio < 4.5`; provide responsive drag-and-drop feedback and global `paste` listener for image payloads in `ImageModule`.
+- Validation: `npm run check` passed end-to-end (ESLint, Prettier format check, dependency cruiser boundaries with 205 modules and 0 violations, 231 passing Vitest unit/contract tests across 31 files, and production build).
+- Remaining risks: none; pure domain logic is unit-tested and UI state is fully localized and reactive.
+- Next planned task: proceed to P2 priorities (Inter-tool bridge / "Send to..." actions and Studio Backup/Restore JSON).
 
 ## In progress
 

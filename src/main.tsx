@@ -13,7 +13,6 @@ if (!rootEl) {
         <StudioApp />
       </StrictMode>,
     );
-    window.__hideBootLoading?.();
   } catch (err) {
     window.__showBootError?.(
       "Gagal render React",
