@@ -187,7 +187,7 @@ export default function App() {
                 <Suspense fallback={<ModuleLoading />}>
                   {/* ── Color Module ── */}
                   {topTab === "color" && (
-                    <div className="space-y-6 animate-fade-in">
+                    <div className="space-y-6 pt-2 animate-fade-in">
                       {colorTab === "pattern" && <PatternModule />}
                       {colorTab === "matching" && <MatchingModule />}
                       {colorTab === "experiment" && <ExperimentModule />}

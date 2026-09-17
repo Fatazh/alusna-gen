@@ -108,7 +108,7 @@ export type BrandTheme = typeof brandTheme;`;
   }, [kit]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 pt-2 animate-fade-in">
       {/* Export Options */}
       <Card>
         <CardHeader
