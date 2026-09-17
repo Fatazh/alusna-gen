@@ -25,13 +25,14 @@ export function FloatingDonateButton({ bottomOffset = 0 }: FloatingDonateButtonP
       className="fixed right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border transition hover:-translate-y-0.5 hover:scale-105 active:scale-95 sm:right-6"
       style={{
         bottom: `calc(1rem + ${bottomOffset}px)`,
-        borderColor: "var(--border)",
-        backgroundColor: "var(--card-bg)",
-        color: "var(--text-primary)",
+        // Coffee-brand accent: light brown disc, near-black cup (one tone below pure black).
+        borderColor: "#b98a5e",
+        backgroundColor: "#d2a679",
+        color: "#241a12",
         boxShadow: "var(--shadow-soft)",
       }}
     >
-      <Coffee size={22} weight="fill" className="text-amber-600" aria-hidden="true" />
+      <Coffee size={22} weight="fill" aria-hidden="true" />
     </a>
   );
 }
