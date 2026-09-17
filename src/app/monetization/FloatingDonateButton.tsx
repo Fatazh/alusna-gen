@@ -31,7 +31,7 @@ export function FloatingDonateButton({ bottomOffset = 0 }: FloatingDonateButtonP
         // (one tone below pure black), consistent in light and dark mode.
         borderColor: "#b98a5e",
         backgroundColor: "#d2a679",
-        color: "#241a12",
+        color: "var(--text-primary)",
         boxShadow: "var(--shadow-soft)",
       }}
     >
