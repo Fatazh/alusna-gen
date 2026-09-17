@@ -18,7 +18,7 @@ the selected host.
   - Added `savePalette` store action and connected "Save to library" / "Simpan ke library" bridges in `ImageModule.tsx` and `MatchingModule.tsx`.
   - Added Client-Side Studio Backup & Restore (`BackupRestoreDialog.tsx`) in `AppFooter.tsx` using sanitized local JSON export and import.
   - Deduplication & anti-slop refactor: unified `escapeHtml`, `isTextEntryTarget`, `clamp01`, `rgbToHex` in shades, shared storage helpers, and updated legacy "ColorKit" brand references.
-  - Core Web Vitals CLS optimization: statically bundled `HomePageView` to eliminate `Suspense` `<ModuleLoading />` layout shifts, deferred `__hideBootLoading` to React commit lifecycle, switched preloaded UI fonts to `font-display: optional`, and assigned explicit `aspectRatio` to header logo.
+  - Core Web Vitals CLS & Mobile LCP optimization: statically bundled `HomePageView` to eliminate `Suspense` `<ModuleLoading />` layout shifts, deferred `__hideBootLoading` to React commit lifecycle, switched preloaded UI fonts to `font-display: optional`, assigned explicit `aspectRatio` to header logo, optimized `public/logo.png` payload from 293 KB to 54 KB (retina 604x229), added `<link rel="preload" as="image">` in `index.html`, and added `fetchPriority="high"` in `StudioHeader.tsx` to boost mobile PageSpeed score towards 98-100.
   - Verified with `npm run check` (0 lint errors, 0 boundary violations, 232 unit tests passing, production build green).
 - Git repository initialized on `main`.
 - Pre-refactor snapshot committed as `10a9f8e`.

@@ -65,6 +65,7 @@ export function StudioHeader({
             alt={`${APP_BRAND.name} — ${locale === "en" ? APP_BRAND.sloganEn : APP_BRAND.slogan}`}
             width={2207}
             height={763}
+            fetchPriority="high"
             style={{ aspectRatio: "2207 / 763" }}
             className="h-9 w-auto rounded-md object-contain sm:h-11"
           />
