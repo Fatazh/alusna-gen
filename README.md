@@ -163,7 +163,7 @@ VITE_SUPPORT_URL=https://trakteer.id/alusna/tip
 VITE_SUPPORT_TITLE=Trakteer
 ```
 
-Tombol ini tampil di header hanya ketika kedua variabel terisi, membuka tautan di tab baru dengan `rel="noopener noreferrer"`, dan tidak diberi atribut `sponsored`.
+Tombol ini tampil di header dan sebagai tombol mengambang (kanan-bawah, ikon kopi) hanya ketika kedua variabel terisi, membuka tautan di tab baru dengan `rel="noopener noreferrer"`, dan tidak diberi atribut `sponsored`. Tombol mengambang otomatis naik di atas bar riwayat warna agar tidak menutupinya, dan menghilang total saat konfigurasi kosong (fail-closed).
 
 ### Analitik tanpa cookie (opsional, fail-closed)
 

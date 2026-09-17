@@ -6,6 +6,7 @@ import { StudioHeader } from "./layout/StudioHeader";
 import { ToolPageIntro } from "./layout/ToolPageIntro";
 import { AppProviders } from "./providers/AppProviders";
 import { AdvertisingSlot } from "./monetization/AdvertisingSlot";
+import { FloatingDonateButton } from "./monetization/FloatingDonateButton";
 import { useStudioRouter } from "./router/useStudioRouter";
 import { useToolShareUrl } from "./share/useToolShareUrl";
 import { KeyboardShortcutsDialog } from "./layout/KeyboardShortcutsDialog";
@@ -256,6 +257,9 @@ export default function App() {
               activeHex={rgbToHex(selectedColor)}
             />
           )}
+
+          {/* Floating donation entry point; lifts above the recent-colors bar. */}
+          <FloatingDonateButton bottomOffset={showingTool && colorHistory.length > 0 ? 68 : 0} />
 
           {showConsentBanner && (
             <ConsentBanner visible onDecided={() => window.location.reload()} />
