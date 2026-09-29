@@ -48,7 +48,7 @@ export function StudioHeader({
   return (
     <header
       className="sticky top-0 z-30 border-b backdrop-blur-xl"
-      style={{ backgroundColor: "var(--chrome-bg)" }}
+      style={{ backgroundColor: "var(--chrome-bg)", borderColor: "var(--border)" }}
     >
       <div className="mx-auto grid max-w-[1440px] grid-cols-[auto_1fr] items-center gap-x-3 px-4 py-2 sm:px-6 lg:px-8 xl:grid-cols-[auto_1fr_auto] xl:gap-x-6 xl:py-0">
         <a
