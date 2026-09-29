@@ -5,8 +5,7 @@ export function ToolPageIntro({ page }: { page: ToolPage }) {
   return (
     <section
       aria-labelledby="tool-page-title"
-      className="border-b px-1 py-8 sm:py-10"
-      style={{ borderColor: "var(--border)" }}
+      className=" px-1 py-8 sm:py-10"
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-end">
         <div className="max-w-4xl">

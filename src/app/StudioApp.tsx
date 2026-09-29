@@ -136,8 +136,7 @@ export default function App() {
               <>
                 {topTab === "color" && (
                   <nav
-                    className="-mx-4 grid grid-cols-2 gap-px border-b px-4 sm:-mx-6 sm:grid-cols-4 sm:px-6 lg:-mx-8 lg:flex lg:gap-1 lg:px-8"
-                    style={{ borderColor: "var(--border)" }}
+                    className="-mx-4 grid grid-cols-2 gap-px px-4 sm:-mx-6 sm:grid-cols-4 sm:px-6 lg:-mx-8 lg:flex lg:gap-1 lg:px-8"
                     role="tablist"
                     aria-label={currentPage.locale === "en" ? "Color tools" : "Alat warna"}
                   >
