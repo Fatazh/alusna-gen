@@ -18,34 +18,39 @@ export function FloatingDonateButton({ bottomOffset = 0 }: FloatingDonateButtonP
   if (!support) return null;
 
   return (
-    <a
-      href={support.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-support-placement="floating"
-      aria-label={text("Traktir Kopi untuk ALUSNA", "Buy a coffee for ALUSNA")}
-      className="group fixed right-4 z-40 flex h-12 items-center rounded-full border transition hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a2b] motion-reduce:transition-none sm:right-6"
-      style={{
-        bottom: `calc(1rem + ${bottomOffset}px)`,
-        // Coffee-brand accent: light brown pill, near-black cup & text
-        // (one tone below pure black), consistent in light and dark mode.
-        borderColor: "#b98a5e",
-        backgroundColor: "#d2a679",
-        color: "var(--text-primary)",
-        boxShadow: "var(--shadow-soft)",
-      }}
-    >
-      <span className="w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 ease-out group-hover:w-56 group-hover:opacity-100 group-focus-visible:w-56 group-focus-visible:opacity-100">
-        <span
-          aria-hidden="true"
-          className="block translate-x-3 pl-5 pr-1 text-sm font-bold transition-transform duration-300 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0"
-        >
-          {text("Traktir Kopi untuk ALUSNA", "Buy a coffee for ALUSNA")}
+    // Landmark `complementary` agar tautan melayang ini bukan "konten di luar
+    // landmark" (axe `region`). Anak <a> tetap `fixed` sehingga pembungkusnya
+    // tidak memengaruhi layout.
+    <aside aria-label={text("Dukung ALUSNA", "Support ALUSNA")}>
+      <a
+        href={support.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-support-placement="floating"
+        aria-label={text("Traktir Kopi untuk ALUSNA", "Buy a coffee for ALUSNA")}
+        className="group fixed right-4 z-40 flex h-12 items-center rounded-full border transition hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a2b] motion-reduce:transition-none sm:right-6"
+        style={{
+          bottom: `calc(1rem + ${bottomOffset}px)`,
+          // Coffee-brand accent: light brown pill, near-black cup & text
+          // (one tone below pure black), consistent in light and dark mode.
+          borderColor: "#b98a5e",
+          backgroundColor: "#d2a679",
+          color: "var(--text-primary)",
+          boxShadow: "var(--shadow-soft)",
+        }}
+      >
+        <span className="w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 ease-out group-hover:w-56 group-hover:opacity-100 group-focus-visible:w-56 group-focus-visible:opacity-100">
+          <span
+            aria-hidden="true"
+            className="block translate-x-3 pl-5 pr-1 text-sm font-bold transition-transform duration-300 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0"
+          >
+            {text("Traktir Kopi untuk ALUSNA", "Buy a coffee for ALUSNA")}
+          </span>
         </span>
-      </span>
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center">
-        <Coffee size={26} weight="fill" aria-hidden="true" />
-      </span>
-    </a>
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center">
+          <Coffee size={26} weight="fill" aria-hidden="true" />
+        </span>
+      </a>
+    </aside>
   );
 }

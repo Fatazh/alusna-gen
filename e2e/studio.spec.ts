@@ -259,6 +259,10 @@ test("keyboard shortcuts toggle a dialog and digit keys switch color sub-tools",
 }) => {
   await page.goto("/color-palette-generator/");
 
+  // Wait for the studio shell to mount (its keydown listener attaches in a
+  // passive effect) before exercising keyboard navigation.
+  await expect(page.getByText("ALUSNA · 5 warna")).toBeVisible();
+
   await page.keyboard.press("3");
   await expect(page).toHaveURL(/\/color-mixer\/?$/);
 
@@ -432,11 +436,14 @@ test("ALUSNA identity and structured data are present", async ({ page }) => {
   expect(structuredData.isAccessibleForFree).toBe(true);
 });
 
-test("color tool navigation preserves the selected color in the share URL", async ({ page }) => {
+test("color tool navigation preserves the selected color across sub-tools", async ({ page }) => {
   await page.goto("/color-palette-generator/?c=%23FF0000");
 
   await page.getByRole("tab", { name: /Contrast/ }).click();
-  await expect(page).toHaveURL(/\/contrast-checker\/?\?c=%23FF0000$/);
+  // Shared-state params (see browserNavigation.ts) are consumed once on load and
+  // stripped from the address bar on navigation, so the URL stays clean while the
+  // color itself lives in the store.
+  await expect(page).toHaveURL(/\/contrast-checker\/?$/);
   await expect(
     page.getByRole("heading", {
       name: "WCAG Color Contrast Checker",
@@ -444,6 +451,8 @@ test("color tool navigation preserves the selected color in the share URL", asyn
       exact: true,
     }),
   ).toBeVisible();
+  // The selected color survives the navigation: it is still in the shared history bar.
+  await expect(page.locator('[title="#FF0000"]')).toBeVisible();
 });
 
 test("representative tools do not overflow at mobile, tablet, or desktop widths", async ({

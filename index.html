@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#6366F1" />
+    <meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1013" media="(prefers-color-scheme: dark)" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Font UI kritis di-host sendiri dan di-preload: sebelumnya font baru
          diunduh SETELAH CSS aplikasi (dulu via @import Google Fonts yang
@@ -55,7 +56,10 @@
     <div id="root"></div>
     <div id="boot-error" role="alert"></div>
 
-    <script src="/boot.js" defer></script>
+    <!-- boot.js harus sinkron sebelum main.tsx agar error-trap terpasang
+         lebih awal; defer membuatnya berbalapan dengan fetch modul dan
+         dapat meninggalkan overlay "Memuat ALUSNA…" tanpa pesan error. -->
+    <script src="/boot.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

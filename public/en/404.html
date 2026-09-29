@@ -4,10 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, follow" />
-    <link rel="canonical" href="https://alusna.id/en/404.html" />
-    <link rel="alternate" hreflang="id" href="https://alusna.id/404.html" />
-    <link rel="alternate" hreflang="en" href="https://alusna.id/en/404.html" />
-    <link rel="alternate" hreflang="x-default" href="https://alusna.id/404.html" />
+    <!-- Root-relative: en/404.html disalin apa adanya saat build (tidak bisa
+         membaca VITE_SITE_URL), jadi biarkan crawler resolve terhadap origin
+         aktual sehingga canonical/hreflang tidak lagi hardcoded ke domain tertentu. -->
+    <link rel="canonical" href="/en/404.html" />
+    <link rel="alternate" hreflang="id" href="/404.html" />
+    <link rel="alternate" hreflang="en" href="/en/404.html" />
+    <link rel="alternate" hreflang="x-default" href="/404.html" />
     <title>Page Not Found | ALUSNA</title>
     <style>
       :root {

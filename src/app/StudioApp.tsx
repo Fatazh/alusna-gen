@@ -9,7 +9,6 @@ import { AdvertisingSlot } from "./monetization/AdvertisingSlot";
 import { FloatingDonateButton } from "./monetization/FloatingDonateButton";
 import { useStudioRouter } from "./router/useStudioRouter";
 import { useToolShareUrl } from "./share/useToolShareUrl";
-import { KeyboardShortcutsDialog } from "./layout/KeyboardShortcutsDialog";
 import { usePageSeo } from "./seo/usePageSeo";
 import { usePageAnalytics } from "./analytics/usePageAnalytics";
 import { isAnalyticsEnabled } from "./analytics/analytics";
@@ -58,6 +57,13 @@ const NotFoundViewLazy = lazy(() =>
 const ToolGuideView = lazy(() =>
   import("./content/ToolGuideView").then((module) => ({ default: module.ToolGuideView })),
 );
+// Dialog pintasan keyboard hanya diperlukan saat dibuka (dialog mengembalikan
+// null saat tertutup), jadi dimuat on-demand untuk menekan ukuran entry chunk.
+const KeyboardShortcutsDialog = lazy(() =>
+  import("./layout/KeyboardShortcutsDialog").then((module) => ({
+    default: module.KeyboardShortcutsDialog,
+  })),
+);
 
 const COLOR_TABS: { id: ColorTab; label: string; desc: string }[] = [
   { id: "pattern", label: "Pattern", desc: "Palet kurasi" },
@@ -96,9 +102,6 @@ export default function App() {
   usePageSeo(currentPage);
   usePageAnalytics(currentPage);
 
-  // The banner asks once per browser; consent is remembered in localStorage.
-  // It stays hidden when no GA4 destination is configured or analytics is
-  // master-switched off, so nothing is ever requested without a purpose.
   const showConsentBanner =
     !hasStoredConsent() &&
     isGa4Configured() &&
@@ -238,16 +241,20 @@ export default function App() {
 
           <AppFooter locale={currentPage.locale} onNavigate={navigateToPath} />
 
-          <KeyboardShortcutsDialog
-            open={helpOpen}
-            onClose={() => setHelpOpen(false)}
-            showColorTab={showingTool && topTab === "color"}
-            showUndoRedo={
-              showingTool &&
-              topTab === "color" &&
-              ["pattern", "matching", "experiment", "gradient"].includes(colorTab)
-            }
-          />
+          {helpOpen && (
+            <Suspense fallback={null}>
+              <KeyboardShortcutsDialog
+                open
+                onClose={() => setHelpOpen(false)}
+                showColorTab={showingTool && topTab === "color"}
+                showUndoRedo={
+                  showingTool &&
+                  topTab === "color" &&
+                  ["pattern", "matching", "experiment", "gradient"].includes(colorTab)
+                }
+              />
+            </Suspense>
+          )}
 
           {/* Recent colors bar */}
           {showingTool && colorHistory.length > 0 && (

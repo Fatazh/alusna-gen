@@ -23,11 +23,21 @@ const routesSource = readFileSync(
 );
 const toolPaths = [...routesSource.matchAll(/path: "(\/[a-z0-9-]+)"/g)].map((m) => m[1]);
 
-const MAIN_PAGES = ["/", ...toolPaths, "/tentang", "/privasi"];
+const TRUST_PAGES = [
+  { id: "/tentang", en: "/en/about" },
+  { id: "/privasi", en: "/en/privacy" },
+];
+
+const MAIN_TOOL_PAGES = ["/", ...toolPaths];
 
 const pages = [
-  ...MAIN_PAGES.map((path) => ({ path, name: `id ${path}` })),
-  ...MAIN_PAGES.map((path) => ({ path: `/en${path === "/" ? "" : path}`, name: `en ${path}` })),
+  ...MAIN_TOOL_PAGES.map((path) => ({ path, name: `id ${path}` })),
+  ...MAIN_TOOL_PAGES.map((path) => ({
+    path: `/en${path === "/" ? "" : path}`,
+    name: `en ${path}`,
+  })),
+  ...TRUST_PAGES.map((page) => ({ path: page.id, name: `id ${page.id}` })),
+  ...TRUST_PAGES.map((page) => ({ path: page.en, name: `en ${page.id}` })),
 ];
 
 // Every shipped theme must pass (antislop R-34): light and dark both audited.

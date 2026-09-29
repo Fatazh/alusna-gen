@@ -37,7 +37,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid #d4d4d8;
-  border-top-color: #4f46e5;
+  border-top-color: #2f5fae;
   border-radius: 9999px;
   content: "";
   animation: alusna-boot-spin 0.8s linear infinite;
@@ -51,7 +51,7 @@
 
   #boot-loading::before {
     border-color: #3f3f46;
-    border-top-color: #818cf8;
+    border-top-color: #91ace6;
   }
 }
 

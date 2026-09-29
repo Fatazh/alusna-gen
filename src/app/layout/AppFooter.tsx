@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { APP_BRAND } from "../../shared/config/brand";
 import { type Locale } from "../../shared/i18n";
 import { ENGLISH_TRUST_PAGES, TRUST_PAGES } from "../router/routes";
-import { BackupRestoreDialog } from "./BackupRestoreDialog";
+
+const BackupRestoreDialog = lazy(() =>
+  import("./BackupRestoreDialog").then((module) => ({ default: module.BackupRestoreDialog })),
+);
 
 const FOOTER_LABELS = {
   id: {
@@ -85,7 +88,11 @@ export function AppFooter({
         </div>
       </footer>
 
-      <BackupRestoreDialog open={backupOpen} onClose={() => setBackupOpen(false)} />
+      {backupOpen && (
+        <Suspense fallback={null}>
+          <BackupRestoreDialog open onClose={() => setBackupOpen(false)} />
+        </Suspense>
+      )}
     </>
   );
 }

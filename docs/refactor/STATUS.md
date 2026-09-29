@@ -1,6 +1,6 @@
 # Refactor Status
 
-Last updated: 2026-09-18
+Last updated: 2026-09-29
 
 ## Current objective
 
@@ -369,6 +369,72 @@ the selected host.
 - Validation: `npm run check` passed end-to-end (ESLint, Prettier format check, dependency cruiser boundaries with 205 modules and 0 violations, 231 passing Vitest unit/contract tests across 31 files, and production build).
 - Remaining risks: none; pure domain logic is unit-tested and UI state is fully localized and reactive.
 - Next planned task: proceed to P2 priorities (Inter-tool bridge / "Send to..." actions and Studio Backup/Restore JSON).
+
+## Boot error-trap & theme-color correction — 2026-09-29
+
+- Objective: repair two regressions found during a bug/quality sweep — the startup error trap was
+  weakened and the browser UI theme color still carried the retired indigo brand.
+- Files changed: `index.html` (removed `defer` from `/boot.js` so the error trap is installed
+  synchronously before `main.tsx` fetches its module graph; replaced the single `#6366F1`
+  `theme-color` with light `#eef0f3` and dark `#0d1013` `prefers-color-scheme` variants matching
+  `--app-bg`), and this status document.
+- Decisions: `theme-color` follows the OS color scheme via two media-scoped metas because a static
+  meta cannot react to the in-app theme toggle; values use `--app-bg` (the loaded canvas) rather
+  than `--accent`. The dual metas propagate to every generated static SEO page through the shared
+  `index.html` source.
+- Validation: `npm run build` green; entry and lazy chunks unchanged; Prettier `format:check` clean;
+  the boot E2E scenario (`production HTML uses an external bootstrap and blocks inline scripts`)
+  passes and `dist/index.html` confirms the synchronous `boot.js` and dual `theme-color`.
+- Remaining risks: `theme-color` still tracks OS preference, not the user's in-app light/dark choice.
+  The `boot.css` loading spinner keeps legacy indigo `#4f46e5`/`#818cf8` — cosmetic, deferred.
+- Next planned task: address the P2/P3 findings (untracked `.freebuff/` debug artifacts, hardcoded
+  `alusna.id` in the static 404 pages, and the entry-chunk growth from the recorded 66 kB).
+
+## Debug-artifact cleanup & entry-chunk diagnosis — 2026-09-29
+
+- Objective: remove accidentally committed debug artifacts from version control and pinpoint why the
+  production entry chunk grew to 83.67 kB gzip versus the recorded ~66–68 kB.
+- Files changed: `.gitignore` now excludes `.freebuff/`; the 10 tracked `.freebuff/*` preview/push
+  logs, `project-id`, and `run.md` were untracked with `git rm -r --cached` (files remain on disk);
+  `public/boot.css` loading-spinner accent moved from the retired indigo `#4f46e5`/`#818cf8` to the
+  shared cobalt `#2f5fae`/`#91ace6`; this status document.
+- Decisions: only the color-domain findings were in scope; no behavior-changing refactor was made.
+- Entry-chunk diagnosis (sourcemap audit, not yet acted on): the entry statically bundles the
+  consent-gated GA4 stack (`ga4.ts`, `ConsentBanner.tsx`, `consent.ts`), the monetization stack
+  (`FloatingDonateButton`, `AdvertisingSlot`, `support`), `BackupRestoreDialog.tsx` (~12 kB) and
+  `KeyboardShortcutsDialog.tsx`, plus ~54 kB of `@phosphor-icons/react` pulled in through the
+  always-on shell components. React-DOM remains the dominant cost (~134 kB).
+- Validation: `npm run build` green; Prettier `format:check` clean; boot E2E scenario still passes.
+- Remaining risks: entry-chunk growth is a performance observation, not a functional defect; reducing
+  it needs a lazy-loading/tree-shaking pass with its own test coverage.
+- Next planned task: decide whether to lazy-load `BackupRestoreDialog`, the analytics/monetization
+  controls, and trim shell icon imports to reclaim entry-chunk bytes.
+
+## Launch-gate hardening & E2E green-up — 2026-09-29
+
+- Objective: reclaim entry-chunk bytes, remove the hardcoded `alusna.id` domain from static 404s,
+  and clear the 58 pre-existing E2E failures found on `main` (56 axe `region` violations + 2 studio
+  navigation assertions).
+- Files changed: `src/app/layout/AppFooter.tsx` and `src/app/StudioApp.tsx` now lazy-mount
+  `BackupRestoreDialog` / `KeyboardShortcutsDialog` behind their `open` flags (both returned `null`
+  when closed, so this is behavior-preserving); `public/404.html` and `public/en/404.html` switched
+  canonical/hreflang to root-relative paths; `src/app/monetization/FloatingDonateButton.tsx` wraps its
+  floating `<a>` in an `<aside aria-label="Dukung ALUSNA">` complementary landmark; `e2e/accessibility.spec.ts`
+  uses the correct English trust slugs (`/en/about`, `/en/privacy`); `e2e/studio.spec.ts` fixes the two
+  navigation tests; this status document.
+- Decisions: the donate/consent links must live in a landmark rather than be hidden, so the axe fix is
+  accessible-first; the 404s use root-relative URLs because `public/` is copied verbatim and cannot read
+  build-time `VITE_SITE_URL`; the two studio tests were updated to the current intended design rather than
+  the code — the keyboard test was missing the readiness auto-wait its sibling tests already had, and the
+  share-URL test predated the deliberate `?c=`/`?f=` strip documented in `browserNavigation.ts`, so it now
+  asserts a clean address bar plus color persistence in the shared history bar.
+- Validation: `npm run build` green (entry 250.54 kB / 80.32 kB gzip, down ~3.4 kB); `npm run lint` clean;
+  `npm run format:check` clean; `npm run check:boundaries` 0 violations (207 modules); `npm test` 232 passed;
+  `npm run test:e2e` 95 passed, 2 skipped (optional sponsor/support config).
+- Remaining risks: the 2 E2E skips only exercise sponsor/support placement when those env vars are set,
+  which CI does not configure; entry-chunk still statically includes the consent-GA4 and monetization stacks.
+- Next planned task: launch-time verification against the real HTTPS origin, or a follow-up tree-shaking pass
+  on the always-on shell if entry size becomes a priority.
 
 ## In progress
 
